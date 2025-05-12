@@ -1,63 +1,88 @@
-![TahubuSF](media/tahubusf-light.png)
+![TahubuSF](media/tahubusf-light.svg)
 
-GenAI product TahubuSF for Sitefinity - Product repo
+# TahubuSF - Sitefinity MCP API Server
 
-## MCP server setup
+An enterprise-grade MCP server for interacting with Sitefinity APIs.
 
-To run the MCP server, you need to have Python 3.10 or higher installed on your machine. You can download it from the official website: [Python Downloads](https://www.python.org/downloads/).
+## Project Structure
 
-In VS Code, you need to create a new Python environment. You can do this by opening the terminal in VS Code and running the following command:
-
-```bash
-python -m venv venv
+```
+tahubu_sf/
+├── api/                  # API endpoint modules
+│   ├── blogs.py          # Blog-related endpoints
+│   ├── news.py           # News-related endpoints
+│   ├── pages.py          # Pages and templates endpoints
+│   ├── sites.py          # Site information endpoints
+│   └── __init__.py
+├── config/               # Configuration settings
+│   ├── settings.py       # URL and app configuration
+│   └── __init__.py
+├── utils/                # Utility functions
+│   ├── http.py           # HTTP request utilities
+│   └── __init__.py
+└── __init__.py
+app.py                   # Application factory
+run.py                   # Entry point script
 ```
 
-This will create a new virtual environment named `venv`. You can activate the virtual environment by running the following command:
+## Running the Server
 
-- On Windows:
+### Development Mode (Recommended)
 
-```bash
-.venv/Scripts/Activate.ps1
-```
-
-- On macOS and Linux:
+For the easiest and most reliable development experience:
 
 ```bash
-source venv/bin/activate
+python simple_server.py
 ```
 
-Next, you need to install `uv`. You can follow the instructions in the [uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
+This starts a custom HTTP server that:
 
-After activating the virtual environment and installing `uv`, you should see `(venv)` at the beginning of your terminal prompt. This indicates that you are now working within the virtual environment.
+- Serves a web interface for testing the TahubuSF MCP tools
+- Directly executes MCP tools without any dependency issues
+- Opens your browser automatically to the testing interface
+
+This development mode uses the well-organized modular code structure from the `tahubu_sf` package.
+
+### Production Mode
+
+For direct integration with Claude Desktop:
 
 ```bash
-pip install -r requirements.txt
+python run.py
 ```
 
-## Run the MCP server
+This runs the server with stdio transport using the modular code structure from the `tahubu_sf` package.
 
-To run the MCP server, navigate to the directory where the `main.py` file is located and run the following command:
+## Claude Desktop Integration
 
-```bash
-mcp dev main.py
-```
-
-## Claude Desktop use
-
-To use the MCP server in Claude desktop you need open the `claude_desktop_config.json` file and include the following lines:  `change the directory to wherever it is installed on your machine`
+To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` file and include the following:
 
 ```json
 {
-    "mcpServers":{
-        "TahubuSF": {
-            "command": "uv",
+    "mcpServers": {
+        "TahubuSFAPI": {
+            "command": "python",
             "args": [
-                "--directory",
-                "e:\\TahubuSF",
-                "run",
-                "main.py"
-            ]
+                "run.py"
+            ],
+            "cwd": "D:\\repos\\TahubuSF"
         }
     }
 }
 ```
+
+Replace `D:\\repos\\TahubuSF` with the absolute path to your project directory.
+
+## Development
+
+### Adding New Endpoints
+
+To add a new API endpoint:
+
+1. Create a new module in the `tahubu_sf/api/` directory
+2. Add the endpoint URL to `tahubu_sf/config/settings.py`
+3. Create your API function using the provided HTTP utilities
+4. Register the function in `tahubu_sf/app.py`
+5. Add it to `simple_server.py` if you want it available in the development interface
+
+For more details, see [Code Structure Guidelines](docs/code_structure.md).
