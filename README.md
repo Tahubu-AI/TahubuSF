@@ -12,7 +12,7 @@ To use the MCP server in Claude desktop you need open the `claude_desktop_config
             "command": "uv",
             "args": [
                 "--directory",
-                "e:\\MCPSamples\\01-firstlesson",
+                "e:\\TahubuSF",
                 "run",
                 "main.py"
             ]
