@@ -1,4 +1,5 @@
 ![TahubuSF](media/tahubusf-light.png)
+
 GenAI product TahubuSF for Sitefinity - Product repo
 
 ## Claude Desktop use
