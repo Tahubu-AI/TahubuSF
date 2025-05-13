@@ -7,8 +7,14 @@ import logging
 import os
 import sys
 
-from fastapi_server.main import start as start_server
-from fastapi_server.config import settings
+# Use relative import when run directly from fastapi_server directory
+try:
+    from fastapi_server.main import start as start_server
+    from fastapi_server.config import settings
+except ModuleNotFoundError:
+    # Fallback to relative imports when run directly from this directory
+    from .main import start as start_server
+    from .config import settings
 
 # Configure logging
 logging.basicConfig(

@@ -99,6 +99,7 @@ pip install fastapi uvicorn[standard] pydantic
 If you encounter dependency conflicts with packages like LangChain, try these solutions:
 
 1. Create a separate virtual environment for this project:
+
    ```bash
    python -m venv fresh_venv
    .\fresh_venv\Scripts\Activate.ps1
@@ -106,17 +107,20 @@ If you encounter dependency conflicts with packages like LangChain, try these so
    ```
 
 2. Use `--no-deps` flag to avoid dependency resolution conflicts:
+
    ```bash
    pip install --force-reinstall fastapi==0.110.0 uvicorn[standard]==0.27.0 pydantic==2.6.0 --no-deps
    ```
 
 3. Ensure the correct Python interpreter is being used in VS Code by selecting it from the Python interpreter list.
 
-## Running the Server
+## Testing & Running Options
 
-### Local Development (simple_server.py)
+This project offers multiple ways to test and run your MCP server, each optimized for different use cases:
 
-For quick, reliable local development and testing:
+### 1. Simple Server (Recommended for Development)
+
+The simplest and most reliable way to test your MCP tools:
 
 ```bash
 python simple_server.py
@@ -130,32 +134,48 @@ This starts a custom HTTP server built with Python's standard library that:
 - Opens your browser automatically to the testing interface
 - Is extremely reliable across different Python environments
 
-The simple server is the recommended way to test your code during development, as it avoids the dependency and environment issues sometimes encountered with the MCP development tools.
+**Best for**: Daily development and testing when you need a stable experience
 
-### Azure-Ready Server (FastAPI)
+### 2. FastAPI Server Options
 
-For production deployment to Azure App Service:
+#### Option A: Direct Test Script (Easiest)
+
+For quickly testing the FastAPI server without import path issues:
 
 ```bash
-# First, ensure you're in the activated virtual environment
-# and have installed the FastAPI dependencies
-
-python run_fastapi.py
+python direct_test.py
 ```
 
-The FastAPI implementation offers:
+This script:
 
-- Production-ready API with Swagger documentation
-- Azure App Service deployment support
-- Proper request/response models with validation
-- Detailed error handling and logging
-- CORS and security configuration options
+- Automatically installs required dependencies if needed
+- Handles Python path issues automatically
+- Opens your browser to the FastAPI server UI
+- Shows real-time logs in the console
+
+#### Option B: Standard Entry Point
+
+The standard way to run the FastAPI server:
+
+```bash
+python run_fastapi.py [--port PORT] [--host HOST]
+```
+
+Example with custom port:
 
 ```bash
 python run_fastapi.py --port 9000
 ```
 
-### Claude Desktop Integration (run.py)
+#### Option C: Testing with UI and API Tests
+
+```bash
+python test_fastapi.py
+```
+
+This runs the FastAPI server, opens a browser, and executes API tests to verify functionality.
+
+### 3. Claude Desktop Integration
 
 For direct integration with Claude Desktop:
 
@@ -165,16 +185,23 @@ python run.py
 
 This runs the server with stdio transport using the modular code structure from the `tahubu_sf` package.
 
-## Server Comparison
+## Entry Points Comparison
 
-| Feature | simple_server.py | FastAPI Server |
-|---------|------------------|----------------|
-| **Purpose** | Local development & testing | Production & cloud deployment |
-| **Dependencies** | Minimal (Python stdlib) | FastAPI ecosystem (multiple packages) |
-| **Reliability** | Very high, minimal points of failure | Good, but more dependencies |
-| **Features** | Basic testing interface | Production API, Swagger UI, request validation |
-| **Deployment** | Local use only | Azure App Service ready |
-| **Best for** | Quick testing, avoiding dependency issues | Cloud deployment, API consumption |
+| Entry Point | Command | Best For | Pros | Cons |
+|-------------|---------|----------|------|------|
+| **simple_server.py** | `python simple_server.py` | Local development | • Most reliable<br>• No dependency issues<br>• Simple to use | • Basic UI<br>• Not suitable for production |
+| **direct_test.py** | `python direct_test.py` | Testing FastAPI | • Handles import issues<br>• Auto-installs requirements | • Temporary files<br>• More complex |
+| **run_fastapi.py** | `python run_fastapi.py` | Azure deployment prep | • Production-quality API<br>• Swagger docs | • More dependencies<br>• Possible import issues |
+| **test_fastapi.py** | `python test_fastapi.py` | API validation | • Runs tests automatically<br>• Validates responses | • Focuses on testing |
+| **run.py** | `python run.py` | Claude Desktop | • Direct tool execution<br>• MCP integration | • No web interface |
+
+### When to Use Each Option
+
+- **simple_server.py**: When you want reliable, hassle-free testing during development
+- **direct_test.py**: When you want to test the FastAPI implementation without dealing with Python path issues
+- **run_fastapi.py**: When preparing for Azure deployment or need a production-quality API
+- **test_fastapi.py**: When testing API correctness and responses
+- **run.py**: When integrating with Claude Desktop
 
 ## Claude Desktop Integration
 
@@ -213,3 +240,13 @@ For more details, see [Code Structure Guidelines](docs/code_structure.md).
 ## FastAPI Server Details
 
 For more details on the FastAPI implementation that can be deployed to Azure App Service, see [FastAPI Server Documentation](fastapi_server/README.md).
+
+### Quick Testing
+
+To quickly test the FastAPI server without any import path issues, use the direct test script:
+
+```bash
+python direct_test.py
+```
+
+This is the most reliable way to test the FastAPI server on different Python environments.

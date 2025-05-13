@@ -13,10 +13,16 @@ import subprocess
 from typing import Dict, Any, Optional
 from pathlib import Path
 
-import requests
+# First make sure we have the requests module
+try:
+    import requests
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+    import requests
 
 # Add project root to path
 BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 
 # Configure logging
 logging.basicConfig(
@@ -40,12 +46,42 @@ def start_server() -> subprocess.Popen:
     
     # Run the server using the fastapi_server/run.py script
     run_script = os.path.join(os.path.dirname(__file__), "run.py")
-    process = subprocess.Popen(
-        [sys.executable, run_script, "--port", str(PORT)],
-        env=env
-    )
     
-    return process
+    try:
+        # Try to directly import and run the module
+        logger.info("Attempting to directly start the server...")
+        
+        # Create a temporary module to run in a separate process
+        temp_script = os.path.join(BASE_DIR, "temp_fastapi.py")
+        with open(temp_script, "w") as f:
+            f.write("""
+import sys
+import os
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fastapi_server.main import app
+import uvicorn
+uvicorn.run(app, host="localhost", port=8000)
+            """.strip())
+        
+        # Run the temporary module
+        process = subprocess.Popen(
+            [sys.executable, temp_script],
+            env=env
+        )
+        
+        return process
+    except Exception as e:
+        logger.error(f"Error starting server directly: {e}")
+        logger.info("Falling back to subprocess method...")
+        
+        # Fall back to running the script directly
+        process = subprocess.Popen(
+            [sys.executable, run_script, "--port", str(PORT)],
+            env=env
+        )
+        
+        return process
 
 def wait_for_server(max_retries: int = 10, retry_interval: float = 1.0) -> bool:
     """Wait for the server to be ready"""
@@ -59,6 +95,8 @@ def wait_for_server(max_retries: int = 10, retry_interval: float = 1.0) -> bool:
                 return True
         except requests.ConnectionError:
             pass
+        except Exception as e:
+            logger.warning(f"Error while waiting for server: {str(e)}")
         
         logger.info(f"Waiting... ({i+1}/{max_retries})")
         time.sleep(retry_interval)
@@ -174,6 +212,14 @@ def main():
             server_process.terminate()
             server_process.wait()
             logger.info("Server stopped")
+            
+            # Remove temporary file if it exists
+            temp_script = os.path.join(BASE_DIR, "temp_fastapi.py")
+            if os.path.exists(temp_script):
+                try:
+                    os.remove(temp_script)
+                except Exception:
+                    pass
 
 if __name__ == "__main__":
     main() 

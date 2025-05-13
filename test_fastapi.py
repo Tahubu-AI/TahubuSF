@@ -12,9 +12,29 @@ script_dir = Path(__file__).resolve().parent
 # Add the project root to the Python path
 sys.path.insert(0, str(script_dir))
 
-# Import and run the fastapi_server test script
-from fastapi_server.test import main
+# Fix Python path for direct import
+os.environ["PYTHONPATH"] = str(script_dir)
 
+# Start the test directly to avoid import issues
 if __name__ == "__main__":
-    # Run the tests
-    main() 
+    # Run the server test program directly
+    server_process = None
+    
+    try:
+        # Import and run directly
+        from fastapi_server.test import main
+        main()
+    except ModuleNotFoundError as e:
+        print(f"Error importing module: {e}")
+        print("Trying alternative method...")
+        
+        # If import fails, run as subprocess with proper environment
+        import subprocess
+        
+        server_process = subprocess.Popen(
+            [sys.executable, "-m", "fastapi_server.test"],
+            env={**os.environ, "PYTHONPATH": str(script_dir)}
+        )
+        
+        # Wait for process to complete
+        server_process.wait() 
