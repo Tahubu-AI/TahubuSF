@@ -77,7 +77,31 @@ uv pip install -r requirements.txt
 pip install -r requirements.txt
 ```
 
-### 3. FastAPI Dependencies (for Azure Deployment)
+### 3. Configure Environment Variables
+
+The TahubuSF application uses environment variables for configuration, the most important being:
+
+- `SITEFINITY_SITE_PREFIX`: Base URL for your Sitefinity site (default: https://thetrainingboss.com)
+
+Set this by creating a `.env` file in the project root:
+
+```
+SITEFINITY_SITE_PREFIX=https://your-sitefinity-site.com
+```
+
+Or set it in your environment before running any server:
+
+```bash
+# Windows PowerShell
+$env:SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com"
+
+# Linux/macOS
+export SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com"
+```
+
+For a complete list of environment variables, see [Environment Variables Documentation](ENV_VARIABLES.md).
+
+### 4. FastAPI Dependencies (for Azure Deployment)
 
 If you plan to use the FastAPI server for Azure deployment, install the additional dependencies:
 

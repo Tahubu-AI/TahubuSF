@@ -81,11 +81,28 @@ See [Azure deployment documentation](https://learn.microsoft.com/azure/app-servi
 
 The server can be configured using environment variables or a `.env` file at the project root:
 
+### Core Variables
+
+- `SITEFINITY_SITE_PREFIX`: Base URL for the Sitefinity site (default: https://thetrainingboss.com)
+
+### FastAPI Specific Variables
+
 - `PORT`: Server port (default: 8000)
 - `HOST`: Server host (default: 0.0.0.0)
 - `LOG_LEVEL`: Logging level (default: info)
 - `CORS_ORIGINS`: CORS allowed origins (default: *)
 - `APPINSIGHTS_INSTRUMENTATIONKEY`: Azure Application Insights key
+
+### Environment Variables for Azure
+
+When deploying to Azure App Service, you must set these environment variables in the application settings:
+
+```
+SITEFINITY_SITE_PREFIX=https://your-sitefinity-site.com
+WEBSITES_PORT=8000
+```
+
+For more details on environment variables, see [Environment Variables Documentation](../ENV_VARIABLES.md).
 
 ## Testing
 

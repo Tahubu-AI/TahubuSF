@@ -10,6 +10,9 @@ LOG_LEVEL=info
 # CORS Settings (comma-separated list for multiple origins)
 CORS_ORIGINS=*
 
+# Sitefinity Configuration
+SITEFINITY_SITE_PREFIX=https://thetrainingboss.com
+
 # Azure Settings (for cloud deployment)
 AZURE_APP_NAME=TahubuSF
 APPINSIGHTS_INSTRUMENTATIONKEY= 
