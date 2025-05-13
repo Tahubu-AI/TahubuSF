@@ -1,11 +1,16 @@
+[build-system]
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "TahubuSF"
+name = "tahubu_sf"
 version = "0.1.0"
-description = "TahubuSF is a tool for managing Sitefinity AI Applications"
+description = "Sitefinity MCP API Server"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.28.1",
     "mcp[cli]>=1.8.0",
+    "python-dotenv>=1.0.0",
     "asyncio>=3.4.3",
 ]

@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+"""
+Simple HTTP JSON API server to run MCP tools directly using the modular code structure
+"""
+import json
+import asyncio
+import webbrowser
+import os
+import sys
+import mimetypes
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+# Add the project root to the path so imports work correctly
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Import from our modular architecture
+from tahubu_sf.api.news import get_news
+from tahubu_sf.api.blogs import get_blog_posts
+from tahubu_sf.api.pages import get_pages, get_page_templates
+from tahubu_sf.api.sites import get_sites
+
+# Initialize mime types
+mimetypes.init()
+
+class MCPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        """Handle GET requests - serve HTML UI and static files"""
+        if self.path == "/" or self.path == "":
+            # Serve the main HTML page
+            self.send_response(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            with open("inspector.html", "r") as f:
+                self.wfile.write(f.read().encode())
+        elif self.path.startswith("/media/"):
+            # Serve files from the media directory
+            try:
+                file_path = self.path[1:]  # Remove leading '/'
+                with open(file_path, "rb") as f:
+                    # Determine content type
+                    content_type, _ = mimetypes.guess_type(file_path)
+                    if content_type is None:
+                        content_type = "application/octet-stream"
+                    
+                    self.send_response(200)
+                    self.send_header("Content-type", content_type)
+                    self.end_headers()
+                    self.wfile.write(f.read())
+            except (FileNotFoundError, IOError):
+                self.send_response(404)
+                self.end_headers()
+                self.wfile.write(b"File not found")
+        else:
+            # Handle all other paths
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b"Not found")
+            
+    def do_POST(self):
+        """Handle POST requests to execute MCP tools"""
+        if self.path == "/api/run-tool":
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            request = json.loads(post_data)
+            
+            tool_name = request.get("name")
+            params = request.get("params", {})
+            
+            print(f"Running tool: {tool_name} with params: {params}")
+            
+            try:
+                result = self.execute_tool(tool_name, params)
+                
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                
+                response = {"result": result}
+                self.wfile.write(json.dumps(response).encode())
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e)}).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def execute_tool(self, tool_name, params):
+        """Execute the specified tool with parameters"""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        try:
+            # Use the modular code structure
+            if tool_name == "getNews":
+                result = loop.run_until_complete(get_news())
+            elif tool_name == "getBlogPosts":
+                result = loop.run_until_complete(get_blog_posts())
+            elif tool_name == "getPages":
+                result = loop.run_until_complete(get_pages())
+            elif tool_name == "getPageTemplates":
+                result = loop.run_until_complete(get_page_templates())
+            elif tool_name == "getSites":
+                result = loop.run_until_complete(get_sites())
+            else:
+                raise ValueError(f"Unknown tool: {tool_name}")
+                
+            return result
+        finally:
+            loop.close()
+
+def run_server(port=7777):
+    """Run the HTTP server"""
+    server = HTTPServer(("localhost", port), MCPRequestHandler)
+    print(f"Server started at http://localhost:{port}")
+    print("Open your browser to this URL to test MCP tools")
+    
+    # Open browser automatically
+    webbrowser.open(f"http://localhost:{port}")
+    
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.server_close()
+        print("Server stopped")
+
+if __name__ == "__main__":
+    run_server() 
