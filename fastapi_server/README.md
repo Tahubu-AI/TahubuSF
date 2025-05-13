@@ -75,7 +75,7 @@ Follow these steps to deploy manually:
    - Configure environment variables
 3. Deploy the code using Git deployment or Azure DevOps
 
-See [Azure deployment documentation](https://docs.microsoft.com/en-us/azure/app-service/quickstart-python) for more details.
+See [Azure deployment documentation](https://learn.microsoft.com/azure/app-service/quickstart-python) for more details.
 
 ## Configuration
 
