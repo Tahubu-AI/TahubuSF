@@ -17,7 +17,7 @@ SFSharedContent = f"{Sitefinity_Site_Prefix}/api/default/contentitems"
 SFPages = f"{Sitefinity_Site_Prefix}/api/default/pages"
 SFPageTemplates = f"{Sitefinity_Site_Prefix}/api/default/templates"
 
-mcp = FastMCP("TahubuSFAPI")
+mcp = FastMCP("TahubuSFAPI", port=4000)
 
 @mcp.tool()
 async def getNews():
@@ -149,4 +149,4 @@ async def getSites():
     return text
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(transport="sse")
