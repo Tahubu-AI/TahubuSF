@@ -28,10 +28,15 @@ class Settings(BaseModel):
     # Azure Settings
     AZURE_APP_NAME: Optional[str] = os.environ.get("AZURE_APP_NAME", None)
     APPINSIGHTS_KEY: Optional[str] = os.environ.get("APPINSIGHTS_INSTRUMENTATIONKEY", None)
+    
+    # Retry Settings
+    RETRY_MAX_ATTEMPTS: int = int(os.environ.get("RETRY_MAX_ATTEMPTS", 3))
+    RETRY_MIN_SECONDS: float = float(os.environ.get("RETRY_MIN_SECONDS", 1))
+    RETRY_MAX_SECONDS: float = float(os.environ.get("RETRY_MAX_SECONDS", 10))
 
     class Config:
         env_file = os.path.join(BASE_DIR, ".env")
         env_file_encoding = "utf-8"
 
 # Load settings
-settings = Settings() 
+settings = Settings()

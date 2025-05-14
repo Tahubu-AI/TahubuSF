@@ -8,6 +8,7 @@ import webbrowser
 import os
 import sys
 import mimetypes
+import logging
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -20,8 +21,13 @@ from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 
-# Initialize mime types
+# Initialize mime types and logging
 mimetypes.init()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("tahubu_sf.simple_server")
 
 class MCPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -67,7 +73,7 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
             tool_name = request.get("name")
             params = request.get("params", {})
             
-            print(f"Running tool: {tool_name} with params: {params}")
+            logger.info(f"Running tool: {tool_name} with params: {params}")
             
             try:
                 result = self.execute_tool(tool_name, params)
@@ -79,6 +85,7 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 response = {"result": result}
                 self.wfile.write(json.dumps(response).encode())
             except Exception as e:
+                logger.error(f"Error executing tool {tool_name}: {str(e)}", exc_info=True)
                 self.send_response(500)
                 self.send_header("Content-type", "application/json")
                 self.end_headers()
@@ -111,20 +118,27 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
         finally:
             loop.close()
 
-def run_server(port=7777):
+def run_server(port=None, host=None):
     """Run the HTTP server"""
-    server = HTTPServer(("localhost", port), MCPRequestHandler)
-    print(f"Server started at http://localhost:{port}")
-    print("Open your browser to this URL to test MCP tools")
+    # Get port from environment variable or use default
+    port = port or int(os.getenv("PORT", 7777))
+    host = host or os.getenv("HOST", "localhost")
+    
+    server = HTTPServer((host, port), MCPRequestHandler)
+    logger.info(f"Server started at http://{host}:{port}")
+    logger.info(f"Retry configuration: MAX_ATTEMPTS={os.getenv('RETRY_MAX_ATTEMPTS', '3')}, "
+               f"MIN_WAIT={os.getenv('RETRY_MIN_SECONDS', '1')}s, "
+               f"MAX_WAIT={os.getenv('RETRY_MAX_SECONDS', '10')}s")
+    logger.info("Open your browser to this URL to test MCP tools")
     
     # Open browser automatically
-    webbrowser.open(f"http://localhost:{port}")
+    webbrowser.open(f"http://{host}:{port}")
     
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         server.server_close()
-        print("Server stopped")
+        logger.info("Server stopped")
 
 if __name__ == "__main__":
     run_server() 

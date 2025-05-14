@@ -71,6 +71,10 @@ async def get_ui():
 
 def start():
     """Start the server (used for production)"""
+    logger.info(f"Starting {APP_NAME} FastAPI server on {settings.HOST}:{settings.PORT}")
+    logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
+               f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
+               f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
     uvicorn.run(
         "fastapi_server.main:app",
         host=settings.HOST,
@@ -81,4 +85,7 @@ def start():
 if __name__ == "__main__":
     # This is for local development only
     logger.info(f"Starting {APP_NAME} FastAPI server on {settings.HOST}:{settings.PORT}")
-    start() 
+    logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
+               f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
+               f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
+    start()
