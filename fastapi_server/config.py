@@ -32,7 +32,13 @@ class Settings(BaseModel):
     # Retry Settings
     RETRY_MAX_ATTEMPTS: int = int(os.environ.get("RETRY_MAX_ATTEMPTS", 3))
     RETRY_MIN_SECONDS: float = float(os.environ.get("RETRY_MIN_SECONDS", 1))
-    RETRY_MAX_SECONDS: float = float(os.environ.get("RETRY_MAX_SECONDS", 10))
+    RETRY_MAX_SECONDS: float = float(os.environ.get("RETRY_MAX_SECONDS", 5))
+    
+    # Sitefinity Authentication Settings
+    SITEFINITY_AUTH_TYPE: str = os.environ.get("SITEFINITY_AUTH_TYPE", "anonymous").lower()
+    SITEFINITY_API_KEY: Optional[str] = os.environ.get("SITEFINITY_API_KEY", None)
+    SITEFINITY_USERNAME: Optional[str] = os.environ.get("SITEFINITY_USERNAME", None)
+    SITEFINITY_PASSWORD: Optional[str] = os.environ.get("SITEFINITY_PASSWORD", None)
 
     class Config:
         env_file = os.path.join(BASE_DIR, ".env")
