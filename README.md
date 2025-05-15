@@ -233,13 +233,15 @@ To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` f
 
 ```json
 {
-    "mcpServers": {
-        "TahubuSFAPI": {
-            "command": "python",
+    "mcpServers":{
+        "TahubuSF": {
+            "command": "uv",
             "args": [
+                "--directory",
+                "D:\\repos\\TahubuSF",
+                "run",
                 "run.py"
-            ],
-            "cwd": "D:\\repos\\TahubuSF"
+            ]
         }
     }
 }
