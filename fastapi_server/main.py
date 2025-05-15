@@ -75,6 +75,7 @@ def start():
     logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
                f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
                f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
+    logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
     uvicorn.run(
         "fastapi_server.main:app",
         host=settings.HOST,
@@ -88,4 +89,5 @@ if __name__ == "__main__":
     logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
                f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
                f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
+    logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
     start()
