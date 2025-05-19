@@ -142,9 +142,17 @@ If you encounter dependency conflicts with packages like LangChain, try these so
 
 This project offers multiple ways to test and run your MCP server, each optimized for different use cases:
 
-### 1. Simple Server (Recommended for Development)
+### 1. MCP Inspector (Web Interface for Testing)
 
-The simplest and most reliable way to test your MCP tools:
+To quickly test your MCP tools via the MCP-provided web interface, use the MCP Inspector:
+
+```bash
+mcp dev run.py
+```
+
+### 2. Simple Server (Custom HTTP Server for testing and development)
+
+The simplest and most reliable way to test your MCP tools via a custom HTTP server:
 
 ```bash
 python simple_server.py
@@ -160,7 +168,7 @@ This starts a custom HTTP server built with Python's standard library that:
 
 **Best for**: Daily development and testing when you need a stable experience
 
-### 2. FastAPI Server Options
+### 3. FastAPI Server Options
 
 #### Option A: Direct Test Script (Easiest)
 
@@ -213,6 +221,7 @@ This runs the server with stdio transport using the modular code structure from 
 
 | Entry Point | Command | Best For | Pros | Cons |
 |-------------|---------|----------|------|------|
+| **mcp dev run.py** | `mcp dev run.py` | MCP Inspector | • Quick testing<br>• MCP web interface | • Requires MCP CLI<br>• Limited to MCP tools |
 | **simple_server.py** | `python simple_server.py` | Local development | • Most reliable<br>• No dependency issues<br>• Simple to use | • Basic UI<br>• Not suitable for production |
 | **direct_test.py** | `python direct_test.py` | Testing FastAPI | • Handles import issues<br>• Auto-installs requirements | • Temporary files<br>• More complex |
 | **run_fastapi.py** | `python run_fastapi.py` | Azure deployment prep | • Production-quality API<br>• Swagger docs | • More dependencies<br>• Possible import issues |
