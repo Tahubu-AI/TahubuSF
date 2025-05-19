@@ -7,28 +7,34 @@ An enterprise-grade MCP server for interacting with Sitefinity APIs.
 ## Project Structure
 
 ```
-tahubu_sf/
-├── api/                  # API endpoint modules
-│   ├── blogs.py          # Blog-related endpoints
-│   ├── news.py           # News-related endpoints
-│   ├── pages.py          # Pages and templates endpoints
-│   ├── sites.py          # Site information endpoints
-│   └── __init__.py
-├── config/               # Configuration settings
-│   ├── settings.py       # URL and app configuration
-│   └── __init__.py
-├── utils/                # Utility functions
-│   ├── http.py           # HTTP request utilities
-│   └── __init__.py
-└── __init__.py
-app.py                   # Application factory
-run.py                   # Entry point script
-
-fastapi_server/          # FastAPI implementation
-├── main.py              # FastAPI application definition
-├── routes.py            # API route definitions
-├── config.py            # Configuration settings
-└── wsgi.py              # WSGI entry point for production
+├── tahubu_sf/           # Core library package
+│   ├── api/             # API endpoint modules
+│   │   ├── blogs.py     # Blog-related endpoints
+│   │   ├── news.py      # News-related endpoints
+│   │   ├── pages.py     # Pages and templates endpoints
+│   │   └── sites.py     # Site information endpoints
+│   ├── config/          # Configuration settings
+│   │   └── settings.py  # URL and app configuration
+│   ├── utils/           # Utility functions
+│   │   └── http.py      # HTTP request utilities
+│   └── app.py           # Application factory
+│
+├── fastapi_server/      # FastAPI implementation
+│   ├── main.py          # FastAPI application definition
+│   ├── routes.py        # API route definitions
+│   ├── config.py        # Configuration settings
+│   ├── wsgi.py          # WSGI entry point
+│   ├── azure_deploy.py  # Azure deployment utility
+│   └── tests/           # API tests
+│
+├── media/               # Static media files
+├── docs/                # Documentation files
+├── simple_server.py     # Simple HTTP server for testing
+├── run_fastapi.py       # FastAPI server entry point
+├── direct_test.py       # FastAPI testing utility
+├── test_fastapi.py      # API validation tests
+├── run.py               # Entry point for Claude Desktop
+└── inspector.html       # Web interface for testing
 ```
 
 ## Environment setup
