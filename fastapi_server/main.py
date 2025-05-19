@@ -21,7 +21,7 @@ from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
-from tahubu_sf.config.settings import APP_NAME, AUTH_TYPE, API_KEY, USERNAME
+from tahubu_sf.config.settings import APP_NAME, AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Import local modules
 from fastapi_server.routes import router
@@ -65,7 +65,7 @@ async def health_check():
         "configured": True if (
             AUTH_TYPE == "anonymous" or
             (AUTH_TYPE == "apikey" and API_KEY) or
-            (AUTH_TYPE in ["authenticated", "administrator"] and USERNAME)
+            (AUTH_TYPE == "accesskey" and AUTH_KEY)
         ) else False
     }
     
@@ -94,8 +94,8 @@ def start():
     auth_info = f"Authentication type: {AUTH_TYPE}"
     if AUTH_TYPE == "apikey":
         auth_info += f", API Key: {'configured' if API_KEY else 'not configured'}"
-    elif AUTH_TYPE in ["authenticated", "administrator"]:
-        auth_info += f", Username: {'configured' if USERNAME else 'not configured'}"
+    elif AUTH_TYPE == "accesskey":
+        auth_info += f", Auth Key: {'configured' if AUTH_KEY else 'not configured'}" 
     logger.info(auth_info)
     
     uvicorn.run(
@@ -117,8 +117,8 @@ if __name__ == "__main__":
     auth_info = f"Authentication type: {AUTH_TYPE}"
     if AUTH_TYPE == "apikey":
         auth_info += f", API Key: {'configured' if API_KEY else 'not configured'}"
-    elif AUTH_TYPE in ["authenticated", "administrator"]:
-        auth_info += f", Username: {'configured' if USERNAME else 'not configured'}"
+    elif AUTH_TYPE == "accesskey":
+        auth_info += f", Auth Key: {'configured' if AUTH_KEY else 'not configured'}"
     logger.info(auth_info)
     
     start()

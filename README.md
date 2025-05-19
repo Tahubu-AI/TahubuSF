@@ -101,7 +101,49 @@ export SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com"
 
 For a complete list of environment variables, see [Environment Variables Documentation](ENV_VARIABLES.md).
 
-### 4. FastAPI Dependencies (for Azure Deployment)
+### 4. Authentication Configuration
+
+Sitefinity web services require authentication for most operations. TahubuSF supports three authentication methods:
+
+#### Anonymous Access
+For public content or services that don't require authentication:
+
+```
+SITEFINITY_AUTH_TYPE=anonymous
+```
+
+#### API Key Authentication
+For web services configured with API key access:
+
+```
+SITEFINITY_AUTH_TYPE=apikey
+SITEFINITY_API_KEY=your-api-key-from-sitefinity
+```
+
+In Sitefinity, generate an API key at: Administration → Settings → Advanced → WebServices → WebServiceAccessKey
+
+#### Access Key
+For user-specific authentication:
+
+```
+SITEFINITY_AUTH_TYPE=accesskey
+SITEFINITY_AUTH_KEY=your-access-key
+```
+
+In Sitefinity, you can generate an Access Key by following these steps:
+1. Create a user with appropriate permissions for the web service
+2. Navigate to Administration → Users
+3. Click Actions → Generate access key for the specific user
+4. Copy the key immediately (it will only be shown once)
+
+For more details, see [Sitefinity's official documentation on generating access keys](https://www.progress.com/documentation/sitefinity-cms/generate-access-key).
+
+Choose the appropriate authentication method based on your Sitefinity's web services configuration:
+- For "Anonymous users", use `anonymous`
+- For "API key authentication", use `apikey` 
+- For "Authenticated users", use `accesskey`
+
+### 5. FastAPI Dependencies (for Azure Deployment)
 
 If you plan to use the FastAPI server for Azure deployment, install the additional dependencies:
 

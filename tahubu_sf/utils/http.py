@@ -9,7 +9,7 @@ from typing import Dict, Any, Optional
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from tahubu_sf.config.settings import DEFAULT_HEADERS, AUTH_TYPE, USERNAME, PASSWORD, ENDPOINTS
+from tahubu_sf.config.settings import DEFAULT_HEADERS, AUTH_TYPE, AUTH_KEY, API_KEY, ENDPOINTS
 
 logger = logging.getLogger(__name__)
 
@@ -27,72 +27,32 @@ _AUTH_HEADERS = {}
 
 async def get_auth_token() -> Dict[str, str]:
     """
-    Get an authentication token from Sitefinity.
+    Get authentication headers for Sitefinity API.
     
     Returns:
-        Dict[str, str]: Headers with the authentication token
+        Dict[str, str]: Headers with the authentication information
     """
-    global _AUTH_TOKEN, _AUTH_HEADERS
-    
-    # If we already have a token, return the cached headers
-    if _AUTH_TOKEN and _AUTH_HEADERS:
-        return _AUTH_HEADERS
-        
-    # If anonymous, no token needed
+    # For anonymous, apikey, and accesskey types, the headers are already set in DEFAULT_HEADERS
+    # No additional token generation needed
     if AUTH_TYPE == "anonymous":
+        logger.debug("Using anonymous authentication")
         return {}
-        
-    # If API key auth, headers are already set in DEFAULT_HEADERS
+    
     if AUTH_TYPE == "apikey":
-        return {}
+        if not API_KEY:
+            logger.warning("API key authentication configured but no API key provided")
+            return {}
+        logger.debug("Using API key authentication")
+        return {"X-SF-APIKEY": API_KEY}
     
-    # For authenticated and administrator authentication, we need to get a token
-    if AUTH_TYPE in ["authenticated", "administrator"]:
-        if not USERNAME or not PASSWORD:
-            logger.warning("Authentication required but username/password not provided")
+    if AUTH_TYPE == "accesskey":
+        if not AUTH_KEY:
+            logger.warning("Access key authentication configured but no access key provided")
             return {}
-            
-        try:
-            # Get a token from Sitefinity
-            async with httpx.AsyncClient() as client:
-                data = {
-                    "username": USERNAME,
-                    "password": PASSWORD,
-                    "grant_type": "password",
-                    "scope": "openid",
-                    "client_id": "sitefinity",
-                }
-                
-                headers = {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-                
-                logger.debug(f"Getting authentication token for user: {USERNAME}")
-                response = await client.post(
-                    ENDPOINTS["login"],
-                    data=data,
-                    headers=headers
-                )
-                response.raise_for_status()
-                
-                auth_data = response.json()
-                _AUTH_TOKEN = auth_data.get("access_token")
-                
-                if _AUTH_TOKEN:
-                    _AUTH_HEADERS = {"Authorization": f"Bearer {_AUTH_TOKEN}"}
-                    logger.info("Successfully obtained authentication token")
-                    return _AUTH_HEADERS
-                else:
-                    logger.error("Failed to get valid authentication token")
-                    return {}
-                    
-        except httpx.HTTPStatusError as e:
-            logger.error(f"HTTP error during authentication: {e}")
-            return {}
-        except Exception as e:
-            logger.error(f"Error during authentication: {e}")
-            return {}
+        logger.debug("Using Access Key")
+        return {"X-SF-Access-Key": AUTH_KEY}
     
+    logger.warning(f"Unsupported authentication type: {AUTH_TYPE}")
     return {}
 
 @retry(
@@ -131,19 +91,15 @@ async def make_request(
     if headers:
         request_headers.update(headers)
     
-    # Add authentication if needed
-    if AUTH_TYPE != "anonymous":
-        if AUTH_TYPE == "apikey":
-            # API key is already in DEFAULT_HEADERS
-            pass
-        elif AUTH_TYPE in ["authenticated", "administrator"]:
-            # Get token and add to headers
-            auth_headers = await get_auth_token()
-            request_headers.update(auth_headers)
+    # Add authentication headers if needed (headers from DEFAULT_HEADERS might be overwritten here)
+    auth_headers = await get_auth_token()
+    if auth_headers:
+        request_headers.update(auth_headers)
     
     try:
         async with httpx.AsyncClient() as client:
             logger.debug(f"Making request to {url}")
+            logger.debug(f"Request headers: {request_headers}")
             response = await client.get(url, headers=request_headers, params=params)
             response.raise_for_status()
             return response.json()

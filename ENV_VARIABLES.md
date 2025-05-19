@@ -12,10 +12,9 @@ This document describes the environment variables used in TahubuSF across all se
 
 | Variable | Description | Default | Used By |
 |----------|-------------|---------|---------|
-| `SITEFINITY_AUTH_TYPE` | Authentication type for Sitefinity API (anonymous, authenticated, administrator, apikey) | anonymous | All server implementations |
+| `SITEFINITY_AUTH_TYPE` | Authentication type for Sitefinity API (anonymous, apikey, accesskey) | anonymous | All server implementations |
 | `SITEFINITY_API_KEY` | API key for Sitefinity API when using apikey auth type | None | All server implementations |
-| `SITEFINITY_USERNAME` | Username for Sitefinity API when using authenticated or administrator auth type | None | All server implementations |
-| `SITEFINITY_PASSWORD` | Password for Sitefinity API when using authenticated or administrator auth type | None | All server implementations |
+| `SITEFINITY_AUTH_KEY` | Access Key for Sitefinity API when using accesskey auth type | None | All server implementations |
 
 ## Retry Strategy Variables
 
@@ -55,13 +54,18 @@ Create a `.env` file in the project root with your configuration:
 # Core settings
 SITEFINITY_SITE_PREFIX=https://your-sitefinity-site.com
 
-# Authentication settings
-SITEFINITY_AUTH_TYPE=apikey
-SITEFINITY_API_KEY=your-api-key
-# Or for authenticated users:
-# SITEFINITY_AUTH_TYPE=authenticated
-# SITEFINITY_USERNAME=your-username
-# SITEFINITY_PASSWORD=your-password
+# Authentication settings - choose one approach:
+
+# Option 1: Anonymous access (default)
+SITEFINITY_AUTH_TYPE=anonymous
+
+# Option 2: API key authentication (for web services)
+# SITEFINITY_AUTH_TYPE=apikey
+# SITEFINITY_API_KEY=your-api-key
+
+# Option 3: Access Key (for user-specific auth)
+# SITEFINITY_AUTH_TYPE=accesskey
+# SITEFINITY_AUTH_KEY=your-access-key
 
 # Retry strategy settings
 RETRY_MAX_ATTEMPTS=3

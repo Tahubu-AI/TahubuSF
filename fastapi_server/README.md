@@ -85,6 +85,12 @@ The server can be configured using environment variables or a `.env` file at the
 
 - `SITEFINITY_SITE_PREFIX`: Base URL for the Sitefinity site (default: https://thetrainingboss.com)
 
+### Authentication Variables
+
+- `SITEFINITY_AUTH_TYPE`: Authentication type to use (anonymous, apikey, accesskey)
+- `SITEFINITY_API_KEY`: API key when using apikey auth type
+- `SITEFINITY_AUTH_KEY`: Access Key when using accesskey auth type
+
 ### FastAPI Specific Variables
 
 - `PORT`: Server port (default: 8000)
@@ -99,6 +105,8 @@ When deploying to Azure App Service, you must set these environment variables in
 
 ```
 SITEFINITY_SITE_PREFIX=https://your-sitefinity-site.com
+SITEFINITY_AUTH_TYPE=apikey  # Choose appropriate auth type
+SITEFINITY_API_KEY=your-api-key  # If using apikey auth
 WEBSITES_PORT=8000
 ```
 
