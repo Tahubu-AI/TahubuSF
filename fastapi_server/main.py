@@ -65,7 +65,8 @@ async def health_check():
         "configured": True if (
             AUTH_TYPE == "anonymous" or
             (AUTH_TYPE == "apikey" and API_KEY) or
-            (AUTH_TYPE == "accesskey" and AUTH_KEY)
+            (AUTH_TYPE == "accesskey" and AUTH_KEY) or
+            (AUTH_TYPE == "authenticated" and AUTH_KEY)  # For backward compatibility
         ) else False
     }
     

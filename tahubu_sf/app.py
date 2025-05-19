@@ -7,6 +7,7 @@ from mcp.server.fastmcp import FastMCP
 from tahubu_sf.config.settings import APP_NAME
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
+from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 
@@ -33,7 +34,9 @@ def create_app() -> FastMCP:
         get_blog_posts,
         get_pages,
         get_page_templates,
-        get_sites
+        get_sites,
+        create_blog_post_draft,
+        get_parent_blogs
     ]
     
     # Register each tool

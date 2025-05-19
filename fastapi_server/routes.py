@@ -11,6 +11,7 @@ from pydantic import BaseModel
 # Import tool functions
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
+from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 
@@ -27,6 +28,8 @@ TOOL_MAP = {
     "getPages": get_pages,
     "getPageTemplates": get_page_templates,
     "getSites": get_sites,
+    "createBlogPostDraft": create_blog_post_draft,
+    "getParentBlogs": get_parent_blogs,
 }
 
 # Data models
@@ -47,6 +50,22 @@ class ToolInfo(BaseModel):
 class ToolListResponse(BaseModel):
     """Response model for tool listing"""
     tools: List[ToolInfo]
+
+# Blog post specific models
+class BlogPostDraftRequest(BaseModel):
+    """Request model for creating a blog post draft"""
+    title: str
+    content: str
+    summary: str = None
+    parent_id: str = None
+    allow_comments: bool = True
+
+class BlogPostResponse(BaseModel):
+    """Response model for a created blog post"""
+    id: str
+    title: str
+    url_name: str
+    status: str
 
 @router.post("/run-tool", response_model=ToolResponse)
 async def run_tool(request: ToolRequest):
@@ -72,6 +91,46 @@ async def run_tool(request: ToolRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Error running tool: {str(e)}"
+        )
+
+@router.post("/blog-posts/draft", response_model=BlogPostResponse)
+async def create_blog_draft(request: BlogPostDraftRequest):
+    """Create a new blog post draft"""
+    try:
+        logger.info(f"Creating blog post draft: {request.title}")
+        
+        result = await create_blog_post_draft(
+            title=request.title,
+            content=request.content,
+            summary=request.summary,
+            parent_id=request.parent_id,
+            allow_comments=request.allow_comments
+        )
+        
+        # Extract ID and other info from result
+        return BlogPostResponse(
+            id=result.get("Id", "unknown"),
+            title=request.title,
+            url_name=result.get("UrlName", ""),
+            status="draft"
+        )
+    except Exception as e:
+        logger.exception(f"Error creating blog post draft: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error creating blog post draft: {str(e)}"
+        )
+
+@router.get("/blog-parents", response_model=Dict[str, str])
+async def get_blog_parents():
+    """Get a list of available parent blogs"""
+    try:
+        return await get_parent_blogs()
+    except Exception as e:
+        logger.exception(f"Error getting parent blogs: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting parent blogs: {str(e)}"
         )
 
 @router.get("/list-tools", response_model=ToolListResponse)

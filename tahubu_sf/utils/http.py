@@ -45,11 +45,11 @@ async def get_auth_token() -> Dict[str, str]:
         logger.debug("Using API key authentication")
         return {"X-SF-APIKEY": API_KEY}
     
-    if AUTH_TYPE == "accesskey":
+    if AUTH_TYPE == "accesskey" or AUTH_TYPE == "authenticated":  # Support both names
         if not AUTH_KEY:
             logger.warning("Access key authentication configured but no access key provided")
             return {}
-        logger.debug("Using Access Key")
+        logger.debug("Using Access Key authentication")
         return {"X-SF-Access-Key": AUTH_KEY}
     
     logger.warning(f"Unsupported authentication type: {AUTH_TYPE}")
@@ -98,13 +98,85 @@ async def make_request(
     
     try:
         async with httpx.AsyncClient() as client:
-            logger.debug(f"Making request to {url}")
+            logger.debug(f"Making GET request to {url}")
             logger.debug(f"Request headers: {request_headers}")
             response = await client.get(url, headers=request_headers, params=params)
             response.raise_for_status()
             return response.json()
     except httpx.HTTPStatusError as e:
         logger.error(f"HTTP error occurred: {e}")
+        raise
+    except httpx.RequestError as e:
+        logger.error(f"Request error occurred: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise
+
+@retry(
+    stop=stop_after_attempt(MAX_RETRIES),
+    wait=wait_exponential(multiplier=1, min=MIN_WAIT, max=MAX_WAIT),
+    retry=retry_if_exception_type((httpx.HTTPStatusError, httpx.RequestError)),
+    reraise=True,
+    before_sleep=lambda retry_state: logger.warning(
+        f"Retry attempt {retry_state.attempt_number}/{MAX_RETRIES} after error: {retry_state.outcome.exception()}"
+    )
+)
+async def make_post_request(
+    url: str,
+    data: Dict[str, Any],
+    headers: Optional[Dict[str, str]] = None
+) -> Dict[str, Any]:
+    """
+    Make an HTTP POST request to the specified URL with automatic retries for transient errors.
+    Will include authentication headers if configured.
+    
+    Args:
+        url: The URL to make the request to
+        data: The JSON data to send in the request body
+        headers: Optional headers to include in the request
+        
+    Returns:
+        The JSON response as a dictionary
+        
+    Raises:
+        httpx.HTTPStatusError: If the request fails after all retry attempts
+    """
+    # Start with default headers
+    request_headers = dict(DEFAULT_HEADERS)
+    
+    # Add any custom headers
+    if headers:
+        request_headers.update(headers)
+    
+    # Add authentication headers if needed
+    auth_headers = await get_auth_token()
+    if auth_headers:
+        request_headers.update(auth_headers)
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            logger.debug(f"Making POST request to {url}")
+            logger.debug(f"Request headers: {request_headers}")
+            logger.debug(f"Request data: {data}")
+            
+            response = await client.post(
+                url, 
+                json=data, 
+                headers=request_headers
+            )
+            response.raise_for_status()
+            
+            # Some POST responses may not include JSON content
+            if response.headers.get("content-type", "").startswith("application/json"):
+                return response.json()
+            else:
+                logger.debug(f"Response status: {response.status_code}")
+                return {"status": "success", "status_code": response.status_code}
+                
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error occurred: {e}")
+        logger.error(f"Response content: {e.response.content.decode() if hasattr(e, 'response') else 'No response'}")
         raise
     except httpx.RequestError as e:
         logger.error(f"Request error occurred: {e}")
