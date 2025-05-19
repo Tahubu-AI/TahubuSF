@@ -3,21 +3,57 @@ HTTP client utilities for making API requests
 """
 import logging
 import os
+import json
 from typing import Dict, Any, Optional
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from tahubu_sf.config.settings import DEFAULT_HEADERS
+from tahubu_sf.config.settings import DEFAULT_HEADERS, AUTH_TYPE, AUTH_KEY, API_KEY, ENDPOINTS
 
 logger = logging.getLogger(__name__)
 
 # Get retry configuration from environment variables
 MAX_RETRIES = int(os.getenv("RETRY_MAX_ATTEMPTS", "3"))
 MIN_WAIT = float(os.getenv("RETRY_MIN_SECONDS", "1"))
-MAX_WAIT = float(os.getenv("RETRY_MAX_SECONDS", "10"))
+MAX_WAIT = float(os.getenv("RETRY_MAX_SECONDS", "5"))
 
 logger.debug(f"Initialized retry configuration: MAX_ATTEMPTS={MAX_RETRIES}, MIN_WAIT={MIN_WAIT}s, MAX_WAIT={MAX_WAIT}s")
+logger.debug(f"Authentication type: {AUTH_TYPE}")
+
+# Cache for the authentication token
+_AUTH_TOKEN = None
+_AUTH_HEADERS = {}
+
+async def get_auth_token() -> Dict[str, str]:
+    """
+    Get authentication headers for Sitefinity API.
+    
+    Returns:
+        Dict[str, str]: Headers with the authentication information
+    """
+    # For anonymous, apikey, and accesskey types, the headers are already set in DEFAULT_HEADERS
+    # No additional token generation needed
+    if AUTH_TYPE == "anonymous":
+        logger.debug("Using anonymous authentication")
+        return {}
+    
+    if AUTH_TYPE == "apikey":
+        if not API_KEY:
+            logger.warning("API key authentication configured but no API key provided")
+            return {}
+        logger.debug("Using API key authentication")
+        return {"X-SF-APIKEY": API_KEY}
+    
+    if AUTH_TYPE == "accesskey":
+        if not AUTH_KEY:
+            logger.warning("Access key authentication configured but no access key provided")
+            return {}
+        logger.debug("Using Access Key")
+        return {"X-SF-Access-Key": AUTH_KEY}
+    
+    logger.warning(f"Unsupported authentication type: {AUTH_TYPE}")
+    return {}
 
 @retry(
     stop=stop_after_attempt(MAX_RETRIES),
@@ -35,6 +71,7 @@ async def make_request(
 ) -> Dict[str, Any]:
     """
     Make an HTTP GET request to the specified URL with automatic retries for transient errors.
+    Will include authentication headers if configured.
     
     Args:
         url: The URL to make the request to
@@ -47,11 +84,22 @@ async def make_request(
     Raises:
         httpx.HTTPStatusError: If the request fails after all retry attempts
     """
-    request_headers = headers or DEFAULT_HEADERS
+    # Start with default headers
+    request_headers = dict(DEFAULT_HEADERS)
+    
+    # Add any custom headers
+    if headers:
+        request_headers.update(headers)
+    
+    # Add authentication headers if needed (headers from DEFAULT_HEADERS might be overwritten here)
+    auth_headers = await get_auth_token()
+    if auth_headers:
+        request_headers.update(auth_headers)
     
     try:
         async with httpx.AsyncClient() as client:
             logger.debug(f"Making request to {url}")
+            logger.debug(f"Request headers: {request_headers}")
             response = await client.get(url, headers=request_headers, params=params)
             response.raise_for_status()
             return response.json()

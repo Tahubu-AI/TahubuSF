@@ -20,6 +20,7 @@ from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
+from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME
 
 # Initialize mime types and logging
 mimetypes.init()
@@ -130,6 +131,15 @@ def run_server(port=None, host=None):
                f"MIN_WAIT={os.getenv('RETRY_MIN_SECONDS', '1')}s, "
                f"MAX_WAIT={os.getenv('RETRY_MAX_SECONDS', '10')}s")
     logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
+    
+    # Log authentication configuration
+    auth_info = f"Authentication type: {AUTH_TYPE}"
+    if AUTH_TYPE == "apikey":
+        auth_info += f", API Key: {'configured' if API_KEY else 'not configured'}"
+    elif AUTH_TYPE in ["authenticated", "administrator"]:
+        auth_info += f", Username: {'configured' if USERNAME else 'not configured'}"
+    logger.info(auth_info)
+    
     logger.info("Open your browser to this URL to test MCP tools")
     
     # Open browser automatically

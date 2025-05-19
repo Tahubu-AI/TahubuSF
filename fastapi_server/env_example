@@ -11,7 +11,24 @@ LOG_LEVEL=info
 CORS_ORIGINS=*
 
 # Sitefinity Configuration
-SITEFINITY_SITE_PREFIX=https://thetrainingboss.com
+SITEFINITY_SITE_PREFIX=https://yoursitefinity.com
+
+# Authentication options:
+# Option 1: Anonymous access
+SITEFINITY_AUTH_TYPE=anonymous
+
+# Option 2: API key authentication (for web services)
+#SITEFINITY_AUTH_TYPE=apikey
+#SITEFINITY_API_KEY=your_api_key_here
+
+# Option 3: Access Key (for user-specific auth)
+#SITEFINITY_AUTH_TYPE=accesskey
+#SITEFINITY_AUTH_KEY=your_access_key_here
+
+# Retry Configuration
+RETRY_MAX_ATTEMPTS=3
+RETRY_MIN_SECONDS=1
+RETRY_MAX_SECONDS=5
 
 # Azure Settings (for cloud deployment)
 AZURE_APP_NAME=TahubuSF
