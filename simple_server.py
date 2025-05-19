@@ -129,7 +129,8 @@ def run_server(port=None, host=None):
     logger.info(f"Server started at http://{host}:{port}")
     logger.info(f"Retry configuration: MAX_ATTEMPTS={os.getenv('RETRY_MAX_ATTEMPTS', '3')}, "
                f"MIN_WAIT={os.getenv('RETRY_MIN_SECONDS', '1')}s, "
-               f"MAX_WAIT={os.getenv('RETRY_MAX_SECONDS', '5')}s")
+               f"MAX_WAIT={os.getenv('RETRY_MAX_SECONDS', '10')}s")
+    logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
     
     # Log authentication configuration
     auth_info = f"Authentication type: {AUTH_TYPE}"

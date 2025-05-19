@@ -88,6 +88,7 @@ def start():
     logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
                f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
                f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
+    logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
     
     # Log authentication configuration
     auth_info = f"Authentication type: {AUTH_TYPE}"
@@ -110,6 +111,7 @@ if __name__ == "__main__":
     logger.info(f"Retry configuration: MAX_ATTEMPTS={settings.RETRY_MAX_ATTEMPTS}, "
                f"MIN_WAIT={settings.RETRY_MIN_SECONDS}s, "
                f"MAX_WAIT={settings.RETRY_MAX_SECONDS}s")
+    logger.info(f"Sitefinity configuration: SITE_PREFIX={os.getenv('SITEFINITY_SITE_PREFIX', '')}")
     
     # Log authentication configuration
     auth_info = f"Authentication type: {AUTH_TYPE}"

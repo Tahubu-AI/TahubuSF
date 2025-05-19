@@ -14,3 +14,6 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "asyncio>=3.4.3",
 ]
+
+[tool.setuptools]
+packages = ["tahubu_sf", "fastapi_server"]
