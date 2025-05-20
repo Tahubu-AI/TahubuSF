@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 async def create_blog_post_draft(
     title: str,
     content: str,
+    parent_id: str,
     summary: Optional[str] = None,
-    parent_id: Optional[str] = None,
     allow_comments: bool = True,
 ) -> Dict[str, Any]:
     """
@@ -24,8 +24,8 @@ async def create_blog_post_draft(
     Args:
         title: The title of the blog post
         content: The main content of the blog post (HTML supported)
+        parent_id: The ID of the parent blog (REQUIRED)
         summary: A short summary of the blog post (optional)
-        parent_id: The ID of the parent blog (optional)
         allow_comments: Whether to allow comments on the post (default: True)
     
     Returns:
@@ -33,6 +33,10 @@ async def create_blog_post_draft(
     """
     try:
         logger.info(f"Creating blog post draft with title: {title}")
+        
+        # Validate required parameters
+        if not parent_id:
+            raise ValueError("Parent blog ID (parent_id) is required for creating blog posts")
         
         # Create a timestamp for the current time
         now = datetime.utcnow().isoformat() + "Z"
@@ -44,12 +48,9 @@ async def create_blog_post_draft(
             "Summary": summary or "",
             "PublicationDate": now,
             "AllowComments": allow_comments,
-            "IncludeInSitemap": True
+            "IncludeInSitemap": True,
+            "ParentId": parent_id
         }
-        
-        # If a parent blog ID is provided, add it to the request
-        if parent_id:
-            post_data["ParentId"] = parent_id
         
         # Generate a proper URL name from the title following Sitefinity requirements
         # - Remove any non-alphanumeric characters except hyphens

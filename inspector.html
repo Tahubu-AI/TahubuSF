@@ -97,6 +97,57 @@
         .hidden {
             display: none;
         }
+        .json-editor {
+            width: 100%;
+            min-height: 200px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 80%;
+            max-width: 800px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #F40000;
+        }
+        .alert {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .alert.info {
+            border: 1px solid #ddd;
+        }
+        .alert.info strong {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -139,6 +190,19 @@
             <button onclick="runTool('getSites')">Run Tool</button>
             <span id="sites-loading" class="loading hidden"></span>
         </div>
+        
+        <div class="tool-card">
+            <h2 class="tool-title">Parent Blogs</h2>
+            <p class="tool-description">Fetch available parent blogs from Sitefinity</p>
+            <button onclick="runTool('getParentBlogs')">Run Tool</button>
+            <span id="parentblogs-loading" class="loading hidden"></span>
+        </div>
+        
+        <div class="tool-card">
+            <h2 class="tool-title">Create Blog Post</h2>
+            <p class="tool-description">Create a new blog post draft in Sitefinity</p>
+            <button onclick="openBlogEditor()">Open Editor</button>
+        </div>
     </div>
     
     <div class="results">
@@ -146,13 +210,39 @@
         <pre id="results">Run a tool to see results...</pre>
     </div>
     
+    <!-- Blog Post Editor Modal -->
+    <div id="blogEditorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBlogEditor()">&times;</span>
+            <h2>Create Blog Post Draft</h2>
+            <div class="alert info">
+                <strong>Important:</strong> Parent Blog ID is required. The editor automatically selects the first available parent blog.
+            </div>
+            <textarea id="blogPostJson" class="json-editor">{
+  "title": "New Blog Post Title",
+  "content": "<h2>Blog Post Heading</h2><p>This is the main content of your blog post.</p><p>You can use HTML formatting.</p>",
+  "summary": "A brief summary of this blog post",
+  "parent_id": "",
+  "allow_comments": true
+}</textarea>
+            <button onclick="createBlogPost()">Create Blog Post</button>
+            <span id="createblogpost-loading" class="loading hidden"></span>
+        </div>
+    </div>
+    
     <script>
         async function runTool(toolName) {
             // Show loading indicator
-            document.getElementById(`${toolName.replace('get', '').toLowerCase()}-loading`).classList.remove('hidden');
+            const loaderId = toolName.toLowerCase().replace('get', '').replace('create', '') + "-loading";
+            const loaderElement = document.getElementById(loaderId);
+            if (loaderElement) {
+                loaderElement.classList.remove('hidden');
+            }
             
-            // Set results to loading
-            document.getElementById('results').textContent = 'Loading...';
+            // Set results to loading if this is a direct user action (not a background fetch)
+            if (loaderElement) {
+                document.getElementById('results').textContent = 'Loading...';
+            }
             
             try {
                 // Call the MCP tool
@@ -173,14 +263,177 @@
                 
                 const data = await response.json();
                 
-                // Display the results
-                document.getElementById('results').textContent = data.result;
+                // Display the results if this is a direct user action
+                if (loaderElement) {
+                    if (toolName === 'getParentBlogs' && data.result) {
+                        // Format parent blogs results in a more readable way
+                        displayParentBlogs(data.result);
+                    } else {
+                        // Display regular JSON results
+                        document.getElementById('results').textContent = JSON.stringify(data.result, null, 2);
+                    }
+                }
+                
+                return data.result;
             } catch (error) {
                 console.error('Error running tool:', error);
+                if (loaderElement) {
+                    document.getElementById('results').textContent = `Error: ${error.message}`;
+                }
+                return null;
+            } finally {
+                // Hide loading indicator
+                if (loaderElement) {
+                    loaderElement.classList.add('hidden');
+                }
+            }
+        }
+        
+        function openBlogEditor() {
+            document.getElementById('blogEditorModal').style.display = 'block';
+            
+            // Automatically fetch parent blogs when opening the editor
+            fetchAndPopulateParentId();
+        }
+        
+        function closeBlogEditor() {
+            document.getElementById('blogEditorModal').style.display = 'none';
+        }
+        
+        // Function to fetch parent blogs and populate the parent_id field
+        async function fetchAndPopulateParentId() {
+            try {
+                // Show loading in the editor
+                const jsonEditor = document.getElementById('blogPostJson');
+                const currentData = getCurrentEditorData();
+                
+                // Show temporary loading message in the JSON editor
+                jsonEditor.value = "/* Fetching parent blogs... */\n" + JSON.stringify(currentData, null, 2);
+                
+                // Fetch parent blogs
+                const parentBlogs = await runTool('getParentBlogs');
+                
+                if (parentBlogs && Object.keys(parentBlogs).length > 0) {
+                    // Get the first parent blog ID
+                    const firstParentId = Object.keys(parentBlogs)[0];
+                    const firstName = parentBlogs[firstParentId];
+                    
+                    // Update the parent_id in the current data
+                    currentData.parent_id = firstParentId;
+                    
+                    // Create comment with all available parent blogs
+                    let blogComment = "/* Available parent blogs:\n";
+                    for (const [id, title] of Object.entries(parentBlogs)) {
+                        const isSelected = (id === firstParentId) ? " (SELECTED)" : "";
+                        blogComment += `${title}${isSelected}: ${id}\n`;
+                    }
+                    blogComment += "*/\n";
+                    
+                    // Update the JSON editor with the comment and updated data
+                    jsonEditor.value = blogComment + JSON.stringify(currentData, null, 2);
+                } else {
+                    // No parent blogs found, show warning
+                    jsonEditor.value = "/* WARNING: No parent blogs found. You need a parent blog to create a post. */\n" + 
+                                      JSON.stringify(currentData, null, 2);
+                }
+            } catch (error) {
+                console.error("Error fetching parent blogs:", error);
+            }
+        }
+        
+        // Helper function to get current data from editor
+        function getCurrentEditorData() {
+            try {
+                const jsonEditor = document.getElementById('blogPostJson');
+                // Remove any comments before parsing
+                const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+                return JSON.parse(jsonWithoutComments);
+            } catch (e) {
+                // Return default template if parsing fails
+                return {
+                    title: "New Blog Post Title",
+                    content: "<h2>Blog Post Heading</h2><p>This is the main content of your blog post.</p><p>You can use HTML formatting.</p>",
+                    summary: "A brief summary of this blog post",
+                    parent_id: "",
+                    allow_comments: true
+                };
+            }
+        }
+        
+        async function createBlogPost() {
+            // Show loading indicator
+            document.getElementById('createblogpost-loading').classList.remove('hidden');
+            
+            try {
+                // Get the JSON data from the editor
+                const jsonEditor = document.getElementById('blogPostJson');
+                let blogPostData;
+                
+                try {
+                    // Remove any comments from the JSON before parsing
+                    const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+                    blogPostData = JSON.parse(jsonWithoutComments);
+                } catch (e) {
+                    throw new Error(`Invalid JSON: ${e.message}`);
+                }
+                
+                // Call the MCP tool
+                const response = await fetch('/api/run-tool', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'createBlogPostDraft',
+                        params: blogPostData
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display the results
+                document.getElementById('results').textContent = JSON.stringify(data.result, null, 2);
+                
+                // Close the modal on success
+                closeBlogEditor();
+            } catch (error) {
+                console.error('Error creating blog post:', error);
                 document.getElementById('results').textContent = `Error: ${error.message}`;
             } finally {
                 // Hide loading indicator
-                document.getElementById(`${toolName.replace('get', '').toLowerCase()}-loading`).classList.add('hidden');
+                document.getElementById('createblogpost-loading').classList.add('hidden');
+            }
+        }
+        
+        function displayParentBlogs(parentBlogs) {
+            const resultsElement = document.getElementById('results');
+            
+            if (!parentBlogs || Object.keys(parentBlogs).length === 0) {
+                resultsElement.textContent = "No parent blogs found.";
+                return;
+            }
+            
+            let formattedOutput = "Available Parent Blogs:\n\n";
+            
+            for (const [id, title] of Object.entries(parentBlogs)) {
+                formattedOutput += `${title}\nID: ${id}\n\n`;
+            }
+            
+            // Add a note about usage
+            formattedOutput += "---\nUse one of these IDs in the 'parent_id' field when creating a blog post.";
+            
+            resultsElement.textContent = formattedOutput;
+        }
+        
+        // Close the modal if the user clicks outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('blogEditorModal');
+            if (event.target === modal) {
+                closeBlogEditor();
             }
         }
     </script>

@@ -18,9 +18,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Import from our modular architecture
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
+from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
-from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME
+from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
 mimetypes.init()
@@ -112,6 +113,37 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_page_templates())
             elif tool_name == "getSites":
                 result = loop.run_until_complete(get_sites())
+            elif tool_name == "getParentBlogs":
+                result = loop.run_until_complete(get_parent_blogs())
+            elif tool_name == "createBlogPostDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                summary = params.get("summary")
+                parent_id = params.get("parent_id")
+                allow_comments = params.get("allow_comments", True)
+                
+                # Validate required parameters
+                if not title or not content or not parent_id:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    if not parent_id:
+                        missing.append("parent_id")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_blog_post_draft(
+                        title=title,
+                        content=content,
+                        summary=summary,
+                        parent_id=parent_id,
+                        allow_comments=allow_comments
+                    )
+                )
             else:
                 raise ValueError(f"Unknown tool: {tool_name}")
                 
@@ -136,7 +168,9 @@ def run_server(port=None, host=None):
     auth_info = f"Authentication type: {AUTH_TYPE}"
     if AUTH_TYPE == "apikey":
         auth_info += f", API Key: {'configured' if API_KEY else 'not configured'}"
-    elif AUTH_TYPE in ["authenticated", "administrator"]:
+    elif AUTH_TYPE in ["authenticated", "accesskey"]:
+        auth_info += f", Access Key: {'configured' if AUTH_KEY else 'not configured'}"
+    elif AUTH_TYPE in ["administrator"]:
         auth_info += f", Username: {'configured' if USERNAME else 'not configured'}"
     logger.info(auth_info)
     

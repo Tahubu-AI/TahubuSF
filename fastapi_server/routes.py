@@ -2,11 +2,12 @@
 API routes for the FastAPI server
 """
 import logging
-from typing import Dict, Any, List
+import json
+from typing import Dict, Any, List, Union
 
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Import tool functions
 from tahubu_sf.api.news import get_news
@@ -40,7 +41,7 @@ class ToolRequest(BaseModel):
 
 class ToolResponse(BaseModel):
     """Response model for tool execution"""
-    result: str
+    result: Any = Field(description="Tool result that can be string, dict, or other JSON-serializable data")
 
 class ToolInfo(BaseModel):
     """Information about a tool"""
@@ -57,7 +58,7 @@ class BlogPostDraftRequest(BaseModel):
     title: str
     content: str
     summary: str = None
-    parent_id: str = None
+    parent_id: str
     allow_comments: bool = True
 
 class BlogPostResponse(BaseModel):
@@ -67,7 +68,7 @@ class BlogPostResponse(BaseModel):
     url_name: str
     status: str
 
-@router.post("/run-tool", response_model=ToolResponse)
+@router.post("/run-tool")
 async def run_tool(request: ToolRequest):
     """Execute a tool directly with provided parameters"""
     try:
@@ -85,7 +86,8 @@ async def run_tool(request: ToolRequest):
         # Run the tool function
         result = await TOOL_MAP[tool_name](**params)
         
-        return ToolResponse(result=result)
+        # Return a JSON response directly to handle any result type
+        return {"result": result}
     except Exception as e:
         logger.exception(f"Error running tool: {str(e)}")
         raise HTTPException(
@@ -98,6 +100,13 @@ async def create_blog_draft(request: BlogPostDraftRequest):
     """Create a new blog post draft"""
     try:
         logger.info(f"Creating blog post draft: {request.title}")
+        
+        # Validate required fields
+        if not request.parent_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Parent blog ID (parent_id) is required"
+            )
         
         result = await create_blog_post_draft(
             title=request.title,
