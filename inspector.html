@@ -148,6 +148,96 @@
         .alert.info strong {
             font-weight: 600;
         }
+        .alert.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+        }
+        .notification .icon {
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 20px;
+            text-align: center;
+        }
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Results formatting styles */
+        .formatted-results {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .result-item {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 3px solid #F97D22;
+        }
+        .result-item h3 {
+            margin-top: 0;
+            color: #F40000;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .result-property {
+            margin-bottom: 5px;
+        }
+        .property-name {
+            font-weight: 600;
+            color: #333;
+            display: inline-block;
+            width: 120px;
+        }
+        .property-value {
+            color: #555;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .result-table th {
+            background-color: #f0f0f0;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+            color: #444;
+        }
+        .result-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .result-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +245,8 @@
     
     <h1>Sitefinity MCP Tool Inspector</h1>
     
+    <h2>News</h2>
+
     <div class="tool-container">
         <div class="tool-card">
             <h2 class="tool-title">News Items</h2>
@@ -162,33 +254,45 @@
             <button onclick="runTool('getNews')">Run Tool</button>
             <span id="news-loading" class="loading hidden"></span>
         </div>
-        
-        <div class="tool-card">
-            <h2 class="tool-title">Blog Posts</h2>
-            <p class="tool-description">Fetch blog posts from Sitefinity</p>
-            <button onclick="runTool('getBlogPosts')">Run Tool</button>
-            <span id="blogposts-loading" class="loading hidden"></span>
-        </div>
-        
+    </div>
+
+    <h2>Pages</h2>
+
+    <div class="tool-container">
         <div class="tool-card">
             <h2 class="tool-title">Pages</h2>
             <p class="tool-description">Fetch pages from Sitefinity</p>
             <button onclick="runTool('getPages')">Run Tool</button>
             <span id="pages-loading" class="loading hidden"></span>
-        </div>
-        
+        </div>    
+
         <div class="tool-card">
             <h2 class="tool-title">Page Templates</h2>
             <p class="tool-description">Fetch page templates from Sitefinity</p>
             <button onclick="runTool('getPageTemplates')">Run Tool</button>
             <span id="pagetemplates-loading" class="loading hidden"></span>
         </div>
-        
+    </div>
+
+    <h2>Sites</h2>
+
+    <div class="tool-container">
         <div class="tool-card">
             <h2 class="tool-title">Sites</h2>
             <p class="tool-description">Fetch sites from Sitefinity</p>
             <button onclick="runTool('getSites')">Run Tool</button>
             <span id="sites-loading" class="loading hidden"></span>
+        </div>
+    </div>
+
+    <h2>Blogs</h2>
+
+    <div class="tool-container">
+        <div class="tool-card">
+            <h2 class="tool-title">Blog Posts</h2>
+            <p class="tool-description">Fetch blog posts from Sitefinity</p>
+            <button onclick="runTool('getBlogPosts')">Run Tool</button>
+            <span id="blogposts-loading" class="loading hidden"></span>
         </div>
         
         <div class="tool-card">
@@ -207,7 +311,9 @@
     
     <div class="results">
         <h2>Results</h2>
-        <pre id="results">Run a tool to see results...</pre>
+        <div id="results-container">
+            <pre id="results">Run a tool to see results...</pre>
+        </div>
     </div>
     
     <!-- Blog Post Editor Modal -->
@@ -230,6 +336,11 @@
         </div>
     </div>
     
+    <div id="notification" class="notification">
+        <span class="icon">&#10004;</span>
+        <span class="message">Blog post created successfully!</span>
+    </div>
+    
     <script>
         async function runTool(toolName) {
             // Show loading indicator
@@ -241,7 +352,8 @@
             
             // Set results to loading if this is a direct user action (not a background fetch)
             if (loaderElement) {
-                document.getElementById('results').textContent = 'Loading...';
+                // Reset the results container to its initial state with the pre element
+                document.getElementById('results-container').innerHTML = '<pre id="results">Loading...</pre>';
             }
             
             try {
@@ -268,8 +380,24 @@
                     if (toolName === 'getParentBlogs' && data.result) {
                         // Format parent blogs results in a more readable way
                         displayParentBlogs(data.result);
+                    } else if (toolName === 'getPageTemplates' && data.result) {
+                        // Format page templates in a more readable way
+                        formatPageTemplatesResults(data.result);
+                    } else if (toolName === 'getNews' && data.result) {
+                        // Format news items in a more readable way
+                        formatNewsResults(data.result);
+                    } else if (toolName === 'getBlogPosts' && data.result) {
+                        // Format blog posts in a more readable way
+                        formatBlogPostsResults(data.result);
+                    } else if (toolName === 'getSites' && data.result) {
+                        // Format sites in a more readable way
+                        formatSitesResults(data.result);
+                    } else if (toolName === 'getPages' && data.result) {
+                        // Format pages in a more readable way
+                        formatPagesResults(data.result);
                     } else {
-                        // Display regular JSON results
+                        // Display regular JSON results - ensure pre element exists
+                        document.getElementById('results-container').innerHTML = '<pre id="results"></pre>';
                         document.getElementById('results').textContent = JSON.stringify(data.result, null, 2);
                     }
                 }
@@ -278,6 +406,8 @@
             } catch (error) {
                 console.error('Error running tool:', error);
                 if (loaderElement) {
+                    // Ensure the pre element exists
+                    document.getElementById('results-container').innerHTML = '<pre id="results"></pre>';
                     document.getElementById('results').textContent = `Error: ${error.message}`;
                 }
                 return null;
@@ -377,6 +507,11 @@
                     throw new Error(`Invalid JSON: ${e.message}`);
                 }
                 
+                // Validate required fields
+                if (!blogPostData.parent_id || blogPostData.parent_id === "REQUIRED - Use the Parent Blogs tool to get a valid ID") {
+                    throw new Error("Parent blog ID (parent_id) is required. Please use the Parent Blogs tool to get a valid ID.");
+                }
+                
                 // Call the MCP tool
                 const response = await fetch('/api/run-tool', {
                     method: 'POST',
@@ -389,44 +524,182 @@
                     }),
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 
-                // Display the results
-                document.getElementById('results').textContent = JSON.stringify(data.result, null, 2);
-                
-                // Close the modal on success
-                closeBlogEditor();
+                // Check if there was an error
+                if (!response.ok || data.detail) {
+                    // Handle error response
+                    const errorMsg = data.detail || `HTTP error: ${response.status}`;
+                    formatBlogPostError(errorMsg);
+                    showNotification("Blog post creation failed!", "error");
+                } else {
+                    // Format and display the created blog post details
+                    formatCreatedBlogPost(data.result);
+                    
+                    // Show success notification
+                    showNotification("Blog post created successfully!");
+                    
+                    // Close the modal
+                    closeBlogEditor();
+                }
             } catch (error) {
                 console.error('Error creating blog post:', error);
-                document.getElementById('results').textContent = `Error: ${error.message}`;
+                
+                // Format and display the error
+                formatBlogPostError(error.message);
+                
+                // Show error notification
+                showNotification("Blog post creation failed!", "error");
             } finally {
                 // Hide loading indicator
                 document.getElementById('createblogpost-loading').classList.add('hidden');
             }
         }
         
+        function showNotification(message, type = "success") {
+            const notification = document.getElementById('notification');
+            const messageElement = notification.querySelector('.message');
+            const iconElement = notification.querySelector('.icon');
+            
+            // Set the message text
+            messageElement.textContent = message;
+            
+            // Update the icon based on type using decimal HTML entities
+            // &#10004; = checkmark, &#10060; = X mark
+            iconElement.innerHTML = type === "success" ? "&#10004;" : "&#10060;";
+            
+            // Reset classes
+            notification.className = "notification";
+            if (type === "error") {
+                notification.classList.add("error");
+            }
+            
+            notification.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        function formatCreatedBlogPost(blogPost) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<div class="alert success"><strong>Success!</strong> Blog post draft created successfully.</div>';
+                
+                html += '<div class="result-item">';
+                html += `<h3>${blogPost.Title || 'New Blog Post'}</h3>`;
+                
+                // Add post URL if available
+                if (blogPost.ItemDefaultUrl) {
+                    html += `<div class="result-property">
+                        <span class="property-name">URL:</span>
+                        <span class="property-value">${blogPost.ItemDefaultUrl}</span>
+                    </div>`;
+                }
+                
+                // Add ID
+                html += `<div class="result-property">
+                    <span class="property-name">ID:</span>
+                    <span class="property-value">${blogPost.Id || 'Unknown'}</span>
+                </div>`;
+                
+                // Add Status
+                html += `<div class="result-property">
+                    <span class="property-name">Status:</span>
+                    <span class="property-value">Draft</span>
+                </div>`;
+                
+                // Add Publication Date
+                if (blogPost.PublicationDate) {
+                    const date = new Date(blogPost.PublicationDate).toLocaleString();
+                    html += `<div class="result-property">
+                        <span class="property-name">Created:</span>
+                        <span class="property-value">${date}</span>
+                    </div>`;
+                }
+                
+                // Add Summary if available
+                if (blogPost.Summary) {
+                    html += `<div class="result-property">
+                        <span class="property-name">Summary:</span>
+                        <span class="property-value">${blogPost.Summary}</span>
+                    </div>`;
+                }
+                
+                // Preview of content (truncated)
+                if (blogPost.Content) {
+                    // Strip HTML tags for preview
+                    const contentText = blogPost.Content.replace(/<[^>]*>/g, ' ').substring(0, 100);
+                    html += `<div class="result-property">
+                        <span class="property-name">Content:</span>
+                        <span class="property-value">${contentText}${blogPost.Content.length > 100 ? '...' : ''}</span>
+                    </div>`;
+                }
+                
+                html += '</div>';
+                
+                // Add note about Sitefinity
+                html += `<div class="result-item">
+                    <div class="result-property">
+                        <p>The blog post has been created as a draft. You can now edit, review, and publish it in the Sitefinity admin panel.</p>
+                    </div>
+                </div>`;
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting created blog post:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = JSON.stringify(blogPost, null, 2);
+            }
+        }
+        
         function displayParentBlogs(parentBlogs) {
-            const resultsElement = document.getElementById('results');
+            const resultsContainer = document.getElementById('results-container');
             
-            if (!parentBlogs || Object.keys(parentBlogs).length === 0) {
-                resultsElement.textContent = "No parent blogs found.";
-                return;
+            try {
+                if (!parentBlogs || Object.keys(parentBlogs).length === 0) {
+                    resultsContainer.innerHTML = '<pre id="results">No parent blogs found.</pre>';
+                    return;
+                }
+                
+                let formattedOutput = '<div class="formatted-results">';
+                formattedOutput += '<h3>Available Parent Blogs</h3>';
+                
+                for (const [id, title] of Object.entries(parentBlogs)) {
+                    formattedOutput += `<div class="result-item">
+                        <h3>${title}</h3>
+                        <div class="result-property">
+                            <span class="property-name">ID:</span>
+                            <span class="property-value">${id}</span>
+                        </div>
+                    </div>`;
+                }
+                
+                // Add a note about usage
+                formattedOutput += '<div class="result-item">'+
+                    '<div class="result-property">'+
+                    '<p>Use one of these IDs in the \'parent_id\' field when creating a blog post.</p>'+
+                    '</div></div>';
+                
+                formattedOutput += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = formattedOutput;
+            } catch (error) {
+                console.error('Error displaying parent blogs:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = JSON.stringify(parentBlogs, null, 2);
             }
-            
-            let formattedOutput = "Available Parent Blogs:\n\n";
-            
-            for (const [id, title] of Object.entries(parentBlogs)) {
-                formattedOutput += `${title}\nID: ${id}\n\n`;
-            }
-            
-            // Add a note about usage
-            formattedOutput += "---\nUse one of these IDs in the 'parent_id' field when creating a blog post.";
-            
-            resultsElement.textContent = formattedOutput;
         }
         
         // Close the modal if the user clicks outside of it
@@ -434,6 +707,554 @@
             const modal = document.getElementById('blogEditorModal');
             if (event.target === modal) {
                 closeBlogEditor();
+            }
+        }
+        
+        function formatPageTemplatesResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Parse the data if it's a string (sometimes it might be pre-parsed)
+                let templates = data;
+                if (typeof data === 'string') {
+                    // Try to identify and parse structured data in the string
+                    templates = parseStructuredString(data);
+                }
+                
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                
+                if (Array.isArray(templates)) {
+                    // It's an array of template objects
+                    html += '<h3>Page Templates</h3>';
+                    html += '<div class="result-table-container">';
+                    html += '<table class="result-table">';
+                    html += '<thead><tr><th>Title</th><th>Framework</th><th>Renderer</th></tr></thead>';
+                    html += '<tbody>';
+                    
+                    templates.forEach(template => {
+                        html += `<tr>
+                            <td>${template.Title || ''}</td>
+                            <td>${template.Framework || ''}</td>
+                            <td>${template.Renderer || 'None'}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                } else {
+                    // It's a string-based format or unknown format
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    items.forEach(item => {
+                        html += '<div class="result-item">';
+                        
+                        const lines = item.split('\n');
+                        let title = 'Unknown Template';
+                        
+                        // Extract properties
+                        lines.forEach(line => {
+                            if (line.startsWith('Title:')) {
+                                title = line.replace('Title:', '').trim();
+                                html += `<h3>${title}</h3>`;
+                            } else if (line.includes(':')) {
+                                const [name, value] = line.split(':').map(s => s.trim());
+                                html += `<div class="result-property">
+                                    <span class="property-name">${name}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            } else if (line.trim()) {
+                                html += `<div class="result-property">${line}</div>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting page templates:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function formatNewsResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Parse the data if needed
+                let newsItems = data;
+                if (typeof data === 'string' && data.includes('\n\n')) {
+                    // Try to parse structured string data
+                    newsItems = parseStructuredString(data);
+                }
+                
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>News Items</h3>';
+                
+                if (Array.isArray(newsItems)) {
+                    // It's an array of news item objects
+                    newsItems.forEach(item => {
+                        html += `<div class="result-item">
+                            <h3>${item.Title || 'Untitled News Item'}</h3>`;
+                            
+                        // Add common news properties
+                        if (item.PublicationDate) {
+                            const date = new Date(item.PublicationDate).toLocaleDateString();
+                            html += `<div class="result-property">
+                                <span class="property-name">Published:</span>
+                                <span class="property-value">${date}</span>
+                            </div>`;
+                        }
+                        
+                        if (item.Summary) {
+                            html += `<div class="result-property">
+                                <span class="property-name">Summary:</span>
+                                <span class="property-value">${item.Summary}</span>
+                            </div>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                } else {
+                    // It's a string-based format or unknown format
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    items.forEach(item => {
+                        html += '<div class="result-item">';
+                        
+                        const lines = item.split('\n');
+                        let title = 'Unknown News Item';
+                        
+                        // Extract properties
+                        lines.forEach((line, index) => {
+                            if (index === 0) {
+                                // Assume first line is title
+                                title = line.trim();
+                                html += `<h3>${title}</h3>`;
+                            } else if (line.includes(':')) {
+                                const [name, value] = line.split(':').map(s => s.trim());
+                                html += `<div class="result-property">
+                                    <span class="property-name">${name}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            } else if (line.trim()) {
+                                html += `<div class="result-property">${line}</div>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting news items:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function formatBlogPostsResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Blog Posts</h3>';
+                
+                if (typeof data === 'object' && data !== null) {
+                    // It might be a parsed object with blog posts
+                    const posts = data.value || data;
+                    
+                    if (Array.isArray(posts)) {
+                        posts.forEach(post => {
+                            html += `<div class="result-item">
+                                <h3>${post.Title || 'Untitled Post'}</h3>`;
+                                
+                            // Add common blog post properties
+                            if (post.PublicationDate) {
+                                const date = new Date(post.PublicationDate).toLocaleDateString();
+                                html += `<div class="result-property">
+                                    <span class="property-name">Published:</span>
+                                    <span class="property-value">${date}</span>
+                                </div>`;
+                            }
+                            
+                            if (post.Summary) {
+                                html += `<div class="result-property">
+                                    <span class="property-name">Summary:</span>
+                                    <span class="property-value">${post.Summary}</span>
+                                </div>`;
+                            }
+                            
+                            if (post.Id) {
+                                html += `<div class="result-property">
+                                    <span class="property-name">ID:</span>
+                                    <span class="property-value">${post.Id}</span>
+                                </div>`;
+                            }
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        // Single post or unknown format
+                        html += formatGenericResult(data);
+                    }
+                } else if (typeof data === 'string') {
+                    // Try to parse the string data
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            html += '<div class="result-item">';
+                            
+                            const lines = item.split('\n');
+                            let title = 'Unknown Post';
+                            
+                            // Extract properties
+                            lines.forEach((line, index) => {
+                                if (index === 0) {
+                                    // Assume first line is title
+                                    title = line.trim();
+                                    html += `<h3>${title}</h3>`;
+                                } else if (line.includes(':')) {
+                                    const [name, value] = line.split(':').map(s => s.trim());
+                                    html += `<div class="result-property">
+                                        <span class="property-name">${name}:</span>
+                                        <span class="property-value">${value}</span>
+                                    </div>`;
+                                } else if (line.trim()) {
+                                    html += `<div class="result-property">${line}</div>`;
+                                }
+                            });
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        html += `<div class="result-item">
+                            <h3>Blog Posts</h3>
+                            <div class="result-property">${data}</div>
+                        </div>`;
+                    }
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting blog posts:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function formatSitesResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Sites</h3>';
+                
+                if (typeof data === 'object' && data !== null) {
+                    const sites = data.value || data;
+                    
+                    if (Array.isArray(sites)) {
+                        sites.forEach(site => {
+                            html += `<div class="result-item">
+                                <h3>${site.Title || site.Name || 'Unnamed Site'}</h3>`;
+                                
+                            // Add all site properties except Title/Name
+                            for (const [key, value] of Object.entries(site)) {
+                                if (key !== 'Title' && key !== 'Name') {
+                                    html += `<div class="result-property">
+                                        <span class="property-name">${key}:</span>
+                                        <span class="property-value">${value}</span>
+                                    </div>`;
+                                }
+                            }
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        // Single site or unknown format
+                        html += formatGenericResult(data);
+                    }
+                } else if (typeof data === 'string') {
+                    // Process string data with newline-separated sites
+                    const sites = data.split('\n\n').filter(item => item.trim());
+                    
+                    sites.forEach(siteString => {
+                        html += '<div class="result-item">';
+                        
+                        // Parse the site properties
+                        const properties = {};
+                        const lines = siteString.split('\n').map(line => line.trim()).filter(line => line);
+                        
+                        let title = 'Unnamed Site';
+                        lines.forEach(line => {
+                            // Try to extract property name and value
+                            if (line.includes(':')) {
+                                const colonIndex = line.indexOf(':');
+                                const name = line.substring(0, colonIndex).trim();
+                                const value = line.substring(colonIndex + 1).trim();
+                                
+                                properties[name] = value;
+                                
+                                // If this is the title/name, save it
+                                if (name === 'Title' || name === 'Name') {
+                                    title = value;
+                                }
+                            }
+                        });
+                        
+                        // Add the title
+                        html += `<h3>${title}</h3>`;
+                        
+                        // Add all other properties except Title/Name
+                        for (const [key, value] of Object.entries(properties)) {
+                            if (key !== 'Title' && key !== 'Name') {
+                                html += `<div class="result-property">
+                                    <span class="property-name">${key}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            }
+                        }
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting sites:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function formatPagesResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Pages</h3>';
+                
+                if (typeof data === 'object' && data !== null) {
+                    const pages = data.value || data;
+                    
+                    if (Array.isArray(pages)) {
+                        pages.forEach(page => {
+                            html += `<div class="result-item">
+                                <h3>${page.Title || 'Untitled Page'}</h3>`;
+                                
+                            // Add common page properties
+                            for (const [key, value] of Object.entries(page)) {
+                                if (key !== 'Title') {
+                                    html += `<div class="result-property">
+                                        <span class="property-name">${key}:</span>
+                                        <span class="property-value">${value}</span>
+                                    </div>`;
+                                }
+                            }
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        // Single page or unknown format
+                        html += formatGenericResult(data);
+                    }
+                } else if (typeof data === 'string') {
+                    // Process string data with newline-separated pages
+                    const pages = data.split('\n\n').filter(item => item.trim());
+                    
+                    pages.forEach(pageString => {
+                        html += '<div class="result-item">';
+                        
+                        // Parse the page properties
+                        const properties = {};
+                        const lines = pageString.split('\n').map(line => line.trim()).filter(line => line);
+                        
+                        lines.forEach(line => {
+                            // Try to extract property name and value
+                            if (line.includes(':')) {
+                                const colonIndex = line.indexOf(':');
+                                const name = line.substring(0, colonIndex).trim();
+                                const value = line.substring(colonIndex + 1).trim();
+                                
+                                properties[name] = value;
+                                
+                                // If this is the title, add it as a header
+                                if (name === 'Title') {
+                                    html += `<h3>${value}</h3>`;
+                                }
+                            }
+                        });
+                        
+                        // Add all other properties except Title
+                        for (const [key, value] of Object.entries(properties)) {
+                            if (key !== 'Title') {
+                                html += `<div class="result-property">
+                                    <span class="property-name">${key}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            }
+                        }
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting pages:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function parseStructuredString(str) {
+            // Try to identify and parse a string with structured data
+            try {
+                // First check if it's JSON
+                return JSON.parse(str);
+            } catch (e) {
+                // Not JSON, might be another structured format
+                const items = [];
+                
+                // Split by double newlines which typically separate items
+                const chunks = str.split('\n\n').filter(chunk => chunk.trim());
+                
+                chunks.forEach(chunk => {
+                    const item = {};
+                    const lines = chunk.split('\n');
+                    
+                    lines.forEach(line => {
+                        if (line.includes(':')) {
+                            const [key, value] = line.split(':').map(s => s.trim());
+                            item[key] = value;
+                        }
+                    });
+                    
+                    if (Object.keys(item).length > 0) {
+                        items.push(item);
+                    }
+                });
+                
+                return items.length > 0 ? items : str;
+            }
+        }
+        
+        function formatGenericResult(data) {
+            if (typeof data === 'object' && data !== null) {
+                let html = '';
+                
+                // For objects, create a property list
+                for (const [key, value] of Object.entries(data)) {
+                    if (typeof value === 'object' && value !== null) {
+                        html += `<div class="result-property">
+                            <span class="property-name">${key}:</span>
+                            <span class="property-value">${JSON.stringify(value)}</span>
+                        </div>`;
+                    } else {
+                        html += `<div class="result-property">
+                            <span class="property-name">${key}:</span>
+                            <span class="property-value">${value}</span>
+                        </div>`;
+                    }
+                }
+                
+                return html;
+            } else if (typeof data === 'string') {
+                return `<div class="result-property">${data}</div>`;
+            } else {
+                return `<div class="result-property">${JSON.stringify(data)}</div>`;
+            }
+        }
+        
+        function formatBlogPostError(errorMessage) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += `<div class="alert error"><strong>Error!</strong> Blog post creation failed.</div>`;
+                
+                html += '<div class="result-item">';
+                html += `<h3>Blog Post Creation Error</h3>`;
+                
+                // Extract details from the error message
+                let errorDetails = errorMessage;
+                
+                // Try to parse and format the error message if it's more complex
+                if (errorMessage.includes("Failed to create blog post draft:")) {
+                    // The error might contain multiple lines or details
+                    const lines = errorMessage.split('\n');
+                    errorDetails = '';
+                    
+                    lines.forEach(line => {
+                        // Format each line as a separate detail
+                        errorDetails += `<div class="result-property">
+                            <span class="property-value">${line}</span>
+                        </div>`;
+                    });
+                } else {
+                    // Simple error message
+                    errorDetails = `<div class="result-property">
+                        <span class="property-value">${errorMessage}</span>
+                    </div>`;
+                }
+                
+                html += errorDetails;
+                html += '</div>';
+                
+                // Add possible solutions
+                html += `<div class="result-item">
+                    <h3>Possible Solutions</h3>
+                    <div class="result-property">
+                        <p>1. Make sure you've provided a valid parent blog ID</p>
+                        <p>2. Check that your blog post title and content are valid</p>
+                        <p>3. Verify that Sitefinity is accessible and working correctly</p>
+                    </div>
+                </div>`;
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting blog post error:', error);
+                // Fallback to showing the raw error
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = errorMessage;
             }
         }
     </script>

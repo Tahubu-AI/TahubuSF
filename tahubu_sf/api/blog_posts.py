@@ -49,7 +49,7 @@ async def create_blog_post_draft(
             "PublicationDate": now,
             "AllowComments": allow_comments,
             "IncludeInSitemap": True,
-            "ParentId": parent_id
+            "ParentId": parent_id,
         }
         
         # Generate a proper URL name from the title following Sitefinity requirements
