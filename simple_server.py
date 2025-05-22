@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Import from our modular architecture
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
-from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
+from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
@@ -136,7 +136,7 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 
                 # Call the tool with the parameters
                 result = loop.run_until_complete(
-                    create_blog_post_draft(
+                    create_blog_post(
                         title=title,
                         content=content,
                         summary=summary,

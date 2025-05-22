@@ -6,7 +6,7 @@ import logging
 import sys
 from dotenv import load_dotenv
 
-from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
+from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 
 # Configure logging
 logging.basicConfig(
@@ -57,7 +57,7 @@ async def test_create_blog_post():
         logger.info("No parent blog selected")
     
     # Create the blog post
-    result = await create_blog_post_draft(
+    result = await create_blog_post(
         title=title,
         content=content,
         summary=summary,

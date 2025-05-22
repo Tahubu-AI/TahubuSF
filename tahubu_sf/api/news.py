@@ -1,10 +1,10 @@
 """
 API endpoint for retrieving news items
 """
-from typing import Dict, Any
-
-from tahubu_sf.config.settings import ENDPOINTS
+from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request
+
+NEWS_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.news}"
 
 async def get_news() -> str:
     """
@@ -17,7 +17,7 @@ async def get_news() -> str:
             - author: The Author of the news item
             - publicationdate: The publication date of the news item
     """
-    data = await make_request(ENDPOINTS["news"])
+    data = await make_request(NEWS_CONTENT_ENDPOINT)
     
     text = ""
     for newsitem in data["value"]:
@@ -26,4 +26,4 @@ async def get_news() -> str:
         author = newsitem["Author"]
         publicationdate = newsitem["PublicationDate"]
         text += (f"Title: {title}\n Summary: {summary}\n Author: {author}\n Publication Date: {publicationdate}\n\n")   
-    return text 
+    return text

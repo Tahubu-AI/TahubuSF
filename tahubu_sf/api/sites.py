@@ -1,8 +1,11 @@
 """
 API endpoint for retrieving site information
 """
-from tahubu_sf.config.settings import ENDPOINTS
+from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request
+
+# Define the API endpoint for sites
+SITES_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.sites}"
 
 async def get_sites() -> str:
     """
@@ -14,7 +17,7 @@ async def get_sites() -> str:
             - liveurl: The liveurl of the site variant
             - isoffline: Whether the site is offline
     """
-    data = await make_request(ENDPOINTS["sites"])
+    data = await make_request(SITES_CONTENT_ENDPOINT)
     
     text = ""
     for site in data["value"]:
