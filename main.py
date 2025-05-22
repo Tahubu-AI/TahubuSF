@@ -1,10 +1,11 @@
 from mcp.server.fastmcp import FastMCP
 import httpx
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-Sitefinity_Site_Prefix= "https://thetrainingboss.com"  # Configurable URL for Sitefinity site
+Sitefinity_Site_Prefix= os.getenv("SITEFINITY_SITE_PREFIX").rstrip("/")  # Configurable URL for Sitefinity site
 
 SFNews  = f"{Sitefinity_Site_Prefix}/api/default/newsitems"
 SFBlogs = f"{Sitefinity_Site_Prefix}/api/default/blogs"

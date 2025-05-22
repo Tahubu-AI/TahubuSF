@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 # Import tool functions
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
-from tahubu_sf.api.blog_posts import create_blog_post_draft, get_parent_blogs
+from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 
@@ -29,7 +29,7 @@ TOOL_MAP = {
     "getPages": get_pages,
     "getPageTemplates": get_page_templates,
     "getSites": get_sites,
-    "createBlogPostDraft": create_blog_post_draft,
+    "createBlogPostDraft": create_blog_post,
     "getParentBlogs": get_parent_blogs,
 }
 
@@ -108,7 +108,7 @@ async def create_blog_draft(request: BlogPostDraftRequest):
                 detail="Parent blog ID (parent_id) is required"
             )
         
-        result = await create_blog_post_draft(
+        result = await create_blog_post(
             title=request.title,
             content=request.content,
             summary=request.summary,

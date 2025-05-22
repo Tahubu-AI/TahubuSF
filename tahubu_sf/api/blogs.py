@@ -1,8 +1,10 @@
 """
 API endpoint for retrieving blog posts
 """
-from tahubu_sf.config.settings import ENDPOINTS
+from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request
+
+POSTS_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.blog_posts}"
 
 async def get_blog_posts() -> str:
     """
@@ -14,12 +16,13 @@ async def get_blog_posts() -> str:
             - Summary: The summary of the blog post
             - publicationdate: The publication date of the blog post
     """
-    data = await make_request(ENDPOINTS["blog_posts"])
+    data = await make_request(POSTS_CONTENT_ENDPOINT)
     
     text = ""
     for blogpost in data["value"]:
         title = blogpost["Title"]
+        author = blogpost["CreatedBy"] or "Unknown"
         summary = blogpost["Summary"]
         publicationdate = blogpost["PublicationDate"]
-        text += (f"Title: {title}\n Summary: {summary}\n Publication Date: {publicationdate}\n\n")   
+        text += (f"Title: {title}\n Summary: {summary}\n Publication Date: {publicationdate}\nAuthor: {author}\n\n")   
     return text 

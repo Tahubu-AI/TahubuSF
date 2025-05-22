@@ -6,17 +6,22 @@ import re
 from datetime import datetime
 from typing import Dict, Any, Optional
 
-from tahubu_sf.config.settings import ENDPOINTS
+from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request, make_post_request
 
 logger = logging.getLogger(__name__)
 
-async def create_blog_post_draft(
+BLOGS_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.blogs}"
+POSTS_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.blog_posts}"
+POSTS_MANAGEMENT_ENDPOINT = f"{ENDPOINTS.management}/{CONTENT_TYPES.blog_posts}"
+
+async def create_blog_post(
     title: str,
     content: str,
     parent_id: str,
     summary: Optional[str] = None,
     allow_comments: bool = True,
+    draft: bool = True,
 ) -> Dict[str, Any]:
     """
     Create a new blog post as a draft in Sitefinity.
@@ -27,6 +32,7 @@ async def create_blog_post_draft(
         parent_id: The ID of the parent blog (REQUIRED)
         summary: A short summary of the blog post (optional)
         allow_comments: Whether to allow comments on the post (default: True)
+        draft: Whether to create the post as a draft (default: True)
     
     Returns:
         Dict[str, Any]: Response from the Sitefinity API, including the created post's ID
@@ -74,9 +80,11 @@ async def create_blog_post_draft(
         post_data["UrlName"] = url_name
         
         logger.debug(f"Generated URL name: {url_name}")
+
+        endpoint = POSTS_MANAGEMENT_ENDPOINT if draft else POSTS_CONTENT_ENDPOINT
         
         # Send POST request to create the blog post
-        response = await make_post_request(ENDPOINTS["blog_posts"], post_data)
+        response = await make_post_request(endpoint, post_data)
         
         logger.info(f"Blog post draft created successfully: {response.get('Id', 'unknown ID')}")
         return response
@@ -92,7 +100,7 @@ async def get_parent_blogs() -> Dict[str, str]:
         Dict[str, str]: Dictionary of blog IDs and their titles
     """
     try:
-        data = await make_request(ENDPOINTS["blogs"])
+        data = await make_request(BLOGS_CONTENT_ENDPOINT)
         blogs = {blog["Id"]: blog["Title"] for blog in data.get("value", [])}
         logger.info(f"Found {len(blogs)} parent blogs")
         return blogs

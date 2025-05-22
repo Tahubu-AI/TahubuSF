@@ -3,11 +3,17 @@ Configuration settings for Sitefinity API
 """
 import os
 from dotenv import load_dotenv
+from types import SimpleNamespace
 
 load_dotenv()
 
-# Base URL Configuration
-SITEFINITY_SITE_PREFIX = os.getenv("SITEFINITY_SITE_PREFIX", "https://thetrainingboss.com")
+# Sitefinity Configuration
+SITEFINITY_SITE_PREFIX = os.getenv("SITEFINITY_SITE_PREFIX").rstrip("/")
+if not SITEFINITY_SITE_PREFIX or SITEFINITY_SITE_PREFIX == '':
+    raise ValueError("SITEFINITY_SITE_PREFIX must be set in the environment variables.")
+
+SITEFINITY_FRONTEND_API_PATH = os.getenv("SITEFINITY_FRONTEND_API_ROUTE", "api/default").rstrip("/").lstrip("/")
+SITEFINITY_BACKEND_API_PATH = os.getenv("SITEFINITY_BACKEND_API_ROUTE", "sf/system").rstrip("/").lstrip("/")
 
 # Authentication Configuration
 AUTH_TYPE = os.getenv("SITEFINITY_AUTH_TYPE", "anonymous").lower()
@@ -16,21 +22,25 @@ AUTH_KEY = os.getenv("SITEFINITY_AUTH_KEY", None)
 USERNAME = os.getenv("SITEFINITY_USERNAME", None)
 PASSWORD = os.getenv("SITEFINITY_PASSWORD", None)
 
+ENDPOINTS = SimpleNamespace(
+    content = f"{SITEFINITY_SITE_PREFIX}/{SITEFINITY_FRONTEND_API_PATH}",
+    management = f"{SITEFINITY_SITE_PREFIX}/{SITEFINITY_BACKEND_API_PATH}",
+    authentication = f"{SITEFINITY_SITE_PREFIX}/Sitefinity/Authenticate/OpenID/connect/token"
+)
+
 # API Endpoints
-ENDPOINTS = {
-    "news": f"{SITEFINITY_SITE_PREFIX}/api/default/newsitems",
-    "blogs": f"{SITEFINITY_SITE_PREFIX}/api/default/blogs",
-    "blog_posts": f"{SITEFINITY_SITE_PREFIX}/api/default/blogposts",
-    "events": f"{SITEFINITY_SITE_PREFIX}/api/default/eventsitems",
-    "sites": f"{SITEFINITY_SITE_PREFIX}/api/default/sites",
-    "lists": f"{SITEFINITY_SITE_PREFIX}/api/default/lists",
-    "list_items": f"{SITEFINITY_SITE_PREFIX}/api/default/listitems",
-    "shared_content": f"{SITEFINITY_SITE_PREFIX}/api/default/contentitems",
-    "pages": f"{SITEFINITY_SITE_PREFIX}/api/default/pages",
-    "page_templates": f"{SITEFINITY_SITE_PREFIX}/api/default/templates",
-    # Authentication endpoints
-    "login": f"{SITEFINITY_SITE_PREFIX}/Sitefinity/Authenticate/OpenID/connect/token",
-}
+CONTENT_TYPES = SimpleNamespace(
+    news = "newsitems",
+    blogs = "blogs",
+    blog_posts = "blogposts",
+    events = "eventsitems",
+    sites = "sites",
+    lists = "lists",
+    list_items = "listitems",
+    shared_content = "contentitems",
+    pages = "pages",
+    page_templates = "templates"
+)
 
 # HTTP Headers
 DEFAULT_HEADERS = {"Content-Type": "application/json"}

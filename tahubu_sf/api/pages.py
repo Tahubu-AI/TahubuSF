@@ -1,8 +1,12 @@
 """
 API endpoints for retrieving pages and page templates
 """
-from tahubu_sf.config.settings import ENDPOINTS
+from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request
+
+# Define the API endpoints for pages and page templates
+PAGES_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.pages}"
+PAGE_TEMPLATES_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.page_templates}"
 
 async def get_pages() -> str:
     """
@@ -15,7 +19,7 @@ async def get_pages() -> str:
             - ishomepage: Whether the page is the home page of the site
             - publicationdate: The publication date of the page
     """
-    data = await make_request(ENDPOINTS["pages"])
+    data = await make_request(PAGES_CONTENT_ENDPOINT)
     
     text = ""
     for page in data["value"]:
@@ -36,7 +40,7 @@ async def get_page_templates() -> str:
             - framework: The framework the template is based on
             - renderer: The technology used for the front end
     """
-    data = await make_request(ENDPOINTS["page_templates"])
+    data = await make_request(PAGE_TEMPLATES_CONTENT_ENDPOINT)
     
     text = ""
     for pagetemplate in data["value"]:
