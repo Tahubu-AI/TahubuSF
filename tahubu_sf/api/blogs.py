@@ -21,7 +21,7 @@ async def get_blog_posts() -> str:
     text = ""
     for blogpost in data["value"]:
         title = blogpost["Title"]
-        author = blogpost["CreatedBy"] or "Unknown"
+        #author = blogpost["CreatedBy"] or "Unknown"
         summary = blogpost["Summary"]
         publicationdate = blogpost["PublicationDate"]
         text += (f"Title: {title}\n Summary: {summary}\n Publication Date: {publicationdate}\nAuthor: {author}\n\n")   
