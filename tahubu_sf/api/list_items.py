@@ -85,7 +85,7 @@ async def create_list_item(
         logger.error(f"Error creating List Item draft: {str(e)}")
         raise Exception(f"Failed to create List Item draft: {str(e)}") from e
 
-async def get_parent_Lists() -> Dict[str, str]:
+async def get_parent_lists() -> Dict[str, str]:
     """
     Get a list of available parent lists for selection.
     

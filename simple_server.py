@@ -19,8 +19,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
+from tahubu_sf.api.lists import get_list_items
+from tahubu_sf.api.list_items import create_list_item, get_parent_lists
+from tahubu_sf.api.calendars import get_events
+from tahubu_sf.api.events import get_parent_calendar, create_event
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
+from tahubu_sf.api.shared_content import get_shared_content
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -107,6 +112,12 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_news())
             elif tool_name == "getBlogPosts":
                 result = loop.run_until_complete(get_blog_posts())
+            elif tool_name == "getListItems":
+                result = loop.run_until_complete(get_list_items())
+            elif tool_name == "getEvents":
+                result = loop.run_until_complete(get_events())
+            elif tool_name == "getSharedContent":
+                result = loop.run_until_complete(get_shared_content())
             elif tool_name == "getPages":
                 result = loop.run_until_complete(get_pages())
             elif tool_name == "getPageTemplates":
@@ -142,6 +153,37 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                         summary=summary,
                         parent_id=parent_id,
                         allow_comments=allow_comments
+                    )
+                )
+            elif tool_name == "createEventDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                summary = params.get("summary")
+                parent_id = params.get("parent_id")
+                event_start = params.get("eventstart")
+                event_end = params.get("eventend")
+                
+                # Validate required parameters
+                if not title or not content or not parent_id:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    if not parent_id:
+                        missing.append("parent_id")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_event(
+                        title=title,
+                        content=content,
+                        summary=summary,
+                        parent_id=parent_id,
+                        eventstart= eventstart,
+                        eventend= eventend
                     )
                 )
             else:

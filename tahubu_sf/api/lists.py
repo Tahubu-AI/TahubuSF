@@ -6,7 +6,7 @@ from tahubu_sf.utils.http import make_request
 
 POSTS_CONTENT_ENDPOINT = f"{ENDPOINTS.content}/{CONTENT_TYPES.list_items}"
 
-async def get__list_items() -> str:
+async def get_list_items() -> str:
     """
     Get the current list items from the Sitefinity site.
     

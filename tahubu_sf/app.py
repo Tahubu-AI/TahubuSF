@@ -10,6 +10,12 @@ from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
+from tahubu_sf.api.lists import get_list_items
+from tahubu_sf.api.list_items import create_list_item, get_parent_lists
+from tahubu_sf.api.calendars import get_events
+from tahubu_sf.api.events import get_parent_calendar, create_event
+from tahubu_sf.api.shared_content import get_shared_content
+
 
 # Configure logging
 logging.basicConfig(
@@ -36,7 +42,14 @@ def create_app() -> FastMCP:
         get_page_templates,
         get_sites,
         create_blog_post,
-        get_parent_blogs
+        get_parent_blogs,
+        get_list_items,
+        create_list_item,
+        get_parent_lists,
+        get_parent_calendar,
+        get_events,
+        create_event,
+        get_shared_content
     ]
     
     # Register each tool

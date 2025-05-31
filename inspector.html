@@ -316,6 +316,27 @@
                     <button onclick="runTool('getBlogPosts')">Run Tool</button>
                     <span id="blogposts-loading" class="loading hidden"></span>
                 </div>
+
+                <div class="tool-card">
+                    <h2 class="tool-title">List Items</h2>
+                    <p class="tool-description">Fetch list items from Sitefinity</p>
+                    <button onclick="runTool('getListItems')">Run Tool</button>
+                    <span id="listitems-loading" class="loading hidden"></span>
+                </div>
+
+                <div class="tool-card">
+                    <h2 class="tool-title">Events</h2>
+                    <p class="tool-description">Fetch events from Sitefinity</p>
+                    <button onclick="runTool('getEvents')">Run Tool</button>
+                    <span id="events-loading" class="loading hidden"></span>
+                </div>
+
+                <div class="tool-card">
+                    <h2 class="tool-title">Shared Content</h2>
+                    <p class="tool-description">Fetch Shared Content from Sitefinity</p>
+                    <button onclick="runTool('getSharedContent')">Run Tool</button>
+                    <span id="sharedcontent-loading" class="loading hidden"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -487,7 +508,10 @@
                     if (toolName === 'getParentBlogs' && data.result) {
                         // Format parent blogs results in a more readable way
                         displayParentBlogs(data.result);
-                    } else if (toolName === 'getPageTemplates' && data.result) {
+                    }  else if (toolName === 'getParentLists' && data.result) {
+                        // Format parent Lists in a more readable way
+                        displayParentLists(data.result);
+                    }  else if (toolName === 'getPageTemplates' && data.result) {
                         // Format page templates in a more readable way
                         formatPageTemplatesResults(data.result);
                     } else if (toolName === 'getNews' && data.result) {
@@ -496,12 +520,24 @@
                     } else if (toolName === 'getBlogPosts' && data.result) {
                         // Format blog posts in a more readable way
                         formatBlogPostsResults(data.result);
+                    } else if (toolName === 'getListItems' && data.result) {
+                        // Format list Items in a more readable way
+                        formatListItemsResults(data.result);
                     } else if (toolName === 'getSites' && data.result) {
                         // Format sites in a more readable way
                         formatSitesResults(data.result);
                     } else if (toolName === 'getPages' && data.result) {
                         // Format pages in a more readable way
                         formatPagesResults(data.result);
+                    } else if (toolName === 'getEvents' && data.result) {
+                        // Format events in a more readable way
+                        formatEventsResults(data.result);
+                    } else if (toolName === 'getSharedContent' && data.result) {
+                        // Format Shared Content in a more readable way
+                        formatSharedContentResults(data.result);
+                    } else if (data.result && typeof data.result === 'string') {
+                        // If result is a string, display it directly
+                        document.getElementById('results').textContent = data.result;
                     } else {
                         // Display regular JSON results - ensure pre element exists
                         document.getElementById('results-container').innerHTML = '<pre id="results"></pre>';
@@ -808,6 +844,46 @@
                 document.getElementById('results').textContent = JSON.stringify(parentBlogs, null, 2);
             }
         }
+
+        function displayParentLists(parentLists) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                if (!parentLists || Object.keys(parentLists).length === 0) {
+                    resultsContainer.innerHTML = '<pre id="results">No parent Lists found.</pre>';
+                    return;
+                }
+                
+                let formattedOutput = '<div class="formatted-results">';
+                formattedOutput += '<h3>Available Parent Lists</h3>';
+                
+                for (const [id, title] of Object.entries(parentLists)) {
+                    formattedOutput += `<div class="result-item">
+                        <h3>${title}</h3>
+                        <div class="result-property">
+                            <span class="property-name">ID:</span>
+                            <span class="property-value">${id}</span>
+                        </div>
+                    </div>`;
+                }
+                
+                // Add a note about usage
+                formattedOutput += '<div class="result-item">'+
+                    '<div class="result-property">'+
+                    '<p>Use one of these IDs in the \'parent_id\' field when creating a List Item.</p>'+
+                    '</div></div>';
+                
+                formattedOutput += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = formattedOutput;
+            } catch (error) {
+                console.error('Error displaying parent lists:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = JSON.stringify(parentLists, null, 2);
+            }
+        }
         
         // Close the modal if the user clicks outside of it
         window.onclick = function(event) {
@@ -1065,6 +1141,200 @@
                 
             } catch (error) {
                 console.error('Error formatting blog posts:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+        
+        function formatEventsResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Events</h3>';
+                
+                if (typeof data === 'object' && data !== null) {
+                    // It might be a parsed object with Events
+                    const events = data.value || data;
+                    
+                    if (Array.isArray(events)) {
+                        events.forEach(event => {
+                            html += `<div class="result-item">
+                                <h3>${event.Title || 'Untitled Post'}</h3>`;
+                                
+                            // Add common Event properties
+                            if (event.EventStart) {
+                                const date = new Date(e.EventStart).toLocaleDateString();
+                                html += `<div class="result-property">
+                                    <span class="property-name">Event Start:</span>
+                                    <span class="property-value">${date}</span>
+                                </div>`;
+                            }
+                            if (event.EventEnd) {
+                                const date = new Date(e.EventEnd).toLocaleDateString();
+                                html += `<div class="result-property">
+                                    <span class="property-name">Event End:</span>
+                                    <span class="property-value">${date}</span>
+                                </div>`;
+                            }
+                            
+                            if (event.Summary) {
+                                html += `<div class="result-property">
+                                    <span class="property-name">Summary:</span>
+                                    <span class="property-value">${event.Summary}</span>
+                                </div>`;
+                            }
+
+                            if (event.Content) {
+                                html += `<div class="result-property">
+                                    <span class="property-name">Content:</span>
+                                    <span class="property-value">${event.Content}</span>
+                                </div>`;
+                            }
+                            
+                            if (event.Id) {
+                                html += `<div class="result-property">
+                                    <span class="property-name">ID:</span>
+                                    <span class="property-value">${event.Id}</span>
+                                </div>`;
+                            }
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        // Single event or unknown format
+                        html += formatGenericResult(data);
+                    }
+                } else if (typeof data === 'string') {
+                    // Try to parse the string data
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            html += '<div class="result-item">';
+                            
+                            const lines = item.split('\n');
+                            let title = 'Unknown Post';
+                            
+                            // Extract properties
+                            lines.forEach((line, index) => {
+                                if (index === 0) {
+                                    // Assume first line is title
+                                    title = line.trim();
+                                    html += `<h3>${title}</h3>`;
+                                } else if (line.includes(':')) {
+                                    const [name, value] = line.split(':').map(s => s.trim());
+                                    html += `<div class="result-property">
+                                        <span class="property-name">${name}:</span>
+                                        <span class="property-value">${value}</span>
+                                    </div>`;
+                                } else if (line.trim()) {
+                                    html += `<div class="result-property">${line}</div>`;
+                                }
+                            });
+                            
+                            html += '</div>';
+                        });
+                    } else {
+                        html += `<div class="result-item">
+                            <h3>Events</h3>
+                            <div class="result-property">${data}</div>
+                        </div>`;
+                    }
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting events:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+
+        function formatSharedContentResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Parse the data if needed
+                let sharedcontent = data;
+                if (typeof data === 'string' && data.includes('\n\n')) {
+                    // Try to parse structured string data
+                    sharedcontent = parseStructuredString(data);
+                }
+                
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Shared Content</h3>';
+                
+                if (Array.isArray(sharedcontent)) {
+                    // It's an array of news item objects
+                    sharedcontent.forEach(item => {
+                        html += `<div class="result-item">
+                            <h3>${item.Title || 'Untitled Shared Content'}</h3>`;
+                            
+                        // Add common news properties
+                        if (item.PublicationDate) {
+                            const date = new Date(item.PublicationDate).toLocaleDateString();
+                            html += `<div class="result-property">
+                                <span class="property-name">Published:</span>
+                                <span class="property-value">${date}</span>
+                            </div>`;
+                        }
+                        
+                        if (item.Content) {
+                            html += `<div class="result-property">
+                                <span class="property-name">Content:</span>
+                                <span class="property-value">${item.Content}</span>
+                            </div>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                } else {
+                    // It's a string-based format or unknown format
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    items.forEach(item => {
+                        html += '<div class="result-item">';
+                        
+                        const lines = item.split('\n');
+                        let title = 'Unknown Shared Content';
+                        
+                        // Extract properties
+                        lines.forEach((line, index) => {
+                            if (index === 0) {
+                                // Assume first line is title
+                                title = line.trim();
+                                html += `<h3>${title}</h3>`;
+                            } else if (line.includes(':')) {
+                                const [name, value] = line.split(':').map(s => s.trim());
+                                html += `<div class="result-property">
+                                    <span class="property-name">${name}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            } else if (line.trim()) {
+                                html += `<div class="result-property">${line}</div>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting Shared Content:', error);
                 // Fallback to showing the raw data
                 resultsContainer.innerHTML = '<pre id="results"></pre>';
                 document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);

@@ -33,7 +33,6 @@ CONTENT_TYPES = SimpleNamespace(
     news = "newsitems",
     blogs = "blogs",
     blog_posts = "blogposts",
-    events = "eventsitems",
     sites = "sites",
     lists = "lists",
     list_items = "listitems",
