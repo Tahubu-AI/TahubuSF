@@ -39,7 +39,25 @@ CONTENT_TYPES = SimpleNamespace(
     list_items = "listitems",
     shared_content = "contentitems",
     pages = "pages",
-    page_templates = "templates"
+    page_templates = "templates",
+    calendars = "calendars",
+    events = "events",
+    image_libraries = "albums",
+    images = "images",
+    document_libraries = "documentlibraries",
+    documents = "documents",
+    video_libraries = "videolibraries",
+    videos = "videos",
+    form_drafts = "form-drafts",
+    forms = "forms",
+    search_indexes = "searchindexes",
+    pipe_settings = "pipe-settings",
+    servicehooks = "servicehooks",
+    classifications = "taxonomies",
+    flat_taxonomies = "flat-taxa",
+    Hierarchical_Taxonomies = "hierarchy-taxa",
+    folders = "folders",
+    section_presets = "widgetpresets"
 )
 
 # HTTP Headers
