@@ -26,6 +26,10 @@ from tahubu_sf.api.events import get_parent_calendar, create_event
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 from tahubu_sf.api.shared_content import get_shared_content
+from tahubu_sf.api.albums import get_images
+from tahubu_sf.api.images import create_image, get_albums
+from tahubu_sf.api.document_libraries import get_documents
+from tahubu_sf.api.documents import create_document, get_document_libraries
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -126,6 +130,14 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_sites())
             elif tool_name == "getParentBlogs":
                 result = loop.run_until_complete(get_parent_blogs())
+            elif tool_name == "getAlbums":
+                result = loop.run_until_complete(get_albums())
+            elif tool_name == "getImages":
+                result = loop.run_until_complete(get_images())
+            elif tool_name == "getDocumentLibraries":
+                result = loop.run_until_complete(get_document_libraries())
+            elif tool_name == "getDocuments":
+                result = loop.run_until_complete(get_documents())
             elif tool_name == "createBlogPostDraft":
                 # Extract required parameters
                 title = params.get("title")
@@ -182,8 +194,8 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                         content=content,
                         summary=summary,
                         parent_id=parent_id,
-                        eventstart= eventstart,
-                        eventend= eventend
+                        eventstart= event_start,
+                        eventend= event_end
                     )
                 )
             else:

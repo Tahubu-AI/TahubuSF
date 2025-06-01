@@ -41,7 +41,7 @@ CONTENT_TYPES = SimpleNamespace(
     page_templates = "templates",
     calendars = "calendars",
     events = "events",
-    image_libraries = "albums",
+    albums = "albums",
     images = "images",
     document_libraries = "documentlibraries",
     documents = "documents",
@@ -55,7 +55,7 @@ CONTENT_TYPES = SimpleNamespace(
     classifications = "taxonomies",
     flat_taxonomies = "flat-taxa",
     Hierarchical_Taxonomies = "hierarchy-taxa",
-    folders = "folders",
+    # folders = "folders", // Not very useful
     section_presets = "widgetpresets"
 )
 

@@ -15,6 +15,8 @@ from tahubu_sf.api.list_items import create_list_item, get_parent_lists
 from tahubu_sf.api.calendars import get_events
 from tahubu_sf.api.events import get_parent_calendar, create_event
 from tahubu_sf.api.shared_content import get_shared_content
+from tahubu_sf.api.albums import get_images
+from tahubu_sf.api.images import create_image, get_albums
 
 
 # Configure logging
@@ -49,7 +51,10 @@ def create_app() -> FastMCP:
         get_parent_calendar,
         get_events,
         create_event,
-        get_shared_content
+        get_shared_content,
+        get_images,
+        create_image,
+        get_albums,
     ]
     
     # Register each tool
