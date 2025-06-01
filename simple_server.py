@@ -22,7 +22,7 @@ from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.lists import get_list_items
 from tahubu_sf.api.list_items import create_list_item, get_parent_lists
 from tahubu_sf.api.calendars import get_events
-from tahubu_sf.api.events import get_parent_calendar, create_event
+from tahubu_sf.api.events import get_calendars, create_event
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 from tahubu_sf.api.shared_content import get_shared_content
@@ -30,6 +30,8 @@ from tahubu_sf.api.albums import get_images
 from tahubu_sf.api.images import create_image, get_albums
 from tahubu_sf.api.document_libraries import get_documents
 from tahubu_sf.api.documents import create_document, get_document_libraries
+from tahubu_sf.api.videos import create_video, get_video_libraries
+from tahubu_sf.api.video_libraries import get_videos
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -120,6 +122,8 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_list_items())
             elif tool_name == "getEvents":
                 result = loop.run_until_complete(get_events())
+            elif tool_name == "getCalendars":
+                result = loop.run_until_complete(get_calendars())
             elif tool_name == "getSharedContent":
                 result = loop.run_until_complete(get_shared_content())
             elif tool_name == "getPages":
@@ -130,6 +134,8 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_sites())
             elif tool_name == "getParentBlogs":
                 result = loop.run_until_complete(get_parent_blogs())
+            elif tool_name == "getParentLists":
+                result = loop.run_until_complete(get_parent_lists())
             elif tool_name == "getAlbums":
                 result = loop.run_until_complete(get_albums())
             elif tool_name == "getImages":
@@ -138,6 +144,10 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_document_libraries())
             elif tool_name == "getDocuments":
                 result = loop.run_until_complete(get_documents())
+            elif tool_name == "getVideos":
+                result = loop.run_until_complete(get_videos())
+            elif tool_name == "getVideoLibraries":
+                result = loop.run_until_complete(get_video_libraries())
             elif tool_name == "createBlogPostDraft":
                 # Extract required parameters
                 title = params.get("title")

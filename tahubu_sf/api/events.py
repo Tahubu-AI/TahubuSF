@@ -93,7 +93,7 @@ async def create_event(
         logger.error(f"Error creating Event draft: {str(e)}")
         raise Exception(f"Failed to create Event draft: {str(e)}") from e
 
-async def get_parent_calendar() -> Dict[str, str]:
+async def get_calendars() -> Dict[str, str]:
     """
     Get a list of available parent calendars for selection.
     

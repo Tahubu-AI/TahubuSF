@@ -95,8 +95,8 @@ async def get_albums() -> Dict[str, str]:
     try:
         data = await make_request(ALBUMS_CONTENT_ENDPOINT)
         albums = {album["Id"]: album["Title"] for album in data.get("value", [])}
-        logger.info(f"Found {len(albums)} parent lists")
+        logger.info(f"Found {len(albums)} albums")
         return albums
     except Exception as e:
-        logger.error(f"Error retrieving parent albums: {str(e)}")
+        logger.error(f"Error retrieving albums: {str(e)}")
         return {} 
