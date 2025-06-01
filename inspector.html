@@ -358,6 +358,13 @@
                     <button onclick="runTool('getVideos')">Run Tool</button>
                     <span id="videos-loading" class="loading hidden"></span>
                 </div>
+
+                <div class="tool-card">
+                    <h2 class="tool-title">Forms</h2>
+                    <p class="tool-description">Fetch Forms from Sitefinity</p>
+                    <button onclick="runTool('getForms')">Run Tool</button>
+                    <span id="forms-loading" class="loading hidden"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -608,6 +615,9 @@
                     }  else if (toolName === 'getSites' && data.result) {
                         // Format sites in a more readable way
                         formatSitesResults(data.result);
+                    }  else if (toolName === 'getForms' && data.result) {
+                        // Format Forms in a more readable way
+                        formatFormsResults(data.result);
                     }  else if (toolName === 'getSearchIndexes' && data.result) {
                         // Format Search Indexes in a more readable way
                         formatSearchIndexesResults(data.result);  
@@ -2289,6 +2299,87 @@
                 
             } catch (error) {
                 console.error('Error formatting sites:', error);
+                // Fallback to showing the raw data
+                resultsContainer.innerHTML = '<pre id="results"></pre>';
+                document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            }
+        }
+
+        function formatFormsResults(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            try {
+                // Parse the data if needed
+                let forms = data;
+                if (typeof data === 'string' && data.includes('\n\n')) {
+                    // Try to parse structured string data
+                    forms = parseStructuredString(data);
+                }
+                
+                // Create formatted HTML output
+                let html = '<div class="formatted-results">';
+                html += '<h3>Forms</h3>';
+                
+                if (Array.isArray(forms)) {
+                    // It's an array of form objects
+                    forms.forEach(form => {
+                        html += `<div class="result-item">
+                            <h3>${form.Title || 'Untitled Form'}</h3>`;
+                            
+                        // Add common form properties
+                        if (form.SuccessMessage) {
+                            html += `<div class="result-property">
+                                <span class="property-name">Success Message:</span>
+                                <span class="property-value">${form.SuccessMessage}</span>
+                            </div>`;
+                        }
+                        if (form.Renderer) {
+                            html += `<div class="result-property">
+                                <span class="property-name">Renderer:</span>
+                                <span class="property-value">${form.Renderer}</span>
+                            </div>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                } else {
+                    // It's a string-based format or unknown format
+                    const items = data.split('\n\n').filter(item => item.trim());
+                    
+                    items.forEach(item => {
+                        html += '<div class="result-item">';
+                        
+                        const lines = item.split('\n');
+                        let title = 'Unknown News Item';
+                        
+                        // Extract properties
+                        lines.forEach((line, index) => {
+                            if (index === 0) {
+                                // Assume first line is title
+                                title = line.trim();
+                                html += `<h3>${title}</h3>`;
+                            } else if (line.includes(':')) {
+                                const [name, value] = line.split(':').map(s => s.trim());
+                                html += `<div class="result-property">
+                                    <span class="property-name">${name}:</span>
+                                    <span class="property-value">${value}</span>
+                                </div>`;
+                            } else if (line.trim()) {
+                                html += `<div class="result-property">${line}</div>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                    });
+                }
+                
+                html += '</div>';
+                
+                // Update the results container
+                resultsContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error formatting forms:', error);
                 // Fallback to showing the raw data
                 resultsContainer.innerHTML = '<pre id="results"></pre>';
                 document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);

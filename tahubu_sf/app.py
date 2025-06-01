@@ -24,6 +24,7 @@ from tahubu_sf.api.video_libraries import get_videos
 from tahubu_sf.api.search_indexes import get_search_indexes
 from tahubu_sf.api.taxonomies import get_taxonomies
 from tahubu_sf.api.section_presets import get_section_presets
+from tahubu_sf.api.forms import get_forms
 
 
 # Configure logging
@@ -70,7 +71,8 @@ def create_app() -> FastMCP:
         get_video_libraries, 
         get_search_indexes,
         get_taxonomies,
-        get_section_presets
+        get_section_presets,
+        get_forms
     ]
     
     # Register each tool

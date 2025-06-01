@@ -35,6 +35,7 @@ from tahubu_sf.api.video_libraries import get_videos
 from tahubu_sf.api.search_indexes import get_search_indexes
 from tahubu_sf.api.taxonomies import get_taxonomies
 from tahubu_sf.api.section_presets import get_section_presets
+from tahubu_sf.api.forms import get_forms
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -125,6 +126,8 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_list_items())
             elif tool_name == "getEvents":
                 result = loop.run_until_complete(get_events())
+            elif tool_name == "getForms":
+                result = loop.run_until_complete(get_forms())
             elif tool_name == "getCalendars":
                 result = loop.run_until_complete(get_calendars())
             elif tool_name == "getSharedContent":
