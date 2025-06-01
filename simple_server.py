@@ -32,6 +32,9 @@ from tahubu_sf.api.document_libraries import get_documents
 from tahubu_sf.api.documents import create_document, get_document_libraries
 from tahubu_sf.api.videos import create_video, get_video_libraries
 from tahubu_sf.api.video_libraries import get_videos
+from tahubu_sf.api.search_indexes import get_search_indexes
+from tahubu_sf.api.taxonomies import get_taxonomies
+from tahubu_sf.api.section_presets import get_section_presets
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -148,6 +151,12 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_videos())
             elif tool_name == "getVideoLibraries":
                 result = loop.run_until_complete(get_video_libraries())
+            elif tool_name == "getSearchIndexes":
+                result = loop.run_until_complete(get_search_indexes())
+            elif tool_name == "getTaxonomies":
+                result = loop.run_until_complete(get_taxonomies())
+            elif tool_name == "getSectionPresets":
+                result = loop.run_until_complete(get_section_presets())
             elif tool_name == "createBlogPostDraft":
                 # Extract required parameters
                 title = params.get("title")

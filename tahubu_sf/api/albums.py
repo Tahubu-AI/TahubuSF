@@ -26,12 +26,12 @@ async def get_images() -> str:
     text = ""
     for image in data["value"]:
         title = image["Title"]
-        url = image["Url"]
+        embedurl = image["EmbedUrl"]
         extension = image["Extension"]
         totalsize = image["TotalSize"]
         width = image["Width"]
         height = image["Height"]
         alternativetext = image["AlternativeText"]
         publicationdate = image["PublicationDate"]
-        text += (f"Title: {title}\n Url: {url}\n Publication Date: {publicationdate}\n Extension: {extension}\n Total Size: {totalsize}\n Width: {width}\n Height: {height}\n Alternative Text: {alternativetext}\n\n")   
+        text += (f"Title: {title}\n EmbedUrl: {embedurl}\n Publication Date: {publicationdate}\n Extension: {extension}\n Total Size: {totalsize}\n Width: {width}\n Height: {height}\n Alternative Text: {alternativetext}\n\n")   
     return text 

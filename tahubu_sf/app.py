@@ -21,6 +21,9 @@ from tahubu_sf.api.document_libraries import get_documents
 from tahubu_sf.api.documents import create_document, get_document_libraries
 from tahubu_sf.api.videos import create_video, get_video_libraries
 from tahubu_sf.api.video_libraries import get_videos
+from tahubu_sf.api.search_indexes import get_search_indexes
+from tahubu_sf.api.taxonomies import get_taxonomies
+from tahubu_sf.api.section_presets import get_section_presets
 
 
 # Configure logging
@@ -64,7 +67,10 @@ def create_app() -> FastMCP:
         get_document_libraries,
         get_videos,
         create_video,
-        get_video_libraries
+        get_video_libraries, 
+        get_search_indexes,
+        get_taxonomies,
+        get_section_presets
     ]
     
     # Register each tool
