@@ -50,12 +50,35 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """Handle GET requests - serve HTML UI and static files"""
         if self.path == "/" or self.path == "":
+            # Redirect to the inspector
+            self.send_response(302)
+            self.send_header("Location", "/inspector/")
+            self.end_headers()
+        elif self.path == "/inspector/":
             # Serve the main HTML page
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            with open("inspector.html", "r") as f:
+            with open("inspector/index.html", "r") as f:
                 self.wfile.write(f.read().encode())
+        elif self.path.startswith("/inspector/"):
+            # Serve files from the inspector directory
+            try:
+                file_path = self.path[1:]  # Remove leading '/'
+                with open(file_path, "rb") as f:
+                    # Determine content type
+                    content_type, _ = mimetypes.guess_type(file_path)
+                    if content_type is None:
+                        content_type = "application/octet-stream"
+                    
+                    self.send_response(200)
+                    self.send_header("Content-type", content_type)
+                    self.end_headers()
+                    self.wfile.write(f.read())
+            except (FileNotFoundError, IOError):
+                self.send_response(404)
+                self.end_headers()
+                self.wfile.write(b"File not found")
         elif self.path.startswith("/media/"):
             # Serve files from the media directory
             try:
@@ -253,7 +276,7 @@ def run_server(port=None, host=None):
     logger.info("Open your browser to this URL to test MCP tools")
     
     # Open browser automatically
-    webbrowser.open(f"http://{host}:{port}")
+    webbrowser.open(f"http://{host}:{port}/inspector/")
     
     try:
         server.serve_forever()

@@ -16,7 +16,8 @@ An enterprise-grade MCP server for interacting with Sitefinity APIs.
 │   ├── config/          # Configuration settings
 │   │   └── settings.py  # URL and app configuration
 │   ├── utils/           # Utility functions
-│   │   └── http.py      # HTTP request utilities
+│   │   ├── http.py      # HTTP request utilities
+│   │   └── string_utils.py # String manipulation utilities
 │   └── app.py           # Application factory
 │
 ├── fastapi_server/      # FastAPI implementation
@@ -27,14 +28,22 @@ An enterprise-grade MCP server for interacting with Sitefinity APIs.
 │   ├── azure_deploy.py  # Azure deployment utility
 │   └── tests/           # API tests
 │
+├── inspector/           # Web interface for testing
+│   ├── css/             # CSS stylesheets
+│   │   └── styles.css   # Main stylesheet
+│   ├── js/              # JavaScript files
+│   │   ├── utils.js     # Utility functions
+│   │   ├── formatters.js # Result formatters
+│   │   └── tools.js     # Tool interaction functions
+│   └── index.html       # Main HTML page
+│
 ├── media/               # Static media files
 ├── docs/                # Documentation files
 ├── simple_server.py     # Simple HTTP server for testing
 ├── run_fastapi.py       # FastAPI server entry point
 ├── direct_test.py       # FastAPI testing utility
 ├── test_fastapi.py      # API validation tests
-├── run.py               # Entry point for Claude Desktop
-└── inspector.html       # Web interface for testing
+└── run.py               # Entry point for Claude Desktop
 ```
 
 ## Environment setup
@@ -215,6 +224,19 @@ This starts a custom HTTP server built with Python's standard library that:
 - Is extremely reliable across different Python environments
 
 **Best for**: Daily development and testing when you need a stable experience
+
+#### Inspector Interface Structure
+
+The web interface has been refactored for better maintainability:
+
+- `inspector/`: Root folder for the web interface
+  - `index.html`: Main HTML page
+  - `css/styles.css`: All CSS styles
+  - `js/utils.js`: General utility functions
+  - `js/formatters.js`: Functions for formatting API responses
+  - `js/tools.js`: Functions for interacting with the API
+
+This structure makes it easier to maintain and extend the web interface.
 
 ### 3. FastAPI Server Options
 

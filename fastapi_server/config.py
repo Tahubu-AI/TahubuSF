@@ -23,7 +23,10 @@ class Settings(BaseModel):
     MEDIA_DIR: str = os.path.join(BASE_DIR, "media")
     
     # UI Settings
-    UI_HTML_PATH: str = os.path.join(BASE_DIR, "inspector.html")
+    UI_HTML_PATH: str = os.path.join(BASE_DIR, "inspector", "index.html")
+    INSPECTOR_DIR: str = os.path.join(BASE_DIR, "inspector")
+    HOME_HTML_PATH: str = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    STATIC_DIR: str = os.path.join(os.path.dirname(__file__), "static")
     
     # Azure Settings
     AZURE_APP_NAME: Optional[str] = os.environ.get("AZURE_APP_NAME", None)

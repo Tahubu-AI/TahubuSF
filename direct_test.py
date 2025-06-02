@@ -54,9 +54,9 @@ except Exception as e:
 
 try:
     # Open the browser
-    url = "http://localhost:8000"
-    print(f"Starting server on {url}")
-    print("Opening browser...")
+    url = "http://localhost:8000/inspector/"
+    print(f"Starting server on http://localhost:8000")
+    print(f"Opening browser to {url}")
     webbrowser.open(url)
     
     # Run the server
