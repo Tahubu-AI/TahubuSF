@@ -19,8 +19,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tahubu_sf.api.news import get_news
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
+from tahubu_sf.api.lists import get_list_items
+from tahubu_sf.api.list_items import create_list_item, get_parent_lists
+from tahubu_sf.api.calendars import get_events
+from tahubu_sf.api.events import get_calendars, create_event
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
+from tahubu_sf.api.shared_content import get_shared_content
+from tahubu_sf.api.albums import get_images
+from tahubu_sf.api.images import create_image, get_albums
+from tahubu_sf.api.document_libraries import get_documents
+from tahubu_sf.api.documents import create_document, get_document_libraries
+from tahubu_sf.api.videos import create_video, get_video_libraries
+from tahubu_sf.api.video_libraries import get_videos
+from tahubu_sf.api.search_indexes import get_search_indexes
+from tahubu_sf.api.taxonomies import get_taxonomies
+from tahubu_sf.api.section_presets import get_section_presets
+from tahubu_sf.api.forms import get_forms
 from tahubu_sf.config.settings import AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY
 
 # Initialize mime types and logging
@@ -107,6 +122,16 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_news())
             elif tool_name == "getBlogPosts":
                 result = loop.run_until_complete(get_blog_posts())
+            elif tool_name == "getListItems":
+                result = loop.run_until_complete(get_list_items())
+            elif tool_name == "getEvents":
+                result = loop.run_until_complete(get_events())
+            elif tool_name == "getForms":
+                result = loop.run_until_complete(get_forms())
+            elif tool_name == "getCalendars":
+                result = loop.run_until_complete(get_calendars())
+            elif tool_name == "getSharedContent":
+                result = loop.run_until_complete(get_shared_content())
             elif tool_name == "getPages":
                 result = loop.run_until_complete(get_pages())
             elif tool_name == "getPageTemplates":
@@ -115,6 +140,26 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                 result = loop.run_until_complete(get_sites())
             elif tool_name == "getParentBlogs":
                 result = loop.run_until_complete(get_parent_blogs())
+            elif tool_name == "getParentLists":
+                result = loop.run_until_complete(get_parent_lists())
+            elif tool_name == "getAlbums":
+                result = loop.run_until_complete(get_albums())
+            elif tool_name == "getImages":
+                result = loop.run_until_complete(get_images())
+            elif tool_name == "getDocumentLibraries":
+                result = loop.run_until_complete(get_document_libraries())
+            elif tool_name == "getDocuments":
+                result = loop.run_until_complete(get_documents())
+            elif tool_name == "getVideos":
+                result = loop.run_until_complete(get_videos())
+            elif tool_name == "getVideoLibraries":
+                result = loop.run_until_complete(get_video_libraries())
+            elif tool_name == "getSearchIndexes":
+                result = loop.run_until_complete(get_search_indexes())
+            elif tool_name == "getTaxonomies":
+                result = loop.run_until_complete(get_taxonomies())
+            elif tool_name == "getSectionPresets":
+                result = loop.run_until_complete(get_section_presets())
             elif tool_name == "createBlogPostDraft":
                 # Extract required parameters
                 title = params.get("title")
@@ -142,6 +187,37 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                         summary=summary,
                         parent_id=parent_id,
                         allow_comments=allow_comments
+                    )
+                )
+            elif tool_name == "createEventDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                summary = params.get("summary")
+                parent_id = params.get("parent_id")
+                event_start = params.get("eventstart")
+                event_end = params.get("eventend")
+                
+                # Validate required parameters
+                if not title or not content or not parent_id:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    if not parent_id:
+                        missing.append("parent_id")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_event(
+                        title=title,
+                        content=content,
+                        summary=summary,
+                        parent_id=parent_id,
+                        eventstart= event_start,
+                        eventend= event_end
                     )
                 )
             else:

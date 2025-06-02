@@ -33,13 +33,30 @@ CONTENT_TYPES = SimpleNamespace(
     news = "newsitems",
     blogs = "blogs",
     blog_posts = "blogposts",
-    events = "eventsitems",
     sites = "sites",
     lists = "lists",
     list_items = "listitems",
     shared_content = "contentitems",
     pages = "pages",
-    page_templates = "templates"
+    page_templates = "templates",
+    calendars = "calendars",
+    events = "events",
+    albums = "albums",
+    images = "images",
+    document_libraries = "documentlibraries",
+    documents = "documents",
+    video_libraries = "videolibraries",
+    videos = "videos",
+    # form_drafts = "form-drafts", //Published forms are more useful
+    forms = "forms",
+    search_indexes = "searchindexes",
+    # pipe_settings = "pipe-settings", //Useless for most users
+    servicehooks = "servicehooks",
+    classifications = "taxonomies",
+    flat_taxonomies = "flat-taxa",
+    Hierarchical_Taxonomies = "hierarchy-taxa",
+    # folders = "folders", // Not very useful
+    section_presets = "widgetpresets"
 )
 
 # HTTP Headers
