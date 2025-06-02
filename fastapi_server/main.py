@@ -4,11 +4,12 @@ FastAPI server for the TahubuSF MCP tools that can be deployed to Azure App Serv
 """
 import os
 import logging
+import re
 from typing import Dict, Any
 
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -50,8 +51,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files (media directory)
+# Mount static files
 app.mount("/media", StaticFiles(directory=settings.MEDIA_DIR), name="media")
+app.mount("/inspector/css", StaticFiles(directory=os.path.join(settings.INSPECTOR_DIR, "css")), name="inspector_css")
+app.mount("/inspector/js", StaticFiles(directory=os.path.join(settings.INSPECTOR_DIR, "js")), name="inspector_js")
+app.mount("/static", StaticFiles(directory=settings.STATIC_DIR), name="static")
 
 # Include API routes
 app.include_router(router)
@@ -76,11 +80,18 @@ async def health_check():
         "authentication": auth_status
     }
 
-# Define root endpoint to serve the UI
+# Define root endpoint to serve the home page
 @app.get("/", response_class=HTMLResponse)
-async def get_ui():
-    """Serve the UI HTML page"""
-    with open(settings.UI_HTML_PATH, "r") as f:
+async def get_home():
+    """Serve the home page with links to docs and inspector"""
+    with open(settings.HOME_HTML_PATH, "r", encoding="utf-8") as f:
+        return f.read()
+
+# Serve the inspector UI from /inspector/ path
+@app.get("/inspector/", response_class=HTMLResponse)
+async def get_inspector():
+    """Serve the Inspector UI from /inspector/ path"""
+    with open(settings.UI_HTML_PATH, "r", encoding="utf-8") as f:
         return f.read()
 
 def start():
