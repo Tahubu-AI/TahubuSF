@@ -7,204 +7,225 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <img src="/media/tahubusf-light.svg" alt="TahubuSF Logo" style="width: 350px;">
+    <header class="inspector-header">
+        <img src="/media/tahubusf-light.svg" alt="TahubuSF Logo" class="logo">
+        <h1>Sitefinity MCP Tool Inspector</h1>
+    </header>
     
-    <h1>Sitefinity MCP Tool Inspector</h1>
-    
-    <!-- Content Module Section -->
-    <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Content Modules</span>
-            <span class="accordion-icon">&#9660;</span>
-        </div>
-        <div class="accordion-content">
-            <div class="tool-container">
-                <div class="tool-card">
-                    <h2 class="tool-title">News Items</h2>
-                    <p class="tool-description">Fetch news items from Sitefinity</p>
-                    <button onclick="runTool('getNews')">Run Tool</button>
-                    <span id="news-loading" class="loading hidden"></span>
+    <div class="inspector-container">
+        <!-- Tools Column -->
+        <div class="tools-column">
+            <!-- Content Module Section -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)" id="content-modules-header">
+                    <span>Content Modules</span>
+                    <span class="accordion-icon">&#9660;</span>
                 </div>
-                
-                <div class="tool-card">
-                    <h2 class="tool-title">Blog Posts</h2>
-                    <p class="tool-description">Fetch blog posts from Sitefinity</p>
-                    <button onclick="runTool('getBlogPosts')">Run Tool</button>
-                    <span id="blogposts-loading" class="loading hidden"></span>
-                </div>
+                <div class="accordion-content">
+                    <div class="tool-container">
+                        <div class="tool-card">
+                            <h2 class="tool-title">News Items</h2>
+                            <p class="tool-description">Fetch news items from Sitefinity</p>
+                            <button onclick="runTool('getNews')">Run Tool</button>
+                            <span id="news-loading" class="loading hidden"></span>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <h2 class="tool-title">Blog Posts</h2>
+                            <p class="tool-description">Fetch blog posts from Sitefinity</p>
+                            <button onclick="runTool('getBlogPosts')">Run Tool</button>
+                            <span id="blogposts-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">List Items</h2>
-                    <p class="tool-description">Fetch list items from Sitefinity</p>
-                    <button onclick="runTool('getListItems')">Run Tool</button>
-                    <span id="listitems-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">List Items</h2>
+                            <p class="tool-description">Fetch list items from Sitefinity</p>
+                            <button onclick="runTool('getListItems')">Run Tool</button>
+                            <span id="listitems-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Events</h2>
-                    <p class="tool-description">Fetch events from Sitefinity</p>
-                    <button onclick="runTool('getEvents')">Run Tool</button>
-                    <span id="events-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Events</h2>
+                            <p class="tool-description">Fetch events from Sitefinity</p>
+                            <button onclick="runTool('getEvents')">Run Tool</button>
+                            <span id="events-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Shared Content</h2>
-                    <p class="tool-description">Fetch Shared Content from Sitefinity</p>
-                    <button onclick="runTool('getSharedContent')">Run Tool</button>
-                    <span id="sharedcontent-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Shared Content</h2>
+                            <p class="tool-description">Fetch Shared Content from Sitefinity</p>
+                            <button onclick="runTool('getSharedContent')">Run Tool</button>
+                            <span id="sharedcontent-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Images</h2>
-                    <p class="tool-description">Fetch Images from Sitefinity</p>
-                    <button onclick="runTool('getImages')">Run Tool</button>
-                    <span id="images-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Images</h2>
+                            <p class="tool-description">Fetch Images from Sitefinity</p>
+                            <button onclick="runTool('getImages')">Run Tool</button>
+                            <span id="images-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Documents</h2>
-                    <p class="tool-description">Fetch Documents from Sitefinity</p>
-                    <button onclick="runTool('getDocuments')">Run Tool</button>
-                    <span id="documents-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Documents</h2>
+                            <p class="tool-description">Fetch Documents from Sitefinity</p>
+                            <button onclick="runTool('getDocuments')">Run Tool</button>
+                            <span id="documents-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Videos</h2>
-                    <p class="tool-description">Fetch videos from Sitefinity</p>
-                    <button onclick="runTool('getVideos')">Run Tool</button>
-                    <span id="videos-loading" class="loading hidden"></span>
-                </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Videos</h2>
+                            <p class="tool-description">Fetch videos from Sitefinity</p>
+                            <button onclick="runTool('getVideos')">Run Tool</button>
+                            <span id="videos-loading" class="loading hidden"></span>
+                        </div>
 
-                <div class="tool-card">
-                    <h2 class="tool-title">Forms</h2>
-                    <p class="tool-description">Fetch Forms from Sitefinity</p>
-                    <button onclick="runTool('getForms')">Run Tool</button>
-                    <span id="forms-loading" class="loading hidden"></span>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Forms</h2>
+                            <p class="tool-description">Fetch Forms from Sitefinity</p>
+                            <button onclick="runTool('getForms')">Run Tool</button>
+                            <span id="forms-loading" class="loading hidden"></span>
+                        </div>
+                    </div>
+                    <div class="collapse-section">
+                        <button class="collapse-section-btn" onclick="toggleAccordion(document.getElementById('content-modules-header'))">Collapse Section</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pages & Templates Section -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)" id="pages-templates-header">
+                    <span>Pages, Templates, & Section Presets</span>
+                    <span class="accordion-icon">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="tool-container">
+                        <div class="tool-card">
+                            <h2 class="tool-title">Pages</h2>
+                            <p class="tool-description">Fetch pages from Sitefinity</p>
+                            <button onclick="runTool('getPages')">Run Tool</button>
+                            <span id="pages-loading" class="loading hidden"></span>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <h2 class="tool-title">Page Templates</h2>
+                            <p class="tool-description">Fetch page templates from Sitefinity</p>
+                            <button onclick="runTool('getPageTemplates')">Run Tool</button>
+                            <span id="pagetemplates-loading" class="loading hidden"></span>
+                        </div>
+
+                        <div class="tool-card">
+                            <h2 class="tool-title">Section Presets</h2>
+                            <p class="tool-description">Fetch Section Presets from Sitefinity</p>
+                            <button onclick="runTool('getSectionPresets')">Run Tool</button>
+                            <span id="sectionpresets-loading" class="loading hidden"></span>
+                        </div>
+                    </div>
+                    <div class="collapse-section">
+                        <button class="collapse-section-btn" onclick="toggleAccordion(document.getElementById('pages-templates-header'))">Collapse Section</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Site Management Section -->
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)" id="site-management-header">
+                    <span>Site Management</span>
+                    <span class="accordion-icon">&#9660;</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="tool-container">
+                        <div class="tool-card">
+                            <h2 class="tool-title">Sites</h2>
+                            <p class="tool-description">Fetch sites from Sitefinity</p>
+                            <button onclick="runTool('getSites')">Run Tool</button>
+                            <span id="sites-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Search Indexes</h2>
+                            <p class="tool-description">Fetch Search Indexes from Sitefinity</p>
+                            <button onclick="runTool('getSearchIndexes')">Run Tool</button>
+                            <span id="searchindexes-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Taxonomies</h2>
+                            <p class="tool-description">Fetch Taxonomies from Sitefinity</p>
+                            <button onclick="runTool('getTaxonomies')">Run Tool</button>
+                            <span id="taxonomies-loading" class="loading hidden"></span>
+                        </div>
+                    </div>
+                    <div class="collapse-section">
+                        <button class="collapse-section-btn" onclick="toggleAccordion(document.getElementById('site-management-header'))">Collapse Section</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Entity Management Section -->
+            <div class="accordion">
+                <div class="accordion-header active" onclick="toggleAccordion(this)" id="entity-management-header">
+                    <span>Entity Management</span>
+                    <span class="accordion-icon">&#9660;</span>
+                </div>
+                <div class="accordion-content active">
+                    <div class="tool-container">
+                        <div class="tool-card">
+                            <h2 class="tool-title">Parent Blogs</h2>
+                            <p class="tool-description">Fetch available parent blogs from Sitefinity</p>
+                            <button onclick="runTool('getParentBlogs')">Run Tool</button>
+                            <span id="parentblogs-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Parent Lists</h2>
+                            <p class="tool-description">Fetch available parent lists from Sitefinity</p>
+                            <button onclick="runTool('getParentLists')">Run Tool</button>
+                            <span id="parentlists-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Calendars</h2>
+                            <p class="tool-description">Fetch available calendars from Sitefinity</p>
+                            <button onclick="runTool('getCalendars')">Run Tool</button>
+                            <span id="calendars-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Albums</h2>
+                            <p class="tool-description">Fetch available albums from Sitefinity</p>
+                            <button onclick="runTool('getAlbums')">Run Tool</button>
+                            <span id="albums-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Document Libraries</h2>
+                            <p class="tool-description">Fetch available document Libraries from Sitefinity</p>
+                            <button onclick="runTool('getDocumentLibraries')">Run Tool</button>
+                            <span id="documentlibraries-loading" class="loading hidden"></span>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Video Libraries</h2>
+                            <p class="tool-description">Fetch available video Libraries from Sitefinity</p>
+                            <button onclick="runTool('getVideoLibraries')">Run Tool</button>
+                            <span id="videolibraries-loading" class="loading hidden"></span>
+                        </div>
+                        
+                        <div class="tool-card">
+                            <h2 class="tool-title">Create Blog Post</h2>
+                            <p class="tool-description">Create a new blog post draft in Sitefinity</p>
+                            <button onclick="openBlogEditor()">Open Editor</button>
+                        </div>
+                    </div>
+                    <div class="collapse-section">
+                        <button class="collapse-section-btn" onclick="toggleAccordion(document.getElementById('entity-management-header'))">Collapse Section</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Pages & Templates Section -->
-    <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Pages, Templates, & Section Presets</span>
-            <span class="accordion-icon">&#9660;</span>
-        </div>
-        <div class="accordion-content">
-            <div class="tool-container">
-                <div class="tool-card">
-                    <h2 class="tool-title">Pages</h2>
-                    <p class="tool-description">Fetch pages from Sitefinity</p>
-                    <button onclick="runTool('getPages')">Run Tool</button>
-                    <span id="pages-loading" class="loading hidden"></span>
-                </div>
-                
-                <div class="tool-card">
-                    <h2 class="tool-title">Page Templates</h2>
-                    <p class="tool-description">Fetch page templates from Sitefinity</p>
-                    <button onclick="runTool('getPageTemplates')">Run Tool</button>
-                    <span id="pagetemplates-loading" class="loading hidden"></span>
-                </div>
-
-                <div class="tool-card">
-                    <h2 class="tool-title">Section Presets</h2>
-                    <p class="tool-description">Fetch Section Presets from Sitefinity</p>
-                    <button onclick="runTool('getSectionPresets')">Run Tool</button>
-                    <span id="sectionpresets-loading" class="loading hidden"></span>
+        
+        <!-- Results Column -->
+        <div class="results-column">
+            <div class="results">
+                <h2>Results</h2>
+                <div id="results-container">
+                    <pre id="results">Run a tool to see results...</pre>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Site Management Section -->
-    <div class="accordion">
-        <div class="accordion-header" onclick="toggleAccordion(this)">
-            <span>Site Management</span>
-            <span class="accordion-icon">&#9660;</span>
-        </div>
-        <div class="accordion-content">
-            <div class="tool-container">
-                <div class="tool-card">
-                    <h2 class="tool-title">Sites</h2>
-                    <p class="tool-description">Fetch sites from Sitefinity</p>
-                    <button onclick="runTool('getSites')">Run Tool</button>
-                    <span id="sites-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Search Indexes</h2>
-                    <p class="tool-description">Fetch Search Indexes from Sitefinity</p>
-                    <button onclick="runTool('getSearchIndexes')">Run Tool</button>
-                    <span id="searchindexes-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Taxonomies</h2>
-                    <p class="tool-description">Fetch Taxonomies from Sitefinity</p>
-                    <button onclick="runTool('getTaxonomies')">Run Tool</button>
-                    <span id="taxonomies-loading" class="loading hidden"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Entity Management Section -->
-    <div class="accordion">
-        <div class="accordion-header active" onclick="toggleAccordion(this)">
-            <span>Entity Management</span>
-            <span class="accordion-icon">&#9660;</span>
-        </div>
-        <div class="accordion-content active">
-            <div class="tool-container">
-                <div class="tool-card">
-                    <h2 class="tool-title">Parent Blogs</h2>
-                    <p class="tool-description">Fetch available parent blogs from Sitefinity</p>
-                    <button onclick="runTool('getParentBlogs')">Run Tool</button>
-                    <span id="parentblogs-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Parent Lists</h2>
-                    <p class="tool-description">Fetch available parent lists from Sitefinity</p>
-                    <button onclick="runTool('getParentLists')">Run Tool</button>
-                    <span id="parentlists-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Calendars</h2>
-                    <p class="tool-description">Fetch available calendars from Sitefinity</p>
-                    <button onclick="runTool('getCalendars')">Run Tool</button>
-                    <span id="calendars-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Albums</h2>
-                    <p class="tool-description">Fetch available albums from Sitefinity</p>
-                    <button onclick="runTool('getAlbums')">Run Tool</button>
-                    <span id="albums-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Document Libraries</h2>
-                    <p class="tool-description">Fetch available document Libraries from Sitefinity</p>
-                    <button onclick="runTool('getDocumentLibraries')">Run Tool</button>
-                    <span id="documentlibraries-loading" class="loading hidden"></span>
-                </div>
-                <div class="tool-card">
-                    <h2 class="tool-title">Video Libraries</h2>
-                    <p class="tool-description">Fetch available video Libraries from Sitefinity</p>
-                    <button onclick="runTool('getVideoLibraries')">Run Tool</button>
-                    <span id="videolibraries-loading" class="loading hidden"></span>
-                </div>
-                
-                <div class="tool-card">
-                    <h2 class="tool-title">Create Blog Post</h2>
-                    <p class="tool-description">Create a new blog post draft in Sitefinity</p>
-                    <button onclick="openBlogEditor()">Open Editor</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="results">
-        <h2>Results</h2>
-        <div id="results-container">
-            <pre id="results">Run a tool to see results...</pre>
         </div>
     </div>
     
@@ -233,6 +254,14 @@
         </div>
     </div>
     
+    <!-- Mobile Toggle for Results -->
+    <div class="mobile-results-toggle">
+        <button id="toggle-results-btn" onclick="toggleMobileResults()">
+            <span class="toggle-icon">↑</span> 
+            <span class="toggle-text">Show Results</span>
+        </button>
+    </div>
+    
     <!-- Load JavaScript files -->
     <script src="js/utils.js"></script>
     <script src="js/formatters.js"></script>
@@ -252,6 +281,15 @@
                     closeBlogEditor();
                 }
             }
+            
+            // Listen for window resize to adjust results visibility on desktop
+            window.addEventListener('resize', function() {
+                const resultsColumn = document.querySelector('.results-column');
+                if (window.innerWidth > 768) {
+                    // On desktop, ensure any mobile-specific classes are removed
+                    resultsColumn.classList.remove('mobile-visible');
+                }
+            });
         });
     </script>
 </body>

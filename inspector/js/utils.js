@@ -7,21 +7,59 @@ function toggleAccordion(header) {
     header.classList.toggle('active');
     
     const content = header.nextElementSibling;
+    
+    // Toggle active class on content
     content.classList.toggle('active');
     
-    // Open and close with animation
+    // Recalculate scrollHeight to account for dynamic content
+    // This is important when the collapse button at the bottom is clicked
     if (content.classList.contains('active')) {
-        content.style.maxHeight = content.scrollHeight + "px";
+        // First set maxHeight to none to get the true scrollHeight
+        content.style.maxHeight = 'none';
+        // Then get the scrollHeight and set it as the maxHeight
+        const scrollHeight = content.scrollHeight;
+        content.style.maxHeight = scrollHeight + "px";
     } else {
         content.style.maxHeight = 0;
     }
     
-    // Initialize the content div max-height for active sections
+    // Initialize the content div max-height for other active sections
     document.querySelectorAll('.accordion-content.active').forEach(element => {
         if (element !== content) {
-            element.style.maxHeight = element.scrollHeight + "px";
+            // Do the same recalculation for other active sections
+            element.style.maxHeight = 'none';
+            const scrollHeight = element.scrollHeight;
+            element.style.maxHeight = scrollHeight + "px";
         }
     });
+}
+
+// Toggle mobile results visibility
+function toggleMobileResults() {
+    const resultsColumn = document.querySelector('.results-column');
+    const toggleBtn = document.getElementById('toggle-results-btn');
+    const toggleText = toggleBtn.querySelector('.toggle-text');
+    const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+    
+    // Check current state
+    const isVisible = resultsColumn.classList.contains('mobile-visible');
+    
+    // Toggle visibility class
+    if (isVisible) {
+        resultsColumn.classList.remove('mobile-visible');
+        toggleText.textContent = 'Show Results';
+        toggleIcon.textContent = '↑';
+    } else {
+        resultsColumn.classList.add('mobile-visible');
+        toggleText.textContent = 'Hide Results';
+        toggleIcon.textContent = '↓';
+        
+        // Scroll to the top of results when showing
+        const resultsContainer = document.getElementById('results-container');
+        if (resultsContainer) {
+            resultsContainer.scrollTop = 0;
+        }
+    }
 }
 
 // Show notification
