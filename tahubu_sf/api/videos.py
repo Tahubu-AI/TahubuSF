@@ -8,6 +8,7 @@ from typing import Dict, Any, Optional
 
 from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request, make_post_request
+from tahubu_sf.utils import generate_url_name
 
 logger = logging.getLogger(__name__)
 
@@ -52,23 +53,7 @@ async def create_video(
         }
         
         # Generate a proper URL name from the title following Sitefinity requirements
-        # - Remove any non-alphanumeric characters except hyphens
-        # - Convert to lowercase
-        # - Replace spaces and other characters with hyphens
-        # - Remove consecutive hyphens
-        # - Remove leading/trailing hyphens
-        # - Limit to 100 characters
-        url_name = title.lower()
-        # First replace spaces with hyphens
-        url_name = url_name.replace(" ", "-")
-        # Then replace all non-alphanumeric and non-hyphen characters
-        url_name = re.sub(r'[^a-z0-9-]', '', url_name)
-        # Replace multiple consecutive hyphens with a single one
-        url_name = re.sub(r'-+', '-', url_name)
-        # Remove leading/trailing hyphens
-        url_name = url_name.strip('-')
-        # Limit to 100 characters
-        url_name = url_name[:100]
+        url_name = generate_url_name(title)
         
         post_data["UrlName"] = url_name
         
