@@ -622,6 +622,13 @@ function formatBlogPostsResults(data) {
                     <span class="property-value">${post.Summary}</span>
                 </div>`;
             }
+
+            if (post.Id) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">ID:</span>
+                    <span class="property-value">${post.Id}</span>
+                </div>`;
+            }
                 
             formattedOutput += '</div>';
         });
@@ -682,6 +689,13 @@ function formatListItemsResults(data) {
                 formattedOutput += `<div class="result-property">
                     <span class="property-name">Content:</span>
                     <span class="property-value">${truncatedContent}</span>
+                </div>`;
+            }
+
+            if (item.Id) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">ID:</span>
+                    <span class="property-value">${item.Id}</span>
                 </div>`;
             }
                 

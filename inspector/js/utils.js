@@ -90,39 +90,48 @@ function showNotification(message, type = "success") {
 }
 
 // Parse a structured string into an array of objects
-function parseStructuredString(data) {
-    if (!data || typeof data !== 'string') {
-        return data;
-    }
-    
+function parseStructuredString(str) {
+    // Try to identify and parse a string with structured data
     try {
-        // First try to parse as JSON
-        return JSON.parse(data);
+        // First check if it's JSON
+        return JSON.parse(str);
     } catch (e) {
-        // Not valid JSON, try to parse as structured text
-        const entries = data.split('\n\n').filter(entry => entry.trim());
+        // Not JSON, might be another structured format
         const items = [];
         
-        entries.forEach(entry => {
-            const lines = entry.split('\n');
+        // Split by double newlines which typically separate items
+        const chunks = str.split('\n\n').filter(chunk => chunk.trim());
+        
+        chunks.forEach(chunk => {
             const item = {};
+            const lines = chunk.split('\n');
             
-            // Extract properties from each line
             lines.forEach(line => {
-                const match = line.match(/([^:]+):\s*(.*)/);
-                if (match) {
-                    const key = match[1].trim();
-                    const value = match[2].trim();
-                    item[key] = value;
-                }
-            });
+                    if (line.includes(':')) {
+                        // Only split on the first colon, and do not split if the value part contains 'https://'
+                        const colonIndex = line.indexOf(':');
+                        if (colonIndex !== -1) {
+                            let key = line.substring(0, colonIndex).trim();
+                            // Remove spaces inside the key
+                            key = key.replace(/\s+/g, '');
+                            const value = line.substring(colonIndex + 1).trim();
+                            // If value contains 'https://', do not split further
+                            if (value.includes('https://')) {
+                                item[key] = value;
+                            } else {
+                                // If value does not contain 'https://', assign as usual
+                                item[key] = value;
+                            }
+                        }
+                    }
+                });
             
             if (Object.keys(item).length > 0) {
                 items.push(item);
             }
         });
         
-        return items.length > 0 ? items : data;
+        return items.length > 0 ? items : str;
     }
 }
 
