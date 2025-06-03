@@ -148,32 +148,23 @@ function displayParentBlogs(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let parentBlogs = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const blogsDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const blogsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        blogsDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    blogsDict[id] = title;
+                if (Object.keys(blogsDict).length > 0) {
+                    parentBlogs = blogsDict;
                 }
-            });
-            
-            parentBlogs = blogsDict;
+            }
         }
         
         if (!parentBlogs || Object.keys(parentBlogs).length === 0) {
@@ -217,32 +208,23 @@ function displayParentLists(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let parentLists = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const listsDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const listsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        listsDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    listsDict[id] = title;
+                if (Object.keys(listsDict).length > 0) {
+                    parentLists = listsDict;
                 }
-            });
-            
-            parentLists = listsDict;
+            }
         }
         
         if (!parentLists || Object.keys(parentLists).length === 0) {
@@ -286,32 +268,23 @@ function displayAlbums(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let albums = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const albumsDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const albumsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        albumsDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    albumsDict[id] = title;
+                if (Object.keys(albumsDict).length > 0) {
+                    albums = albumsDict;
                 }
-            });
-            
-            albums = albumsDict;
+            }
         }
         
         if (!albums || Object.keys(albums).length === 0) {
@@ -355,32 +328,23 @@ function displayCalendars(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let calendars = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const calendarsDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const calendarsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        calendarsDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    calendarsDict[id] = title;
+                if (Object.keys(calendarsDict).length > 0) {
+                    calendars = calendarsDict;
                 }
-            });
-            
-            calendars = calendarsDict;
+            }
         }
         
         if (!calendars || Object.keys(calendars).length === 0) {
@@ -424,32 +388,23 @@ function displayDocumentLibraries(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let documentlibraries = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const librariesDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const librariesDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        librariesDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    librariesDict[id] = title;
+                if (Object.keys(librariesDict).length > 0) {
+                    documentlibraries = librariesDict;
                 }
-            });
-            
-            documentlibraries = librariesDict;
+            }
         }
         
         if (!documentlibraries || Object.keys(documentlibraries).length === 0) {
@@ -493,32 +448,23 @@ function displayVideoLibraries(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
+        // Parse the data if it's a string or object format
         let videolibraries = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into a dictionary object
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const librariesDict = {};
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                let id, title;
-                
-                // Extract ID and Title
-                lines.forEach(line => {
-                    if (line.startsWith('ID:')) {
-                        id = line.replace('ID:', '').trim();
-                    } else if (line.startsWith('Title:')) {
-                        title = line.replace('Title:', '').trim();
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const librariesDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        librariesDict[item.Id] = item.Title;
                     }
                 });
-                
-                if (id && title) {
-                    librariesDict[id] = title;
+                if (Object.keys(librariesDict).length > 0) {
+                    videolibraries = librariesDict;
                 }
-            });
-            
-            videolibraries = librariesDict;
+            }
         }
         
         if (!videolibraries || Object.keys(videolibraries).length === 0) {
@@ -565,39 +511,11 @@ function formatNewsResults(data) {
         // Parse the data if it's a string
         let news = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const newsItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const item = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') item.Title = value;
-                        else if (key === 'Summary') item.Summary = value;
-                        else if (key === 'Content') item.Content = value;
-                        else if (key === 'Publication Date') item.PublicationDate = value;
-                        else if (key === 'Author') item.Author = value;
-                        else if (key.toLowerCase() === 'id') item.Id = value;
-                        else item[key] = value;
-                    }
-                });
-                
-                if (Object.keys(item).length > 0) {
-                    newsItems.push(item);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            news = { value: newsItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                news = { value: parsedData };
+            }
         }
         
         if (!news || !news.value || news.value.length === 0) {
@@ -664,39 +582,11 @@ function formatBlogPostsResults(data) {
         // Parse the data if it's a string
         let posts = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const blogPosts = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const post = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') post.Title = value;
-                        else if (key === 'Summary') post.Summary = value;
-                        else if (key === 'Content') post.Content = value;
-                        else if (key === 'Publication Date') post.PublicationDate = value;
-                        else if (key === 'Author') post.Author = value;
-                        else if (key.toLowerCase() === 'id') post.Id = value;
-                        else post[key] = value;
-                    }
-                });
-                
-                if (Object.keys(post).length > 0) {
-                    blogPosts.push(post);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            posts = { value: blogPosts };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                posts = { value: parsedData };
+            }
         }
         
         if (!posts || !posts.value || posts.value.length === 0) {
@@ -756,39 +646,11 @@ function formatListItemsResults(data) {
         // Parse the data if it's a string
         let items = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const listItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const item = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') item.Title = value;
-                        else if (key === 'Summary') item.Summary = value;
-                        else if (key === 'Content') item.Content = value;
-                        else if (key === 'Publication Date') item.PublicationDate = value;
-                        else if (key === 'Author') item.Author = value;
-                        else if (key.toLowerCase() === 'id') item.Id = value;
-                        else item[key] = value;
-                    }
-                });
-                
-                if (Object.keys(item).length > 0) {
-                    listItems.push(item);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            items = { value: listItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                items = { value: parsedData };
+            }
         }
         
         if (!items || !items.value || items.value.length === 0) {
@@ -846,36 +708,11 @@ function formatSitesResults(data) {
         // Parse the data if it's a string
         let sites = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const siteItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const site = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Name') site.Name = value;
-                        else if (key === 'IsDefault' && value.toLowerCase() === 'true') site.IsDefault = true;
-                        else if (key.toLowerCase() === 'id') site.Id = value;
-                        else site[key] = value;
-                    }
-                });
-                
-                if (Object.keys(site).length > 0) {
-                    siteItems.push(site);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            sites = { value: siteItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                sites = { value: parsedData };
+            }
         }
         
         if (!sites || !sites.value || sites.value.length === 0) {
@@ -890,11 +727,14 @@ function formatSitesResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${site.Name || 'Unnamed Site'}</h3>`;
                 
-            if (site.IsDefault) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Default Site:</span>
-                    <span class="property-value">Yes</span>
-                </div>`;
+            // Add all site properties except Title/Name
+            for (const [key, value] of Object.entries(site)) {
+                if (key !== 'Title' && key !== 'Name') {
+                    formattedOutput += `<div class="result-property">
+                        <span class="property-name">${key}:</span>
+                        <span class="property-value">${value}</span>
+                    </div>`;
+                }
             }
                 
             formattedOutput += '</div>';
@@ -920,36 +760,11 @@ function formatFormsResults(data) {
         // Parse the data if it's a string
         let forms = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const formItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const form = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') form.Title = value;
-                        else if (key === 'UrlName') form.UrlName = value;
-                        else if (key.toLowerCase() === 'id') form.Id = value;
-                        else form[key] = value;
-                    }
-                });
-                
-                if (Object.keys(form).length > 0) {
-                    formItems.push(form);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            forms = { value: formItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                forms = { value: parsedData };
+            }
         }
         
         if (!forms || !forms.value || forms.value.length === 0) {
@@ -964,10 +779,17 @@ function formatFormsResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${form.Title || 'Untitled Form'}</h3>`;
                 
-            if (form.UrlName) {
+            // Add common form properties
+            if (form.SuccessMessage) {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${form.UrlName}</span>
+                    <span class="property-name">Success Message:</span>
+                    <span class="property-value">${form.SuccessMessage}</span>
+                </div>`;
+            }
+            if (form.Renderer) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Renderer:</span>
+                    <span class="property-value">${form.Renderer}</span>
                 </div>`;
             }
                 
@@ -994,36 +816,11 @@ function formatSearchIndexesResults(data) {
         // Parse the data if it's a string
         let indexes = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const indexItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const index = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Name') index.Name = value;
-                        else if (key === 'Description') index.Description = value;
-                        else if (key.toLowerCase() === 'id') index.Id = value;
-                        else index[key] = value;
-                    }
-                });
-                
-                if (Object.keys(index).length > 0) {
-                    indexItems.push(index);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            indexes = { value: indexItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                indexes = { value: parsedData };
+            }
         }
         
         if (!indexes || !indexes.value || indexes.value.length === 0) {
@@ -1038,10 +835,17 @@ function formatSearchIndexesResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${index.Name || 'Unnamed Index'}</h3>`;
                 
-            if (index.Description) {
+            if (index.IsActive) {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">Description:</span>
-                    <span class="property-value">${index.Description}</span>
+                    <span class="property-name">IsActive:</span>
+                    <span class="property-value">${index.IsActive}</span>
+                </div>`;
+            }
+            
+            if (index.IsBackend) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">IsBackend:</span>
+                    <span class="property-value">${index.IsBackend}</span>
                 </div>`;
             }
                 
@@ -1068,36 +872,11 @@ function formatTaxonomiesResults(data) {
         // Parse the data if it's a string
         let taxonomies = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const taxonomyItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const taxonomy = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') taxonomy.Title = value;
-                        else if (key === 'TaxonomyType') taxonomy.TaxonomyType = value;
-                        else if (key.toLowerCase() === 'id') taxonomy.Id = value;
-                        else taxonomy[key] = value;
-                    }
-                });
-                
-                if (Object.keys(taxonomy).length > 0) {
-                    taxonomyItems.push(taxonomy);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            taxonomies = { value: taxonomyItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                taxonomies = { value: parsedData };
+            }
         }
         
         if (!taxonomies || !taxonomies.value || taxonomies.value.length === 0) {
@@ -1112,10 +891,24 @@ function formatTaxonomiesResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${taxonomy.Title || 'Untitled Taxonomy'}</h3>`;
                 
-            if (taxonomy.TaxonomyType) {
+            if (taxonomy.TaxonName) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Taxon Name:</span>
+                    <span class="property-value">${taxonomy.TaxonName}</span>
+                </div>`;
+            }
+            
+            if (taxonomy.Type) {
                 formattedOutput += `<div class="result-property">
                     <span class="property-name">Type:</span>
-                    <span class="property-value">${taxonomy.TaxonomyType}</span>
+                    <span class="property-value">${taxonomy.Type}</span>
+                </div>`;
+            }
+
+            if (taxonomy.UseCount) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Use Count:</span>
+                    <span class="property-value">${taxonomy.UseCount}</span>
                 </div>`;
             }
                 
@@ -1142,36 +935,11 @@ function formatSectionPresetsResults(data) {
         // Parse the data if it's a string
         let presets = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const presetItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const preset = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') preset.Title = value;
-                        else if (key === 'SectionName') preset.SectionName = value;
-                        else if (key.toLowerCase() === 'id') preset.Id = value;
-                        else preset[key] = value;
-                    }
-                });
-                
-                if (Object.keys(preset).length > 0) {
-                    presetItems.push(preset);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            presets = { value: presetItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                presets = { value: parsedData };
+            }
         }
         
         if (!presets || !presets.value || presets.value.length === 0) {
@@ -1186,10 +954,9 @@ function formatSectionPresetsResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${preset.Title || 'Untitled Preset'}</h3>`;
                 
-            if (preset.SectionName) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Section Name:</span>
-                    <span class="property-value">${preset.SectionName}</span>
+            if (preset.Thumbnail) {
+                formattedOutput += `<div class="result-item">
+                    <img src=${preset.Thumbnail} width=800px/>
                 </div>`;
             }
                 
@@ -1216,37 +983,11 @@ function formatPagesResults(data) {
         // Parse the data if it's a string
         let pages = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const pageItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const page = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') page.Title = value;
-                        else if (key === 'UrlName') page.UrlName = value;
-                        else if (key === 'ParentId') page.ParentId = value;
-                        else if (key.toLowerCase() === 'id') page.Id = value;
-                        else page[key] = value;
-                    }
-                });
-                
-                if (Object.keys(page).length > 0) {
-                    pageItems.push(page);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            pages = { value: pageItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                pages = { value: parsedData };
+            }
         }
         
         if (!pages || !pages.value || pages.value.length === 0) {
@@ -1261,18 +1002,14 @@ function formatPagesResults(data) {
             formattedOutput += `<div class="result-item">
                 <h3>${page.Title || 'Untitled Page'}</h3>`;
                 
-            if (page.ParentId) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Parent ID:</span>
-                    <span class="property-value">${page.ParentId}</span>
-                </div>`;
-            }
-            
-            if (page.UrlName) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${page.UrlName}</span>
-                </div>`;
+            // Add common page properties
+            for (const [key, value] of Object.entries(page)) {
+                if (key !== 'Title') {
+                    formattedOutput += `<div class="result-property">
+                        <span class="property-name">${key}:</span>
+                        <span class="property-value">${value}</span>
+                    </div>`;
+                }
             }
                 
             formattedOutput += '</div>';
@@ -1298,41 +1035,11 @@ function formatEventsResults(data) {
         // Parse the data if it's a string
         let events = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const eventItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const event = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') event.Title = value;
-                        else if (key === 'Summary') event.Summary = value;
-                        else if (key === 'Content') event.Content = value;
-                        else if (key === 'Publication Date') event.PublicationDate = value;
-                        else if (key === 'Event Start') event.EventStart = value;
-                        else if (key === 'Event End') event.EventEnd = value;
-                        else if (key === 'Author') event.Author = value;
-                        else if (key.toLowerCase() === 'id') event.Id = value;
-                        else event[key] = value;
-                    }
-                });
-                
-                if (Object.keys(event).length > 0) {
-                    eventItems.push(event);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            events = { value: eventItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                events = { value: parsedData };
+            }
         }
         
         if (!events || !events.value || events.value.length === 0) {
@@ -1412,38 +1119,11 @@ function formatVideosResults(data) {
         // Parse the data if it's a string
         let videos = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const videoItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const video = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') video.Title = value;
-                        else if (key === 'Publication Date') video.PublicationDate = value;
-                        else if (key === 'URL') video.Url = value;
-                        else if (key === 'Content') video.Content = value;
-                        else if (key.toLowerCase() === 'id') video.Id = value;
-                        else video[key] = value;
-                    }
-                });
-                
-                if (Object.keys(video).length > 0) {
-                    videoItems.push(video);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            videos = { value: videoItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                videos = { value: parsedData };
+            }
         }
         
         if (!videos || !videos.value || videos.value.length === 0) {
@@ -1496,37 +1176,11 @@ function formatSharedContentResults(data) {
         // Parse the data if it's a string
         let content = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const contentItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const item = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') item.Title = value;
-                        else if (key === 'Publication Date') item.PublicationDate = value;
-                        else if (key === 'Content') item.Content = value;
-                        else if (key.toLowerCase() === 'id') item.Id = value;
-                        else item[key] = value;
-                    }
-                });
-                
-                if (Object.keys(item).length > 0) {
-                    contentItems.push(item);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            content = { value: contentItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                content = { value: parsedData };
+            }
         }
         
         if (!content || !content.value || content.value.length === 0) {
@@ -1579,42 +1233,11 @@ function formatImagesResults(data) {
         // Parse the data if it's a string
         let images = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const imageItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const image = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') image.Title = value;
-                        else if (key === 'EmbedUrl') image.EmbedUrl = value;
-                        else if (key === 'Extension') image.Extension = value;
-                        else if (key === 'TotalSize') image.TotalSize = value;
-                        else if (key === 'Width') image.Width = value;
-                        else if (key === 'Height') image.Height = value;
-                        else if (key === 'AlternativeText') image.AlternativeText = value;
-                        else if (key === 'Publication Date') image.PublicationDate = value;
-                        else if (key.toLowerCase() === 'id') image.Id = value;
-                        else image[key] = value;
-                    }
-                });
-                
-                if (Object.keys(image).length > 0) {
-                    imageItems.push(image);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            images = { value: imageItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                images = { value: parsedData };
+            }
         }
         
         if (!images || !images.value || images.value.length === 0) {
@@ -1701,38 +1324,11 @@ function formatDocumentsResults(data) {
         // Parse the data if it's a string
         let documents = data;
         if (typeof data === 'string') {
-            // Try to parse structured string data into an array of objects
-            const entries = data.split('\n\n').filter(entry => entry.trim());
-            const documentItems = [];
-            
-            entries.forEach(entry => {
-                const lines = entry.split('\n');
-                const doc = {};
-                
-                // Extract properties from each line
-                lines.forEach(line => {
-                    const match = line.match(/([^:]+):\s*(.*)/);
-                    if (match) {
-                        const key = match[1].trim();
-                        const value = match[2].trim();
-                        
-                        // Map common fields to properties
-                        if (key === 'Title') doc.Title = value;
-                        else if (key === 'Extension') doc.Extension = value;
-                        else if (key === 'TotalSize') doc.TotalSize = parseInt(value) || 0;
-                        else if (key === 'Publication Date') doc.PublicationDate = value;
-                        else if (key.toLowerCase() === 'id') doc.Id = value;
-                        else doc[key] = value;
-                    }
-                });
-                
-                if (Object.keys(doc).length > 0) {
-                    documentItems.push(doc);
-                }
-            });
-            
-            // Create object with value array to match expected format
-            documents = { value: documentItems };
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                documents = { value: parsedData };
+            }
         }
         
         if (!documents || !documents.value || documents.value.length === 0) {
