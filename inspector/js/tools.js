@@ -55,7 +55,7 @@ async function runTool(toolName) {
                 const entries = result.split('\n\n').filter(entry => entry.trim());
                 
                 // Create object array to simulate the original format
-                const items = entries.map(entry => {
+                const items = entries.map((entry, index) => {
                     const lines = entry.split('\n');
                     const obj = {};
                     
@@ -74,9 +74,18 @@ async function runTool(toolName) {
                             else if (key === 'Author') obj.Author = value;
                             else if (key === 'Event Start') obj.EventStart = value;
                             else if (key === 'Event End') obj.EventEnd = value;
+                            // Make sure we handle the ID field properly
+                            else if (key === 'ID' || key === 'Id') obj.Id = value;
                             else obj[key] = value;
                         }
                     });
+                    
+                    // Add a note for missing ID
+                    if (!obj.Id) {
+                        // Generate a placeholder ID using the index
+                        obj.Id = `ID not provided by API`;
+                        obj.IdMissing = true; // Flag to indicate the ID is missing
+                    }
                     
                     return obj;
                 });
@@ -249,32 +258,29 @@ async function createBlogPost() {
             }),
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
-        // Check if there was an error
-        if (!response.ok || data.detail) {
-            // Handle error response
-            const errorMsg = data.detail || `HTTP error: ${response.status}`;
-            formatBlogPostError(errorMsg);
-            showNotification("Blog post creation failed!", "error");
-        } else {
-            // Format and display the created blog post details
+        // Show notification
+        if (data.result && data.result.Id) {
+            showNotification("Blog post created successfully!", "success");
             formatCreatedBlogPost(data.result);
             
-            // Show success notification
-            showNotification("Blog post created successfully!");
-            
-            // Close the modal
+            // Close the modal after successful creation
             closeBlogEditor();
+        } else {
+            throw new Error("Blog post created but no ID was returned. Check results for details.");
         }
+        
+        return data.result;
     } catch (error) {
         console.error('Error creating blog post:', error);
-        
-        // Format and display the error
+        showNotification(error.message, "error");
         formatBlogPostError(error.message);
-        
-        // Show error notification
-        showNotification("Blog post creation failed!", "error");
+        return null;
     } finally {
         // Hide loading indicator
         document.getElementById('createblogpost-loading').classList.add('hidden');
@@ -284,8 +290,6 @@ async function createBlogPost() {
 // Open the blog editor modal
 function openBlogEditor() {
     document.getElementById('blogEditorModal').style.display = 'block';
-    
-    // Automatically fetch parent blogs when opening the editor
     fetchAndPopulateParentId();
 }
 

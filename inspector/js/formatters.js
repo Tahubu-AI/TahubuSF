@@ -82,10 +82,10 @@ function formatCreatedBlogPost(blogPost) {
             </div>`;
         }
         
-        // Add ID
+        // Add ID - Use correct property case, Sitefinity uses "Id" not "ID"
         html += `<div class="result-property">
             <span class="property-name">ID:</span>
-            <span class="property-value">${blogPost.Id || 'Unknown'}</span>
+            <span class="property-value">${blogPost.Id || blogPost.ID || 'Unknown'}</span>
         </div>`;
         
         // Add Status
@@ -402,12 +402,19 @@ function formatNewsResults(news) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>News Items (${news.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (news.value.some(item => item.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         news.value.forEach(item => {
             formattedOutput += `<div class="result-item">
                 <h3>${item.Title || 'Untitled News'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${item.Id || 'Unknown'}</span>
+                    <span class="property-value" ${item.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${item.Id || item.ID || item.id || 'Unknown'}</span>
                 </div>`;
                 
             if (item.PublicationDate) {
@@ -467,12 +474,19 @@ function formatBlogPostsResults(posts) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>Blog Posts (${posts.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (posts.value.some(post => post.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         posts.value.forEach(post => {
             formattedOutput += `<div class="result-item">
                 <h3>${post.Title || 'Untitled Post'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${post.Id || 'Unknown'}</span>
+                    <span class="property-value" ${post.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${post.Id || post.ID || post.id || 'Unknown'}</span>
                 </div>`;
                 
             if (post.PublicationDate) {
@@ -525,12 +539,19 @@ function formatListItemsResults(items) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>List Items (${items.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (items.value.some(item => item.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         items.value.forEach(item => {
             formattedOutput += `<div class="result-item">
                 <h3>${item.Title || 'Untitled Item'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${item.Id || 'Unknown'}</span>
+                    <span class="property-value" ${item.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${item.Id || item.ID || item.id || 'Unknown'}</span>
                 </div>`;
                 
             if (item.PublicationDate) {
@@ -846,12 +867,19 @@ function formatEventsResults(events) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>Events (${events.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (events.value.some(event => event.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         events.value.forEach(event => {
             formattedOutput += `<div class="result-item">
                 <h3>${event.Title || 'Untitled Event'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${event.Id || 'Unknown'}</span>
+                    <span class="property-value" ${event.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${event.Id || event.ID || event.id || 'Unknown'}</span>
                 </div>`;
                 
             if (event.EventStart) {
@@ -968,6 +996,13 @@ function formatImagesResults(images) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>Images (${images.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (images.value.some(image => image.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         images.value.forEach(image => {
             formattedOutput += `<div class="result-item">
                 <h3>${image.Title || 'Untitled Image'}</h3>`;
@@ -980,7 +1015,7 @@ function formatImagesResults(images) {
                 
             formattedOutput += `<div class="result-property">
                 <span class="property-name">ID:</span>
-                <span class="property-value">${image.Id || 'Unknown'}</span>
+                <span class="property-value" ${image.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${image.Id || image.ID || image.id || 'Unknown'}</span>
             </div>`;
                 
             if (image.UrlName) {
@@ -1018,12 +1053,19 @@ function formatDocumentsResults(documents) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>Documents (${documents.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (documents.value.some(doc => doc.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         documents.value.forEach(doc => {
             formattedOutput += `<div class="result-item">
                 <h3>${doc.Title || 'Untitled Document'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${doc.Id || 'Unknown'}</span>
+                    <span class="property-value" ${doc.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${doc.Id || doc.ID || doc.id || 'Unknown'}</span>
                 </div>`;
                 
             if (doc.Extension) {
@@ -1069,12 +1111,19 @@ function formatVideosResults(videos) {
         let formattedOutput = '<div class="formatted-results">';
         formattedOutput += `<h3>Videos (${videos.value.length} found)</h3>`;
         
+        // Add a note about missing IDs if needed
+        if (videos.value.some(video => video.IdMissing)) {
+            formattedOutput += `<div class="alert info">
+                <strong>Note:</strong> The API response did not include ID values for these items.
+            </div>`;
+        }
+        
         videos.value.forEach(video => {
             formattedOutput += `<div class="result-item">
                 <h3>${video.Title || 'Untitled Video'}</h3>
                 <div class="result-property">
                     <span class="property-name">ID:</span>
-                    <span class="property-value">${video.Id || 'Unknown'}</span>
+                    <span class="property-value" ${video.IdMissing ? 'style="color:#999;font-style:italic;"' : ''}>${video.Id || video.ID || video.id || 'Unknown'}</span>
                 </div>`;
                 
             if (video.PublicationDate) {
