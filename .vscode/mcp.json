@@ -1,0 +1,23 @@
+{
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "sitefinity-site-prefix",
+            "description": "Enter your Sitefinity site prefix",
+            "default": "http://localhost:44359",
+            "password": false
+        }
+    ],
+    "servers": {
+        "TahubuSF": {
+            "type": "stdio",
+            "command": "python",
+            "args": [
+                "run.py"
+            ],
+            "env": {
+                "SITEFINITY_SITE_PREFIX": "${input:sitefinity-site-prefix}"
+            }
+        }
+    }
+}
