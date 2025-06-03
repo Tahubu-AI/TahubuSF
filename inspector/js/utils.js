@@ -89,47 +89,40 @@ function showNotification(message, type = "success") {
     }, 5000);
 }
 
-// Parse structured string
-function parseStructuredString(str) {
-    // Try to identify and parse a string with structured data
+// Parse a structured string into an array of objects
+function parseStructuredString(data) {
+    if (!data || typeof data !== 'string') {
+        return data;
+    }
+    
     try {
-        // First check if it's JSON
-        return JSON.parse(str);
+        // First try to parse as JSON
+        return JSON.parse(data);
     } catch (e) {
-        // Not JSON, might be another structured format
+        // Not valid JSON, try to parse as structured text
+        const entries = data.split('\n\n').filter(entry => entry.trim());
         const items = [];
         
-        // Split by double newlines which typically separate items
-        const chunks = str.split('\n\n').filter(chunk => chunk.trim());
-        
-        chunks.forEach(chunk => {
+        entries.forEach(entry => {
+            const lines = entry.split('\n');
             const item = {};
-            const lines = chunk.split('\n');
             
+            // Extract properties from each line
             lines.forEach(line => {
-                 if (line.includes(':')) {
-                     // Only split on the first colon, and do not split if the value part contains 'https://'
-                     const colonIndex = line.indexOf(':');
-                     if (colonIndex !== -1) {
-                         const key = line.substring(0, colonIndex).trim();
-                         const value = line.substring(colonIndex + 1).trim();
-                         // If value contains 'https://', do not split further
-                         if (value.includes('https://')) {
-                             item[key] = value;
-                         } else {
-                             // If value does not contain 'https://', assign as usual
-                             item[key] = value;
-                         }
-                     }
-                 }
-             });
+                const match = line.match(/([^:]+):\s*(.*)/);
+                if (match) {
+                    const key = match[1].trim();
+                    const value = match[2].trim();
+                    item[key] = value;
+                }
+            });
             
             if (Object.keys(item).length > 0) {
                 items.push(item);
             }
         });
         
-        return items.length > 0 ? items : str;
+        return items.length > 0 ? items : data;
     }
 }
 
@@ -161,21 +154,22 @@ function formatGenericResult(data) {
     }
 }
 
-// Helper function to get current data from editor
+// Get the current data from the JSON editor
 function getCurrentEditorData() {
+    const jsonEditor = document.getElementById('blogPostJson');
+    
     try {
-        const jsonEditor = document.getElementById('blogPostJson');
-        // Remove any comments before parsing
+        // Remove any comments from the JSON before parsing
         const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
         return JSON.parse(jsonWithoutComments);
     } catch (e) {
-        // Return default template if parsing fails
+        // Return a default structure if there's an error
         return {
-            title: "New Blog Post Title",
-            content: "<h2>Blog Post Heading</h2><p>This is the main content of your blog post.</p><p>You can use HTML formatting.</p>",
-            summary: "A brief summary of this blog post",
-            parent_id: "",
-            allow_comments: true
+            title: '',
+            content: '',
+            summary: '',
+            parent_id: 'REQUIRED - Use the Parent Blogs tool to get a valid ID',
+            draft: true
         };
     }
 } 

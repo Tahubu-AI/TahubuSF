@@ -38,62 +38,10 @@ async function runTool(toolName) {
         
         // Display the results if this is a direct user action
         if (loaderElement) {
-            let result = data.result;
+            const result = data.result;
             
-            // Convert text results to an object format that our formatters expect
-            // The APIs return text for content types but JSON for parents
-            if (typeof result === 'string' && result.trim() && 
-                (toolName === 'getNews' || toolName === 'getBlogPosts' || 
-                 toolName === 'getListItems' || toolName === 'getEvents' ||
-                 toolName === 'getSharedContent' || toolName === 'getImages' ||
-                 toolName === 'getDocuments' || toolName === 'getVideos' ||
-                 toolName === 'getPages')) {
-                
-                console.log('Converting text result to object format');
-                
-                // Divide entries by double newline
-                const entries = result.split('\n\n').filter(entry => entry.trim());
-                
-                // Create object array to simulate the original format
-                const items = entries.map((entry, index) => {
-                    const lines = entry.split('\n');
-                    const obj = {};
-                    
-                    // Extract key-value pairs
-                    lines.forEach(line => {
-                        const match = line.match(/([^:]+):\s*(.*)/);
-                        if (match) {
-                            const key = match[1].trim();
-                            const value = match[2].trim();
-                            
-                            // Map common fields to Sitefinity-like properties
-                            if (key === 'Title') obj.Title = value;
-                            else if (key === 'Summary') obj.Summary = value;
-                            else if (key === 'Content') obj.Content = value;
-                            else if (key === 'Publication Date') obj.PublicationDate = value;
-                            else if (key === 'Author') obj.Author = value;
-                            else if (key === 'Event Start') obj.EventStart = value;
-                            else if (key === 'Event End') obj.EventEnd = value;
-                            // Make sure we handle the ID field properly
-                            else if (key === 'ID' || key === 'Id') obj.Id = value;
-                            else obj[key] = value;
-                        }
-                    });
-                    
-                    // Add a note for missing ID
-                    if (!obj.Id) {
-                        // Generate a placeholder ID using the index
-                        obj.Id = `ID not provided by API`;
-                        obj.IdMissing = true; // Flag to indicate the ID is missing
-                    }
-                    
-                    return obj;
-                });
-                
-                // Create an object with a value array to match original format
-                result = { value: items };
-            }
-            
+            // Pass the raw result to the appropriate formatter based on tool name
+            // Each formatter is responsible for parsing its own data format
             if (toolName === 'getParentBlogs' && result) {
                 // Format parent blogs results in a more readable way
                 displayParentBlogs(result);
