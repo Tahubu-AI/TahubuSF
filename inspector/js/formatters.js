@@ -82,10 +82,10 @@ function formatCreatedBlogPost(blogPost) {
             </div>`;
         }
         
-        // Add ID
+        // Add ID - Use correct property case, Sitefinity uses "Id" not "ID"
         html += `<div class="result-property">
             <span class="property-name">ID:</span>
-            <span class="property-value">${blogPost.Id || 'Unknown'}</span>
+            <span class="property-value">${blogPost.Id || blogPost.ID || 'Unknown'}</span>
         </div>`;
         
         // Add Status
@@ -144,10 +144,29 @@ function formatCreatedBlogPost(blogPost) {
 }
 
 // Format parent blogs
-function displayParentBlogs(parentBlogs) {
+function displayParentBlogs(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let parentBlogs = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const blogsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        blogsDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(blogsDict).length > 0) {
+                    parentBlogs = blogsDict;
+                }
+            }
+        }
+        
         if (!parentBlogs || Object.keys(parentBlogs).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No parent blogs found.</pre>';
             return;
@@ -180,15 +199,34 @@ function displayParentBlogs(parentBlogs) {
         console.error('Error displaying parent blogs:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(parentBlogs, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format parent lists
-function displayParentLists(parentLists) {
+function displayParentLists(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let parentLists = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const listsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        listsDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(listsDict).length > 0) {
+                    parentLists = listsDict;
+                }
+            }
+        }
+        
         if (!parentLists || Object.keys(parentLists).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No parent Lists found.</pre>';
             return;
@@ -221,15 +259,34 @@ function displayParentLists(parentLists) {
         console.error('Error displaying parent lists:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(parentLists, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format albums
-function displayAlbums(albums) {
+function displayAlbums(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let albums = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const albumsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        albumsDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(albumsDict).length > 0) {
+                    albums = albumsDict;
+                }
+            }
+        }
+        
         if (!albums || Object.keys(albums).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No albums found.</pre>';
             return;
@@ -262,15 +319,34 @@ function displayAlbums(albums) {
         console.error('Error displaying Albums:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(albums, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format calendars
-function displayCalendars(calendars) {
+function displayCalendars(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let calendars = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const calendarsDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        calendarsDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(calendarsDict).length > 0) {
+                    calendars = calendarsDict;
+                }
+            }
+        }
+        
         if (!calendars || Object.keys(calendars).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No calendars found.</pre>';
             return;
@@ -303,15 +379,34 @@ function displayCalendars(calendars) {
         console.error('Error displaying calendars:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(calendars, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format document libraries
-function displayDocumentLibraries(documentlibraries) {
+function displayDocumentLibraries(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let documentlibraries = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const librariesDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        librariesDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(librariesDict).length > 0) {
+                    documentlibraries = librariesDict;
+                }
+            }
+        }
+        
         if (!documentlibraries || Object.keys(documentlibraries).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No document libraries found.</pre>';
             return;
@@ -344,15 +439,34 @@ function displayDocumentLibraries(documentlibraries) {
         console.error('Error displaying document libraries:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(documentlibraries, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format video libraries
-function displayVideoLibraries(videolibraries) {
+function displayVideoLibraries(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string or object format
+        let videolibraries = data;
+        if (typeof data === 'string') {
+            // Try to convert from a structured format to a dictionary
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array of objects to dictionary format
+                const librariesDict = {};
+                parsedData.forEach(item => {
+                    if (item.Id && item.Title) {
+                        librariesDict[item.Id] = item.Title;
+                    }
+                });
+                if (Object.keys(librariesDict).length > 0) {
+                    videolibraries = librariesDict;
+                }
+            }
+        }
+        
         if (!videolibraries || Object.keys(videolibraries).length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No video libraries found.</pre>';
             return;
@@ -385,15 +499,25 @@ function displayVideoLibraries(videolibraries) {
         console.error('Error displaying video libraries:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(videolibraries, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format news results
-function formatNewsResults(news) {
+function formatNewsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let news = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                news = { value: parsedData };
+            }
+        }
+        
         if (!news || !news.value || news.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No news items found.</pre>';
             return;
@@ -404,11 +528,7 @@ function formatNewsResults(news) {
         
         news.value.forEach(item => {
             formattedOutput += `<div class="result-item">
-                <h3>${item.Title || 'Untitled News'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${item.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${item.Title || 'Untitled News'}</h3>`;
                 
             if (item.PublicationDate) {
                 const date = new Date(item.PublicationDate).toLocaleString();
@@ -450,15 +570,25 @@ function formatNewsResults(news) {
         console.error('Error formatting news results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(news, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format blog posts results
-function formatBlogPostsResults(posts) {
+function formatBlogPostsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let posts = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                posts = { value: parsedData };
+            }
+        }
+        
         if (!posts || !posts.value || posts.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No blog posts found.</pre>';
             return;
@@ -469,11 +599,7 @@ function formatBlogPostsResults(posts) {
         
         posts.value.forEach(post => {
             formattedOutput += `<div class="result-item">
-                <h3>${post.Title || 'Untitled Post'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${post.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${post.Title || 'Untitled Post'}</h3>`;
                 
             if (post.PublicationDate) {
                 const date = new Date(post.PublicationDate).toLocaleString();
@@ -496,6 +622,13 @@ function formatBlogPostsResults(posts) {
                     <span class="property-value">${post.Summary}</span>
                 </div>`;
             }
+
+            if (post.Id) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">ID:</span>
+                    <span class="property-value">${post.Id}</span>
+                </div>`;
+            }
                 
             formattedOutput += '</div>';
         });
@@ -508,15 +641,25 @@ function formatBlogPostsResults(posts) {
         console.error('Error formatting blog post results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(posts, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format list items results
-function formatListItemsResults(items) {
+function formatListItemsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let items = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                items = { value: parsedData };
+            }
+        }
+        
         if (!items || !items.value || items.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No list items found.</pre>';
             return;
@@ -527,11 +670,7 @@ function formatListItemsResults(items) {
         
         items.value.forEach(item => {
             formattedOutput += `<div class="result-item">
-                <h3>${item.Title || 'Untitled Item'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${item.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${item.Title || 'Untitled Item'}</h3>`;
                 
             if (item.PublicationDate) {
                 const date = new Date(item.PublicationDate).toLocaleString();
@@ -552,6 +691,13 @@ function formatListItemsResults(items) {
                     <span class="property-value">${truncatedContent}</span>
                 </div>`;
             }
+
+            if (item.Id) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">ID:</span>
+                    <span class="property-value">${item.Id}</span>
+                </div>`;
+            }
                 
             formattedOutput += '</div>';
         });
@@ -564,15 +710,25 @@ function formatListItemsResults(items) {
         console.error('Error formatting list item results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(items, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format sites results
-function formatSitesResults(sites) {
+function formatSitesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let sites = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                sites = { value: parsedData };
+            }
+        }
+        
         if (!sites || !sites.value || sites.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No sites found.</pre>';
             return;
@@ -583,17 +739,16 @@ function formatSitesResults(sites) {
         
         sites.value.forEach(site => {
             formattedOutput += `<div class="result-item">
-                <h3>${site.Name || 'Unnamed Site'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${site.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${site.Name || 'Unnamed Site'}</h3>`;
                 
-            if (site.IsDefault) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Default Site:</span>
-                    <span class="property-value">Yes</span>
-                </div>`;
+            // Add all site properties except Title/Name
+            for (const [key, value] of Object.entries(site)) {
+                if (key !== 'Title' && key !== 'Name') {
+                    formattedOutput += `<div class="result-property">
+                        <span class="property-name">${key}:</span>
+                        <span class="property-value">${value}</span>
+                    </div>`;
+                }
             }
                 
             formattedOutput += '</div>';
@@ -607,15 +762,25 @@ function formatSitesResults(sites) {
         console.error('Error formatting sites results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(sites, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format forms results
-function formatFormsResults(forms) {
+function formatFormsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let forms = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                forms = { value: parsedData };
+            }
+        }
+        
         if (!forms || !forms.value || forms.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No forms found.</pre>';
             return;
@@ -626,16 +791,19 @@ function formatFormsResults(forms) {
         
         forms.value.forEach(form => {
             formattedOutput += `<div class="result-item">
-                <h3>${form.Title || 'Untitled Form'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${form.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${form.Title || 'Untitled Form'}</h3>`;
                 
-            if (form.UrlName) {
+            // Add common form properties
+            if (form.SuccessMessage) {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${form.UrlName}</span>
+                    <span class="property-name">Success Message:</span>
+                    <span class="property-value">${form.SuccessMessage}</span>
+                </div>`;
+            }
+            if (form.Renderer) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Renderer:</span>
+                    <span class="property-value">${form.Renderer}</span>
                 </div>`;
             }
                 
@@ -650,15 +818,25 @@ function formatFormsResults(forms) {
         console.error('Error formatting forms results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(forms, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format search indexes results
-function formatSearchIndexesResults(indexes) {
+function formatSearchIndexesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let indexes = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                indexes = { value: parsedData };
+            }
+        }
+        
         if (!indexes || !indexes.value || indexes.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No search indexes found.</pre>';
             return;
@@ -669,16 +847,19 @@ function formatSearchIndexesResults(indexes) {
         
         indexes.value.forEach(index => {
             formattedOutput += `<div class="result-item">
-                <h3>${index.Name || 'Unnamed Index'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${index.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${index.Name || 'Unnamed Index'}</h3>`;
                 
-            if (index.Description) {
+            if (index.IsActive) {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">Description:</span>
-                    <span class="property-value">${index.Description}</span>
+                    <span class="property-name">IsActive:</span>
+                    <span class="property-value">${index.IsActive}</span>
+                </div>`;
+            }
+            
+            if (index.IsBackend) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">IsBackend:</span>
+                    <span class="property-value">${index.IsBackend}</span>
                 </div>`;
             }
                 
@@ -693,15 +874,25 @@ function formatSearchIndexesResults(indexes) {
         console.error('Error formatting search indexes results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(indexes, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format taxonomies results
-function formatTaxonomiesResults(taxonomies) {
+function formatTaxonomiesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let taxonomies = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                taxonomies = { value: parsedData };
+            }
+        }
+        
         if (!taxonomies || !taxonomies.value || taxonomies.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No taxonomies found.</pre>';
             return;
@@ -712,16 +903,26 @@ function formatTaxonomiesResults(taxonomies) {
         
         taxonomies.value.forEach(taxonomy => {
             formattedOutput += `<div class="result-item">
-                <h3>${taxonomy.Title || 'Untitled Taxonomy'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${taxonomy.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${taxonomy.Title || 'Untitled Taxonomy'}</h3>`;
                 
-            if (taxonomy.TaxonomyType) {
+            if (taxonomy.TaxonName) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Taxon Name:</span>
+                    <span class="property-value">${taxonomy.TaxonName}</span>
+                </div>`;
+            }
+            
+            if (taxonomy.Type) {
                 formattedOutput += `<div class="result-property">
                     <span class="property-name">Type:</span>
-                    <span class="property-value">${taxonomy.TaxonomyType}</span>
+                    <span class="property-value">${taxonomy.Type}</span>
+                </div>`;
+            }
+
+            if (taxonomy.UseCount) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Use Count:</span>
+                    <span class="property-value">${taxonomy.UseCount}</span>
                 </div>`;
             }
                 
@@ -736,15 +937,25 @@ function formatTaxonomiesResults(taxonomies) {
         console.error('Error formatting taxonomies results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(taxonomies, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format section presets results
-function formatSectionPresetsResults(presets) {
+function formatSectionPresetsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let presets = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                presets = { value: parsedData };
+            }
+        }
+        
         if (!presets || !presets.value || presets.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No section presets found.</pre>';
             return;
@@ -755,16 +966,11 @@ function formatSectionPresetsResults(presets) {
         
         presets.value.forEach(preset => {
             formattedOutput += `<div class="result-item">
-                <h3>${preset.Title || 'Untitled Preset'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${preset.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${preset.Title || 'Untitled Preset'}</h3>`;
                 
-            if (preset.SectionName) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Section Name:</span>
-                    <span class="property-value">${preset.SectionName}</span>
+            if (preset.Thumbnail) {
+                formattedOutput += `<div class="result-item">
+                    <img src=${preset.Thumbnail} width=800px/>
                 </div>`;
             }
                 
@@ -779,15 +985,25 @@ function formatSectionPresetsResults(presets) {
         console.error('Error formatting section presets results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(presets, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format pages results
-function formatPagesResults(pages) {
+function formatPagesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let pages = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                pages = { value: parsedData };
+            }
+        }
+        
         if (!pages || !pages.value || pages.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No pages found.</pre>';
             return;
@@ -798,24 +1014,16 @@ function formatPagesResults(pages) {
         
         pages.value.forEach(page => {
             formattedOutput += `<div class="result-item">
-                <h3>${page.Title || 'Untitled Page'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${page.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${page.Title || 'Untitled Page'}</h3>`;
                 
-            if (page.ParentId) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Parent ID:</span>
-                    <span class="property-value">${page.ParentId}</span>
-                </div>`;
-            }
-            
-            if (page.UrlName) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${page.UrlName}</span>
-                </div>`;
+            // Add common page properties
+            for (const [key, value] of Object.entries(page)) {
+                if (key !== 'Title') {
+                    formattedOutput += `<div class="result-property">
+                        <span class="property-name">${key}:</span>
+                        <span class="property-value">${value}</span>
+                    </div>`;
+                }
             }
                 
             formattedOutput += '</div>';
@@ -829,15 +1037,25 @@ function formatPagesResults(pages) {
         console.error('Error formatting pages results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(pages, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format events results
-function formatEventsResults(events) {
+function formatEventsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let events = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                events = { value: parsedData };
+            }
+        }
+        
         if (!events || !events.value || events.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No events found.</pre>';
             return;
@@ -848,11 +1066,7 @@ function formatEventsResults(events) {
         
         events.value.forEach(event => {
             formattedOutput += `<div class="result-item">
-                <h3>${event.Title || 'Untitled Event'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${event.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${event.Title || 'Untitled Event'}</h3>`;
                 
             if (event.EventStart) {
                 const startDate = new Date(event.EventStart).toLocaleString();
@@ -907,15 +1121,82 @@ function formatEventsResults(events) {
         console.error('Error formatting events results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(events, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+}
+
+// Format videos results
+function formatVideosResults(data) {
+    const resultsContainer = document.getElementById('results-container');
+    
+    try {
+        // Parse the data if it's a string
+        let videos = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                videos = { value: parsedData };
+            }
+        }
+        
+        if (!videos || !videos.value || videos.value.length === 0) {
+            resultsContainer.innerHTML = '<pre id="results">No videos found.</pre>';
+            return;
+        }
+        
+        let formattedOutput = '<div class="formatted-results">';
+        formattedOutput += `<h3>Videos (${videos.value.length} found)</h3>`;
+        
+        videos.value.forEach(video => {
+            formattedOutput += `<div class="result-item">
+                <h3>${video.Title || 'Untitled Video'}</h3>`;
+                
+            if (video.PublicationDate) {
+                const date = new Date(video.PublicationDate).toLocaleString();
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Published:</span>
+                    <span class="property-value">${date}</span>
+                </div>`;
+            }
+            
+            if (video.Url) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">URL:</span>
+                    <span class="property-value">${video.Url}</span>
+                </div>`;
+            }
+                
+            formattedOutput += '</div>';
+        });
+        
+        formattedOutput += '</div>';
+        
+        // Update the results container
+        resultsContainer.innerHTML = formattedOutput;
+    } catch (error) {
+        console.error('Error formatting videos results:', error);
+        // Fallback to showing the raw data
+        resultsContainer.innerHTML = '<pre id="results"></pre>';
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format shared content results
-function formatSharedContentResults(content) {
+function formatSharedContentResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let content = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                content = { value: parsedData };
+            }
+        }
+        
         if (!content || !content.value || content.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No shared content found.</pre>';
             return;
@@ -926,17 +1207,20 @@ function formatSharedContentResults(content) {
         
         content.value.forEach(item => {
             formattedOutput += `<div class="result-item">
-                <h3>${item.Title || 'Untitled Content'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${item.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${item.Title || 'Untitled Content'}</h3>`;
                 
             if (item.PublicationDate) {
                 const date = new Date(item.PublicationDate).toLocaleString();
                 formattedOutput += `<div class="result-property">
                     <span class="property-name">Published:</span>
                     <span class="property-value">${date}</span>
+                </div>`;
+            }
+            
+            if (item.Content) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Content:</span>
+                    <span class="property-value">${item.Content}</span>
                 </div>`;
             }
                 
@@ -951,15 +1235,25 @@ function formatSharedContentResults(content) {
         console.error('Error formatting shared content results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(content, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format images results
-function formatImagesResults(images) {
+function formatImagesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let images = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                images = { value: parsedData };
+            }
+        }
+        
         if (!images || !images.value || images.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No images found.</pre>';
             return;
@@ -972,21 +1266,52 @@ function formatImagesResults(images) {
             formattedOutput += `<div class="result-item">
                 <h3>${image.Title || 'Untitled Image'}</h3>`;
                 
-            if (image.ThumbnailUrl) {
+            if (image.EmbedUrl) {
                 formattedOutput += `<div class="result-property">
-                    <img src="${image.ThumbnailUrl}" alt="${image.Title || 'Image thumbnail'}" style="max-width: 200px; max-height: 150px;">
+                    <img src="${image.EmbedUrl}" alt="${image.AlternativeText || 'Image thumbnail'}" style="max-width: 200px; max-height: 150px;">
+                </div>`;
+            }
+            
+            if (image.PublicationDate) {
+                const date = new Date(image.PublicationDate).toLocaleString();
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Published:</span>
+                    <span class="property-value">${date}</span>
+                </div>`;
+            }
+
+            if (image.Extension) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Extension:</span>
+                    <span class="property-value">${image.Extension}</span>
                 </div>`;
             }
                 
-            formattedOutput += `<div class="result-property">
-                <span class="property-name">ID:</span>
-                <span class="property-value">${image.Id || 'Unknown'}</span>
-            </div>`;
-                
-            if (image.UrlName) {
+            if (image.TotalSize) {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${image.UrlName}</span>
+                    <span class="property-name">Total Size:</span>
+                    <span class="property-value">${image.TotalSize}</span>
+                </div>`;
+            }
+
+            if (image.Height) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Height:</span>
+                    <span class="property-value">${image.Height}</span>
+                </div>`;
+            }
+                
+            if (image.Width) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Width:</span>
+                    <span class="property-value">${image.Width}</span>
+                </div>`;
+            }
+
+            if (image.AlternativeText) {
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Alternative Text:</span>
+                    <span class="property-value">${image.AlternativeText}</span>
                 </div>`;
             }
                 
@@ -1001,15 +1326,25 @@ function formatImagesResults(images) {
         console.error('Error formatting images results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(images, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format documents results
-function formatDocumentsResults(documents) {
+function formatDocumentsResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
+        // Parse the data if it's a string
+        let documents = data;
+        if (typeof data === 'string') {
+            const parsedData = parseStructuredString(data);
+            if (Array.isArray(parsedData)) {
+                // Convert array to expected format with 'value' property
+                documents = { value: parsedData };
+            }
+        }
+        
         if (!documents || !documents.value || documents.value.length === 0) {
             resultsContainer.innerHTML = '<pre id="results">No documents found.</pre>';
             return;
@@ -1020,16 +1355,20 @@ function formatDocumentsResults(documents) {
         
         documents.value.forEach(doc => {
             formattedOutput += `<div class="result-item">
-                <h3>${doc.Title || 'Untitled Document'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${doc.Id || 'Unknown'}</span>
-                </div>`;
+                <h3>${doc.Title || 'Untitled Document'}</h3>`;
                 
             if (doc.Extension) {
                 formattedOutput += `<div class="result-property">
                     <span class="property-name">Type:</span>
                     <span class="property-value">${doc.Extension.toUpperCase()}</span>
+                </div>`;
+            }
+
+            if (doc.PublicationDate) {
+                const date = new Date(doc.PublicationDate).toLocaleDateString();
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">Published:</span>
+                    <span class="property-value">${date}</span>
                 </div>`;
             }
             
@@ -1052,100 +1391,81 @@ function formatDocumentsResults(documents) {
         console.error('Error formatting documents results:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(documents, null, 2);
-    }
-}
-
-// Format videos results
-function formatVideosResults(videos) {
-    const resultsContainer = document.getElementById('results-container');
-    
-    try {
-        if (!videos || !videos.value || videos.value.length === 0) {
-            resultsContainer.innerHTML = '<pre id="results">No videos found.</pre>';
-            return;
-        }
-        
-        let formattedOutput = '<div class="formatted-results">';
-        formattedOutput += `<h3>Videos (${videos.value.length} found)</h3>`;
-        
-        videos.value.forEach(video => {
-            formattedOutput += `<div class="result-item">
-                <h3>${video.Title || 'Untitled Video'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${video.Id || 'Unknown'}</span>
-                </div>`;
-                
-            if (video.PublicationDate) {
-                const date = new Date(video.PublicationDate).toLocaleString();
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Published:</span>
-                    <span class="property-value">${date}</span>
-                </div>`;
-            }
-            
-            if (video.UrlName) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${video.UrlName}</span>
-                </div>`;
-            }
-                
-            formattedOutput += '</div>';
-        });
-        
-        formattedOutput += '</div>';
-        
-        // Update the results container
-        resultsContainer.innerHTML = formattedOutput;
-    } catch (error) {
-        console.error('Error formatting videos results:', error);
-        // Fallback to showing the raw data
-        resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(videos, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
 }
 
 // Format page templates results
-function formatPageTemplatesResults(templates) {
+function formatPageTemplatesResults(data) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        if (!templates || !templates.value || templates.value.length === 0) {
-            resultsContainer.innerHTML = '<pre id="results">No page templates found.</pre>';
-            return;
+        // Parse the data if it's a string (sometimes it might be pre-parsed)
+        let templates = data;
+        if (typeof data === 'string') {
+            // Try to identify and parse structured data in the string
+            templates = parseStructuredString(data);
         }
         
-        let formattedOutput = '<div class="formatted-results">';
-        formattedOutput += `<h3>Page Templates (${templates.value.length} found)</h3>`;
+        // Create formatted HTML output
+        let html = '<div class="formatted-results">';
         
-        templates.value.forEach(template => {
-            formattedOutput += `<div class="result-item">
-                <h3>${template.Name || 'Unnamed Template'}</h3>
-                <div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${template.Id || 'Unknown'}</span>
-                </div>`;
+        if (Array.isArray(templates)) {
+            // It's an array of template objects
+            html += '<h3>Page Templates</h3>';
+            html += '<div class="result-table-container">';
+            html += '<table class="result-table">';
+            html += '<thead><tr><th>Title</th><th>Framework</th><th>Renderer</th></tr></thead>';
+            html += '<tbody>';
+            
+            templates.forEach(template => {
+                html += `<tr>
+                    <td>${template.Title || ''}</td>
+                    <td>${template.Framework || ''}</td>
+                    <td>${template.Renderer || 'None'}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+        } else {
+            // It's a string-based format or unknown format
+            const items = data.split('\n\n').filter(item => item.trim());
+            
+            items.forEach(item => {
+                html += '<div class="result-item">';
                 
-            if (template.Title) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Title:</span>
-                    <span class="property-value">${template.Title}</span>
-                </div>`;
-            }
+                const lines = item.split('\n');
+                let title = 'Unknown Template';
                 
-            formattedOutput += '</div>';
-        });
+                // Extract properties
+                lines.forEach(line => {
+                    if (line.startsWith('Title:')) {
+                        title = line.replace('Title:', '').trim();
+                        html += `<h3>${title}</h3>`;
+                    } else if (line.includes(':')) {
+                        const [name, value] = line.split(':').map(s => s.trim());
+                        html += `<div class="result-property">
+                            <span class="property-name">${name}:</span>
+                            <span class="property-value">${value}</span>
+                        </div>`;
+                    } else if (line.trim()) {
+                        html += `<div class="result-property">${line}</div>`;
+                    }
+                });
+                
+                html += '</div>';
+            });
+        }
         
-        formattedOutput += '</div>';
+        html += '</div>';
         
         // Update the results container
-        resultsContainer.innerHTML = formattedOutput;
+        resultsContainer.innerHTML = html;
+        
     } catch (error) {
-        console.error('Error formatting page templates results:', error);
+        console.error('Error formatting page templates:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = JSON.stringify(templates, null, 2);
+        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     }
-} 
+}

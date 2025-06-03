@@ -38,53 +38,10 @@ async function runTool(toolName) {
         
         // Display the results if this is a direct user action
         if (loaderElement) {
-            let result = data.result;
+            const result = data.result;
             
-            // Convert text results to an object format that our formatters expect
-            // The APIs return text for content types but JSON for parents
-            if (typeof result === 'string' && result.trim() && 
-                (toolName === 'getNews' || toolName === 'getBlogPosts' || 
-                 toolName === 'getListItems' || toolName === 'getEvents' ||
-                 toolName === 'getSharedContent' || toolName === 'getImages' ||
-                 toolName === 'getDocuments' || toolName === 'getVideos' ||
-                 toolName === 'getPages')) {
-                
-                console.log('Converting text result to object format');
-                
-                // Divide entries by double newline
-                const entries = result.split('\n\n').filter(entry => entry.trim());
-                
-                // Create object array to simulate the original format
-                const items = entries.map(entry => {
-                    const lines = entry.split('\n');
-                    const obj = {};
-                    
-                    // Extract key-value pairs
-                    lines.forEach(line => {
-                        const match = line.match(/([^:]+):\s*(.*)/);
-                        if (match) {
-                            const key = match[1].trim();
-                            const value = match[2].trim();
-                            
-                            // Map common fields to Sitefinity-like properties
-                            if (key === 'Title') obj.Title = value;
-                            else if (key === 'Summary') obj.Summary = value;
-                            else if (key === 'Content') obj.Content = value;
-                            else if (key === 'Publication Date') obj.PublicationDate = value;
-                            else if (key === 'Author') obj.Author = value;
-                            else if (key === 'Event Start') obj.EventStart = value;
-                            else if (key === 'Event End') obj.EventEnd = value;
-                            else obj[key] = value;
-                        }
-                    });
-                    
-                    return obj;
-                });
-                
-                // Create an object with a value array to match original format
-                result = { value: items };
-            }
-            
+            // Pass the raw result to the appropriate formatter based on tool name
+            // Each formatter is responsible for parsing its own data format
             if (toolName === 'getParentBlogs' && result) {
                 // Format parent blogs results in a more readable way
                 displayParentBlogs(result);
@@ -249,32 +206,29 @@ async function createBlogPost() {
             }),
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
-        // Check if there was an error
-        if (!response.ok || data.detail) {
-            // Handle error response
-            const errorMsg = data.detail || `HTTP error: ${response.status}`;
-            formatBlogPostError(errorMsg);
-            showNotification("Blog post creation failed!", "error");
-        } else {
-            // Format and display the created blog post details
+        // Show notification
+        if (data.result && data.result.Id) {
+            showNotification("Blog post created successfully!", "success");
             formatCreatedBlogPost(data.result);
             
-            // Show success notification
-            showNotification("Blog post created successfully!");
-            
-            // Close the modal
+            // Close the modal after successful creation
             closeBlogEditor();
+        } else {
+            throw new Error("Blog post created but no ID was returned. Check results for details.");
         }
+        
+        return data.result;
     } catch (error) {
         console.error('Error creating blog post:', error);
-        
-        // Format and display the error
+        showNotification(error.message, "error");
         formatBlogPostError(error.message);
-        
-        // Show error notification
-        showNotification("Blog post creation failed!", "error");
+        return null;
     } finally {
         // Hide loading indicator
         document.getElementById('createblogpost-loading').classList.add('hidden');
@@ -284,8 +238,6 @@ async function createBlogPost() {
 // Open the blog editor modal
 function openBlogEditor() {
     document.getElementById('blogEditorModal').style.display = 'block';
-    
-    // Automatically fetch parent blogs when opening the editor
     fetchAndPopulateParentId();
 }
 
