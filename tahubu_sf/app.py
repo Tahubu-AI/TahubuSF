@@ -2,7 +2,7 @@
 Main application entry point for TahubuSF
 """
 import logging
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 from tahubu_sf.config.settings import APP_NAME
 from tahubu_sf.api.news import get_news

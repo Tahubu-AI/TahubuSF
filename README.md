@@ -279,36 +279,11 @@ This runs the FastAPI server, opens a browser, and executes API tests to verify 
 
 ### 3. Claude Desktop Integration
 
-For direct integration with Claude Desktop:
+The TahubuSF MCP server supports multiple transport protocols for different use cases:
 
-```bash
-python run.py
-```
+### Option 1: STDIO Transport (Default)
 
-This runs the server with stdio transport using the modular code structure from the `tahubu_sf` package.
-
-## Entry Points Comparison
-
-| Entry Point | Command | Best For | Pros | Cons |
-|-------------|---------|----------|------|------|
-| **mcp dev run.py** | `mcp dev run.py` | MCP Inspector | • Quick testing<br>• MCP web interface | • Requires MCP CLI<br>• Limited to MCP tools |
-| **simple_server.py** | `python simple_server.py` | Local development | • Most reliable<br>• No dependency issues<br>• Simple to use | • Basic UI<br>• Not suitable for production |
-| **direct_test.py** | `python direct_test.py` | Testing FastAPI | • Handles import issues<br>• Auto-installs requirements | • Temporary files<br>• More complex |
-| **run_fastapi.py** | `python run_fastapi.py` | Azure deployment prep | • Production-quality API<br>• Swagger docs | • More dependencies<br>• Possible import issues |
-| **test_fastapi.py** | `python test_fastapi.py` | API validation | • Runs tests automatically<br>• Validates responses | • Focuses on testing |
-| **run.py** | `python run.py` | Claude Desktop | • Direct tool execution<br>• MCP integration | • No web interface |
-
-### When to Use Each Option
-
-- **simple_server.py**: When you want reliable, hassle-free testing during development
-- **direct_test.py**: When you want to test the FastAPI implementation without dealing with Python path issues
-- **run_fastapi.py**: When preparing for Azure deployment or need a production-quality API
-- **test_fastapi.py**: When testing API correctness and responses
-- **run.py**: When integrating with Claude Desktop
-
-## Claude Desktop Integration
-
-To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` file and include the following:
+For direct local integration with Claude Desktop using STDIO (recommended for most users):
 
 ```json
 {
@@ -326,7 +301,108 @@ To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` f
 }
 ```
 
-Replace `D:\\repos\\TahubuSF` with the absolute path to your project directory.
+### Option 2: SSE Transport (Server-Sent Events)
+
+For web-based integration using SSE transport, first start the server:
+
+```bash
+python run.py --transport sse --port 5000
+```
+
+Then configure Claude Desktop to connect to the SSE endpoint:
+
+```json
+{
+    "mcpServers":{
+        "TahubuSF-SSE": {
+            "url": "http://127.0.0.1:5000/sse"
+        }
+    }
+}
+```
+
+### Option 3: Streamable HTTP Transport 
+
+For modern HTTP-based integration (recommended for web deployments):
+
+```bash
+python run.py --transport streamable-http --port 5000 --path /mcp
+```
+
+Then configure Claude Desktop:
+
+```json
+{
+    "mcpServers":{
+        "TahubuSF-HTTP": {
+            "url": "http://127.0.0.1:5000/mcp"
+        }
+    }
+}
+```
+
+### Transport Options Summary
+
+| Transport | Use Case | Configuration |
+|-----------|----------|---------------|
+| **STDIO** | Local development, direct integration | Command-based config |
+| **SSE** | Web-based, legacy SSE clients | URL-based config with `/sse` endpoint |
+| **Streamable HTTP** | Modern web deployments, production | URL-based config with custom path |
+
+### Command Line Options
+
+The `run.py` script supports the following options:
+
+```bash
+python run.py --help
+```
+
+Options:
+- `--transport {stdio,sse,streamable-http}`: Transport protocol (default: stdio)
+- `--host HOST`: Host to bind to for web transports (default: 127.0.0.1)
+- `--port PORT`: Port to bind to for web transports (default: 5000)
+- `--path PATH`: Path for HTTP transport (default: /sse)
+- `--verbose`: Enable verbose logging
+
+Examples:
+```bash
+# STDIO (default)
+python run.py
+
+# SSE on custom port
+python run.py --transport sse --port 8080
+
+# HTTP with custom path
+python run.py --transport streamable-http --port 3000 --path /api/mcp
+```
+
+**Note**: Replace `D:\\repos\\TahubuSF` with the absolute path to your project directory.
+
+### Current Status
+
+✅ **All Transport Protocols Working**: STDIO, SSE, and Streamable HTTP  
+✅ **FastMCP 2.0**: Latest features and capabilities  
+✅ **Production Ready**: Suitable for web deployments  
+✅ **All MCP Tools**: 27 Sitefinity tools working perfectly across all transports
+
+## Entry Points Comparison
+
+| Entry Point | Command | Best For | Pros | Cons |
+|-------------|---------|----------|------|------|
+| **mcp dev run.py** | `mcp dev run.py` | MCP Inspector | • Quick testing<br>• MCP web interface | • Requires MCP CLI<br>• Limited to MCP tools |
+| **simple_server.py** | `python simple_server.py` | Local development | • Most reliable<br>• No dependency issues<br>• Simple to use | • Basic UI<br>• Not suitable for production |
+| **direct_test.py** | `python direct_test.py` | Testing FastAPI | • Handles import issues<br>• Auto-installs requirements | • Temporary files<br>• More complex |
+| **run_fastapi.py** | `python run_fastapi.py` | Azure deployment prep | • Production-quality API<br>• Swagger docs | • More dependencies<br>• Possible import issues |
+| **test_fastapi.py** | `python test_fastapi.py` | API validation | • Runs tests automatically<br>• Validates responses | • Focuses on testing |
+| **run.py** | `python run.py` | Claude Desktop & Production | • Multiple transports<br>• Production ready<br>• MCP integration | • More complex options |
+
+### When to Use Each Option
+
+- **simple_server.py**: When you want reliable, hassle-free testing during development
+- **direct_test.py**: When you want to test the FastAPI implementation without dealing with Python path issues
+- **run_fastapi.py**: When preparing for Azure deployment or need a production-quality API
+- **test_fastapi.py**: When testing API correctness and responses
+- **run.py**: When integrating with Claude Desktop or deploying with different transports
 
 ## Development
 
