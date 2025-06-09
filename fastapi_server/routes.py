@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 # Import tool functions
-from tahubu_sf.api.news import get_news
+from tahubu_sf.api.news import get_news, create_news_item  # Assuming create_news_item is defined
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.lists import get_list_items
@@ -62,7 +62,7 @@ TOOL_MAP = {
     "getTaxonomies": get_taxonomies,
     "getSectionPresets": get_section_presets,
     "createBlogPostDraft": create_blog_post,
-    "createNewsItemDraft": create_news_item,  # Assuming create_news_item is defined
+    "createNewsItemDraft": create_news_item,
     "createListItemDraft": create_list_item,
     "createEventDraft": create_event,
     "createImageDraft": create_image,
