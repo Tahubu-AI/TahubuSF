@@ -210,4 +210,4 @@ ENV/
 *.swo
 
 # vscode specific files
-mcp.json
+.vscode/mcp.json
