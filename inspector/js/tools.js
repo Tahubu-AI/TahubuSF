@@ -235,13 +235,83 @@ async function createBlogPost() {
     }
 }
 
+// Create a News Item
+async function createNewsItem() {
+    // Show loading indicator
+    document.getElementById('createnewsitem-loading').classList.remove('hidden');
+    
+    try {
+        // Get the JSON data from the editor
+        const jsonEditor = document.getElementById('newsPostJson');
+        let newsData;
+        
+        try {
+            // Remove any comments from the JSON before parsing
+            const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            newsData = JSON.parse(jsonWithoutComments);
+        } catch (e) {
+            throw new Error(`Invalid JSON: ${e.message}`);
+        }
+              
+        // Call the MCP tool
+        const response = await fetch('/api/run-tool', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: 'createNewsItemDraft',
+                params: newsData
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Show notification
+        if (data.result && data.result.Id) {
+            showNotification("News Item created successfully!", "success");
+            formatCreatedNewsItem(data.result);
+            
+            // Close the modal after successful creation
+            closeNewsEditor();
+        } else {
+            throw new Error("News Item was created but something went wrong. Check results for details.");
+        }
+        
+        return data.result;
+    } catch (error) {
+        console.error('Error creating News Item:', error);
+        showNotification(error.message, "error");
+        formatNewsItemError(error.message);
+        return null;
+    } finally {
+        // Hide loading indicator
+        document.getElementById('createnewsitem-loading').classList.add('hidden');
+    }
+}
+
 // Open the blog editor modal
 function openBlogEditor() {
     document.getElementById('blogEditorModal').style.display = 'block';
     fetchAndPopulateParentId();
 }
 
+// Open the news editor modal
+function openNewsEditor() {
+    document.getElementById('newsEditorModal').style.display = 'block';
+    fetchAndPopulateParentId();
+}
+
 // Close the blog editor modal
 function closeBlogEditor() {
     document.getElementById('blogEditorModal').style.display = 'none';
+} 
+
+// Close the news editor modal
+function closeNewsEditor() {
+    document.getElementById('newsEditorModal').style.display = 'none';
 } 

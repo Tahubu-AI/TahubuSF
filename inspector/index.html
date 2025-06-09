@@ -224,6 +224,21 @@
                             <p class="tool-description">Create a new blog post draft in Sitefinity</p>
                             <button onclick="openBlogEditor()">Open Editor</button>
                         </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Create News Item</h2>
+                            <p class="tool-description">Create a new Press Release draft in Sitefinity</p>
+                            <button onclick="openNewsEditor()">Open Editor</button>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Create List Item</h2>
+                            <p class="tool-description">Create a new List Item draft in Sitefinity</p>
+                            <button onclick="openListItemEditor()">Open Editor</button>
+                        </div>
+                        <div class="tool-card">
+                            <h2 class="tool-title">Create Event</h2>
+                            <p class="tool-description">Create a new Event draft in Sitefinity</p>
+                            <button onclick="openEventEditor()">Open Editor</button>
+                        </div>
                     </div>
                     <div class="collapse-section">
                         <button class="collapse-section-btn" onclick="toggleAccordion(document.getElementById('content-management-header'))">Collapse Section</button>
@@ -267,6 +282,22 @@
             <span id="createblogpost-loading" class="loading hidden"></span>
         </div>
     </div>
+
+    <!-- News Editor Modal -->
+    <div id="newsEditorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNewsEditor()">&times;</span>
+            <h2>Create News Item Draft</h2>
+            <textarea id="newsPostJson" class="json-editor">{
+  "title": "New Press Release",
+  "content": "<h2>Press Release Heading</h2><p>This is the main content of your Press Release.</p><p>You can use HTML formatting.</p>",
+  "summary": "A brief summary of this Press Release",
+  "allow_comments": true
+}</textarea>
+            <button onclick="createNewsItem()">Create News Item</button>
+            <span id="createnewsitem-loading" class="loading hidden"></span>
+        </div>
+    </div>
     
     <!-- Mobile Toggle for Results -->
     <div class="mobile-results-toggle">
@@ -290,10 +321,14 @@
             
             // Close the modal if the user clicks outside of it
             window.onclick = function(event) {
-                const modal = document.getElementById('blogEditorModal');
+                const modalBlog = document.getElementById('blogEditorModal');
                 if (event.target === modal) {
                     closeBlogEditor();
                 }
+                const modalNews = document.getElementById('newsEditorModal');
+                if (event.target === modal) {
+                    closeNewsEditor();
+                } 
             }
             
             // Listen for window resize to adjust results visibility on desktop

@@ -62,6 +62,7 @@ TOOL_MAP = {
     "getTaxonomies": get_taxonomies,
     "getSectionPresets": get_section_presets,
     "createBlogPostDraft": create_blog_post,
+    "createNewsItemDraft": create_news_item,  # Assuming create_news_item is defined
     "createListItemDraft": create_list_item,
     "createEventDraft": create_event,
     "createImageDraft": create_image,
