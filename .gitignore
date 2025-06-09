@@ -208,3 +208,6 @@ ENV/
 .idea/
 *.swp
 *.swo
+
+# vscode specific files
+mcp.json
