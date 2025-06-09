@@ -303,7 +303,6 @@ function openBlogEditor() {
 // Open the news editor modal
 function openNewsEditor() {
     document.getElementById('newsEditorModal').style.display = 'block';
-    fetchAndPopulateParentId();
 }
 
 // Close the blog editor modal

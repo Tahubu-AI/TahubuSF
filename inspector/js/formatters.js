@@ -143,6 +143,87 @@ function formatCreatedBlogPost(blogPost) {
     }
 }
 
+// Format created news item
+function formatCreatedNewsItem(newsitem) {
+    const resultsContainer = document.getElementById('results-container');
+    
+    try {
+        // Create formatted HTML output
+        let html = '<div class="formatted-results">';
+        html += '<div class="alert success"><strong>Success!</strong> News Item draft created successfully.</div>';
+        
+        html += '<div class="result-item">';
+        html += `<h3>${newsitem.Title || 'New Press Releaset'}</h3>`;
+        
+        // Add post URL if available
+        if (newsitem.ItemDefaultUrl) {
+            html += `<div class="result-property">
+                <span class="property-name">URL:</span>
+                <span class="property-value">${newsitem.ItemDefaultUrl}</span>
+            </div>`;
+        }
+        
+        // Add ID - Use correct property case, Sitefinity uses "Id" not "ID"
+        html += `<div class="result-property">
+            <span class="property-name">ID:</span>
+            <span class="property-value">${newsitem.Id || newsitem.ID || 'Unknown'}</span>
+        </div>`;
+        
+        // Add Status
+        html += `<div class="result-property">
+            <span class="property-name">Status:</span>
+            <span class="property-value">Draft</span>
+        </div>`;
+        
+        // Add Publication Date
+        if (newsitem.PublicationDate) {
+            const date = new Date(newsitem.PublicationDate).toLocaleString();
+            html += `<div class="result-property">
+                <span class="property-name">Created:</span>
+                <span class="property-value">${date}</span>
+            </div>`;
+        }
+        
+        // Add Summary if available
+        if (newsitem.Summary) {
+            html += `<div class="result-property">
+                <span class="property-name">Summary:</span>
+                <span class="property-value">${newsitem.Summary}</span>
+            </div>`;
+        }
+        
+        // Preview of content (truncated)
+        if (newsitem.Content) {
+            // Strip HTML tags for preview
+            const contentText = newsitem.Content.replace(/<[^>]*>/g, ' ').substring(0, 100);
+            html += `<div class="result-property">
+                <span class="property-name">Content:</span>
+                <span class="property-value">${contentText}${newsitem.Content.length > 100 ? '...' : ''}</span>
+            </div>`;
+        }
+        
+        html += '</div>';
+        
+        // Add note about Sitefinity
+        html += `<div class="result-item">
+            <div class="result-property">
+                <p>The News Item has been created as a draft. You can now edit, review, and publish it in the Sitefinity admin panel.</p>
+            </div>
+        </div>`;
+        
+        html += '</div>';
+        
+        // Update the results container
+        resultsContainer.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error formatting created news item:', error);
+        // Fallback to showing the raw data
+        resultsContainer.innerHTML = '<pre id="results"></pre>';
+        document.getElementById('results').textContent = JSON.stringify(newsitem, null, 2);
+    }
+}
+
 // Format parent blogs
 function displayParentBlogs(data) {
     const resultsContainer = document.getElementById('results-container');
