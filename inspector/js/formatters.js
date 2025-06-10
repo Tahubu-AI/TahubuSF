@@ -224,6 +224,148 @@ function formatCreatedNewsItem(newsitem) {
     }
 }
 
+// Format created List Item
+function formatCreatedListItem(listItem) {
+    const resultsContainer = document.getElementById('results-container');
+    
+    try {
+        // Create formatted HTML output
+        let html = '<div class="formatted-results">';
+        html += '<div class="alert success"><strong>Success!</strong> List Item draft created successfully.</div>';
+        
+        html += '<div class="result-item">';
+        html += `<h3>${listItem.Title || 'New List Item'}</h3>`;
+        
+        // Add post URL if available
+        if (listItem.ItemDefaultUrl) {
+            html += `<div class="result-property">
+                <span class="property-name">URL:</span>
+                <span class="property-value">${listItem.ItemDefaultUrl}</span>
+            </div>`;
+        }
+        
+        // Add ID - Use correct property case, Sitefinity uses "Id" not "ID"
+        html += `<div class="result-property">
+            <span class="property-name">ID:</span>
+            <span class="property-value">${listItem.Id || listItem.ID || 'Unknown'}</span>
+        </div>`;
+        
+        // Add Status
+        html += `<div class="result-property">
+            <span class="property-name">Status:</span>
+            <span class="property-value">Draft</span>
+        </div>`;
+        
+        // Add Publication Date
+        if (listItem.PublicationDate) {
+            const date = new Date(listItem.PublicationDate).toLocaleString();
+            html += `<div class="result-property">
+                <span class="property-name">Created:</span>
+                <span class="property-value">${date}</span>
+            </div>`;
+        }
+        
+        // Add Summary if available
+        if (listItem.Content) {
+            html += `<div class="result-property">
+                <span class="property-name">Content:</span>
+                <span class="property-value">${listItem.Content}</span>
+            </div>`;
+        }
+             
+        html += '</div>';
+        
+        // Add note about Sitefinity
+        html += `<div class="result-item">
+            <div class="result-property">
+                <p>The list item has been created as a draft. You can now edit, review, and publish it in the Sitefinity admin panel.</p>
+            </div>
+        </div>`;
+        
+        html += '</div>';
+        
+        // Update the results container
+        resultsContainer.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error formatting created list item:', error);
+        // Fallback to showing the raw data
+        resultsContainer.innerHTML = '<pre id="results"></pre>';
+        document.getElementById('results').textContent = JSON.stringify(listItem, null, 2);
+    }
+}
+
+// Format created Event
+function formatCreatedEvent(event) {
+    const resultsContainer = document.getElementById('results-container');
+    
+    try {
+        // Create formatted HTML output
+        let html = '<div class="formatted-results">';
+        html += '<div class="alert success"><strong>Success!</strong> Event draft created successfully.</div>';
+        
+        html += '<div class="result-item">';
+        html += `<h3>${event.Title || 'New Event'}</h3>`;
+        
+        // Add post URL if available
+        if (event.ItemDefaultUrl) {
+            html += `<div class="result-property">
+                <span class="property-name">URL:</span>
+                <span class="property-value">${event.ItemDefaultUrl}</span>
+            </div>`;
+        }
+        
+        // Add ID - Use correct property case, Sitefinity uses "Id" not "ID"
+        html += `<div class="result-property">
+            <span class="property-name">ID:</span>
+            <span class="property-value">${event.Id || event.ID || 'Unknown'}</span>
+        </div>`;
+        
+        // Add Status
+        html += `<div class="result-property">
+            <span class="property-name">Status:</span>
+            <span class="property-value">Draft</span>
+        </div>`;
+        
+        // Add Publication Date
+        if (event.PublicationDate) {
+            const date = new Date(event.PublicationDate).toLocaleString();
+            html += `<div class="result-property">
+                <span class="property-name">Created:</span>
+                <span class="property-value">${date}</span>
+            </div>`;
+        }
+        
+        // Add Summary if available
+        if (event.Content) {
+            html += `<div class="result-property">
+                <span class="property-name">Content:</span>
+                <span class="property-value">${event.Content}</span>
+            </div>`;
+        }
+             
+        html += '</div>';
+        
+        // Add note about Sitefinity
+        html += `<div class="result-item">
+            <div class="result-property">
+                <p>The Event has been created as a draft. You can now edit, review, and publish it in the Sitefinity admin panel.</p>
+            </div>
+        </div>`;
+        
+        html += '</div>';
+        
+        // Update the results container
+        resultsContainer.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Error formatting created Event:', error);
+        // Fallback to showing the raw data
+        resultsContainer.innerHTML = '<pre id="results"></pre>';
+        document.getElementById('results').textContent = JSON.stringify(event, null, 2);
+    }
+}
+
 // Format parent blogs
 function displayParentBlogs(data) {
     const resultsContainer = document.getElementById('results-container');

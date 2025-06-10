@@ -8,16 +8,16 @@
             "password": false
         }
     ],
-    "servers": {
-        "TahubuSF": {
-            "type": "stdio",
-            "command": "python",
-            "args": [
-                "run.py"
-            ],
-            "env": {
-                "SITEFINITY_SITE_PREFIX": "${input:sitefinity-site-prefix}"
-            }
-        }
-    }
+    // "servers": {
+    //     "TahubuSF": {
+    //         "type": "stdio",
+    //         "command": "python",
+    //         "args": [
+    //             "run.py"
+    //         ],
+    //         "env": {
+    //             "SITEFINITY_SITE_PREFIX": "${input:sitefinity-site-prefix}"
+    //         }
+    //     }
+    // }
 }

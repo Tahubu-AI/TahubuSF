@@ -212,6 +212,31 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                         allow_comments=allow_comments
                     )
                 )
+            elif tool_name == "createListItemDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                parent_id = params.get("parent_id")
+                
+                # Validate required parameters
+                if not title or not content or not parent_id:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    if not parent_id:
+                        missing.append("parent_id")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_list_item(
+                        title=title,
+                        content=content,
+                        parent_id=parent_id,
+                    )
+                )
             elif tool_name == "createNewsItemDraft":
                 # Extract required parameters
                 title = params.get("title")

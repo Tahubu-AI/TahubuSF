@@ -68,6 +68,8 @@ TOOL_MAP = {
     "createImageDraft": create_image,
     "createDocumentDraft": create_document,
     "createVideoDraft": create_video,
+    "createListItemDraft": create_list_item,
+    "createEventDraft": create_event,
 }
 
 # Data models

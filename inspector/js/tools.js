@@ -131,11 +131,11 @@ async function runTool(toolName) {
 }
 
 // Fetch parent blogs and populate the parent_id field
-async function fetchAndPopulateParentId() {
+async function fetchAndPopulateBlogParentId() {
     try {
         // Show loading in the editor
         const jsonEditor = document.getElementById('blogPostJson');
-        const currentData = getCurrentEditorData();
+        const currentData = getCurrentEditorData(jsonEditor.id);
         
         // Show temporary loading message in the JSON editor
         jsonEditor.value = "/* Fetching parent blogs... */\n" + JSON.stringify(currentData, null, 2);
@@ -171,6 +171,87 @@ async function fetchAndPopulateParentId() {
     }
 }
 
+// Fetch parent list and populate the parent_id field
+async function fetchAndPopulateListParentId() {
+    try {
+        // Show loading in the editor
+        const jsonEditor = document.getElementById('listItemPostJson');
+        const currentData = getCurrentEditorData(jsonEditor.id);
+        
+        // Show temporary loading message in the JSON editor
+        jsonEditor.value = "/* Fetching parent lists... */\n" + JSON.stringify(currentData, null, 2);
+        
+        // Fetch parent Lists
+        const parentLists = await runTool('getParentLists');
+        
+        if (parentLists && Object.keys(parentLists).length > 0) {
+            // Get the first parent blog ID
+            const firstParentId = Object.keys(parentLists)[0];
+            const firstName = parentLists[firstParentId];
+            
+            // Update the parent_id in the current data
+            currentData.parent_id = firstParentId;
+            
+            // Create comment with all available parent blogs
+            let listComment = "/* Available parent Lists:\n";
+            for (const [id, title] of Object.entries(parentLists)) {
+                const isSelected = (id === firstParentId) ? " (SELECTED)" : "";
+                listComment += `${title}${isSelected}: ${id}\n`;
+            }
+            listComment += "*/\n";
+            
+            // Update the JSON editor with the comment and updated data
+            jsonEditor.value = listComment + JSON.stringify(currentData, null, 2);
+        } else {
+            // No parent blogs found, show warning
+            jsonEditor.value = "/* WARNING: No parent lists found. You need a parent list to create a List Item. */\n" + 
+                               JSON.stringify(currentData, null, 2);
+        }
+    } catch (error) {
+        console.error("Error fetching parent lists:", error);
+    }
+}
+
+// Fetch calendar and populate the parent_id field
+async function fetchAndPopulateCalendarParentId() {
+    try {
+        // Show loading in the editor
+        const jsonEditor = document.getElementById('eventPostJson');
+        const currentData = getCurrentEditorData(jsonEditor.id);
+        
+        // Show temporary loading message in the JSON editor
+        jsonEditor.value = "/* Fetching Calendars... */\n" + JSON.stringify(currentData, null, 2);
+        
+        // Fetch parent Calendars
+        const parentCalendars = await runTool('getCalendars');
+        
+        if (parentCalendars && Object.keys(parentCalendars).length > 0) {
+            // Get the first parent Calendar ID
+            const firstParentId = Object.keys(parentCalendars)[0];
+            const firstName = parentCalendars[firstParentId];
+            
+            // Update the parent_id in the current data
+            currentData.parent_id = firstParentId;
+            
+            // Create comment with all available calendars
+            let calendarComment = "/* Available Calenders:\n";
+            for (const [id, title] of Object.entries(parentCalendars)) {
+                const isSelected = (id === firstParentId) ? " (SELECTED)" : "";
+                calendarComment += `${title}${isSelected}: ${id}\n`;
+            }
+            calendarComment += "*/\n";
+            
+            // Update the JSON editor with the comment and updated data
+            jsonEditor.value = calendarComment + JSON.stringify(currentData, null, 2);
+        } else {
+            // No parent blogs found, show warning
+            jsonEditor.value = "/* WARNING: No Calendars found. You need a Calendar to create an event. */\n" + 
+                               JSON.stringify(currentData, null, 2);
+        }
+    } catch (error) {
+        console.error("Error fetching calendars:", error);
+    }
+}
 // Create a blog post
 async function createBlogPost() {
     // Show loading indicator
@@ -232,6 +313,134 @@ async function createBlogPost() {
     } finally {
         // Hide loading indicator
         document.getElementById('createblogpost-loading').classList.add('hidden');
+    }
+}
+
+// Create a List Item
+async function createListItem() {
+    // Show loading indicator
+    document.getElementById('createlistitem-loading').classList.remove('hidden');
+    
+    try {
+        // Get the JSON data from the editor
+        const jsonEditor = document.getElementById('listItemPostJson');
+        let listItemPostData;
+        
+        try {
+            // Remove any comments from the JSON before parsing
+            const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            listItemPostData = JSON.parse(jsonWithoutComments);
+        } catch (e) {
+            throw new Error(`Invalid JSON: ${e.message}`);
+        }
+        
+        // Validate required fields
+        if (!listItemPostData.parent_id || listItemPostData.parent_id === "REQUIRED - Use the Parent List tool to get a valid ID") {
+            throw new Error("Parent list ID (parent_id) is required. Please use the Parent List tool to get a valid ID.");
+        }
+        
+        // Call the MCP tool
+        const response = await fetch('/api/run-tool', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: 'createListItemDraft',
+                params: listItemPostData
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Show notification
+        if (data.result && data.result.Id) {
+            showNotification("List Item created successfully!", "success");
+            formatCreatedListItem(data.result);
+            
+            // Close the modal after successful creation
+            closeListsEditor();
+        } else {
+            throw new Error("List Item created but no ID was returned. Check results for details.");
+        }
+        
+        return data.result;
+    } catch (error) {
+        console.error('Error creating List Item:', error);
+        showNotification(error.message, "error");
+        formatListItemError(error.message);
+        return null;
+    } finally {
+        // Hide loading indicator
+        document.getElementById('createlistitem-loading').classList.add('hidden');
+    }
+}
+
+// Create an Event
+async function createEventItem() {
+    // Show loading indicator
+    document.getElementById('createevent-loading').classList.remove('hidden');
+    
+    try {
+        // Get the JSON data from the editor
+        const jsonEditor = document.getElementById('eventPostJson');
+        let eventPostData;
+        
+        try {
+            // Remove any comments from the JSON before parsing
+            const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            eventPostData = JSON.parse(jsonWithoutComments);
+        } catch (e) {
+            throw new Error(`Invalid JSON: ${e.message}`);
+        }
+        
+        // Validate required fields
+        if (!eventPostData.parent_id || eventPostData.parent_id === "REQUIRED - Use the Calendar tool to get a valid ID") {
+            throw new Error("Calendar ID (parent_id) is required. Please use the Calendar tool to get a valid ID.");
+        }
+        
+        // Call the MCP tool
+        const response = await fetch('/api/run-tool', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: 'createEventDraft',
+                params: eventPostData
+            }),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Show notification
+        if (data.result && data.result.Id) {
+            showNotification("Event created successfully!", "success");
+            formatCreatedEvent(data.result);
+            
+            // Close the modal after successful creation
+            closeEventEditor();
+        } else {
+            throw new Error("Event created but no ID was returned. Check results for details.");
+        }
+        
+        return data.result;
+    } catch (error) {
+        console.error('Error creating Event:', error);
+        showNotification(error.message, "error");
+        formatEventError(error.message);
+        return null;
+    } finally {
+        // Hide loading indicator
+        document.getElementById('createevent-loading').classList.add('hidden');
     }
 }
 
@@ -297,12 +506,24 @@ async function createNewsItem() {
 // Open the blog editor modal
 function openBlogEditor() {
     document.getElementById('blogEditorModal').style.display = 'block';
-    fetchAndPopulateParentId();
+    fetchAndPopulateBlogParentId();
 }
 
 // Open the news editor modal
 function openNewsEditor() {
     document.getElementById('newsEditorModal').style.display = 'block';
+}
+
+// Open the ListItem editor modal
+function openListItemEditor() {
+    document.getElementById('listItemEditorModal').style.display = 'block';
+    fetchAndPopulateListParentId();
+}
+
+// Open the Event editor modal
+function openEventEditor() {
+    document.getElementById('eventEditorModal').style.display = 'block';
+    fetchAndPopulateCalendarParentId();
 }
 
 // Close the blog editor modal
@@ -313,4 +534,13 @@ function closeBlogEditor() {
 // Close the news editor modal
 function closeNewsEditor() {
     document.getElementById('newsEditorModal').style.display = 'none';
+} 
+
+// Close the List Item editor modal
+function closeListsEditor() {
+    document.getElementById('listItemEditorModal').style.display = 'none';
+} 
+// Close the Event editor modal
+function closeEventEditor() {
+    document.getElementById('eventEditorModal').style.display = 'none';
 } 
