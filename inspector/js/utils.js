@@ -164,20 +164,22 @@ function formatGenericResult(data) {
 }
 
 // Get the current data from the JSON editor
-function getCurrentEditorData() {
-    const jsonEditor = document.getElementById('blogPostJson');
-    
+function getCurrentEditorData(jsonEditorId) {
+    const jsonEditor = document.getElementById(jsonEditorId);
+    console.log('JSON Editor ID:', jsonEditor.id);
     try {
         // Remove any comments from the JSON before parsing
         const jsonWithoutComments = jsonEditor.value.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+        console.log('JSON Without Comments:', jsonWithoutComments);
         return JSON.parse(jsonWithoutComments);
     } catch (e) {
         // Return a default structure if there's an error
+        
         return {
             title: '',
             content: '',
             summary: '',
-            parent_id: 'REQUIRED - Use the Parent Blogs tool to get a valid ID',
+            parent_id: 'REQUIRED - Use the Parent entity tool to get a valid ID',
             draft: true
         };
     }
