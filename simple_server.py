@@ -16,7 +16,7 @@ from urllib.parse import urlparse, parse_qs
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import from our modular architecture
-from tahubu_sf.api.news import get_news
+from tahubu_sf.api.news import get_news, create_news_item
 from tahubu_sf.api.blogs import get_blog_posts
 from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
 from tahubu_sf.api.lists import get_list_items
@@ -209,6 +209,56 @@ class MCPRequestHandler(BaseHTTPRequestHandler):
                         content=content,
                         summary=summary,
                         parent_id=parent_id,
+                        allow_comments=allow_comments
+                    )
+                )
+            elif tool_name == "createListItemDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                parent_id = params.get("parent_id")
+                
+                # Validate required parameters
+                if not title or not content or not parent_id:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    if not parent_id:
+                        missing.append("parent_id")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_list_item(
+                        title=title,
+                        content=content,
+                        parent_id=parent_id,
+                    )
+                )
+            elif tool_name == "createNewsItemDraft":
+                # Extract required parameters
+                title = params.get("title")
+                content = params.get("content")
+                summary = params.get("summary")
+                allow_comments = params.get("allow_comments", True)
+                
+                # Validate required parameters
+                if not title or not content:
+                    missing = []
+                    if not title:
+                        missing.append("title")
+                    if not content:
+                        missing.append("content")
+                    raise ValueError(f"Missing required parameters: {', '.join(missing)}")
+                
+                # Call the tool with the parameters
+                result = loop.run_until_complete(
+                    create_news_item(
+                        title=title,
+                        content=content,
+                        summary=summary,
                         allow_comments=allow_comments
                     )
                 )

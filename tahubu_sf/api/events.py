@@ -51,15 +51,15 @@ async def create_event(
         now = datetime.utcnow().isoformat() + "Z"
         
         # Prepare the event data
+        
         post_data = {
             "Title": title,
             "Summary": summary,
             "Content": content,
-            "EventStart": eventstart.isoformat() + "Z",
-            "EventEnd": eventend.isoformat() + "Z",
+            "EventStart": now if eventstart is None else eventstart.isoformat() + "Z",
+            "EventEnd": now if eventend is None else eventend.isoformat() + "Z",
             "ParentId": parent_id,
         }
-        
         # Generate a proper URL name from the title following Sitefinity requirements
         url_name = generate_url_name(title)
         
