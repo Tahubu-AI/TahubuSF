@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-Entry point for running the TahubuSF MCP server
+Entry point for running the TahubuSF MCP server with STDIO transport
+For HTTP/web access, use the FastAPI server in fastapi_server/
 """
 import argparse
 import logging
@@ -19,28 +20,6 @@ def parse_args():
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
-    parser.add_argument(
-        "--transport", "-t", 
-        choices=["stdio", "streamable-http"], 
-        default="stdio",
-        help="Transport protocol to use (default: stdio)"
-    )
-    parser.add_argument(
-        "--host", 
-        default="127.0.0.1",
-        help="Host to bind to for HTTP transport (default: 127.0.0.1)"
-    )
-    parser.add_argument(
-        "--port", "-p", 
-        type=int, 
-        default=5000,
-        help="Port to bind to for HTTP transport (default: 5000)"
-    )
-    parser.add_argument(
-        "--path",
-        default="/mcp",
-        help="Path for HTTP transport (default: /mcp)"
-    )
     return parser.parse_args()
 
 def main():
@@ -55,16 +34,11 @@ def main():
     )
     
     logger.info("Creating TahubuSF MCP server")
+    logger.info("Using STDIO transport for Claude Desktop integration")
+    logger.info("For HTTP/web access, use: cd fastapi_server && python run.py")
     
-    if args.transport == "stdio":
-        logger.info("To run in development mode with web interface, use: python simple_server.py")
-        logger.info("Starting in production mode (stdio only)")
-        # Run the MCP server with stdio transport
-        mcp.run(transport="stdio")
-    elif args.transport == "streamable-http":
-        logger.info(f"Starting HTTP server on {args.host}:{args.port}{args.path}")
-        # Run the MCP server with streamable HTTP transport (recommended for web deployments)
-        mcp.run(transport="streamable-http", host=args.host, port=args.port, path=args.path)
+    # Run the MCP server with STDIO transport (optimal for Claude Desktop)
+    mcp.run(transport="stdio")
 
 if __name__ == "__main__":
     main() 

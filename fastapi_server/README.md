@@ -114,8 +114,8 @@ For more details on environment variables, see [Environment Variables Documentat
 
 ## Testing
 
-Run tests using pytest:
+Run tests against a running FastAPI server instance:
 
 ```bash
-python test_fastapi.py
+python fastapi_http_test.py
 ```
