@@ -301,35 +301,15 @@ For direct local integration with Claude Desktop using STDIO (recommended for mo
 }
 ```
 
-### Option 2: SSE Transport (Server-Sent Events)
+### Option 2: Streamable HTTP Transport (Production-Ready)
 
-For web-based integration using SSE transport, first start the server:
-
-```bash
-python run.py --transport sse --port 5000
-```
-
-Then configure Claude Desktop to connect to the SSE endpoint:
-
-```json
-{
-    "mcpServers":{
-        "TahubuSF-SSE": {
-            "url": "http://127.0.0.1:5000/sse"
-        }
-    }
-}
-```
-
-### Option 3: Streamable HTTP Transport 
-
-For modern HTTP-based integration (recommended for web deployments):
+For modern web deployments using HTTP transport:
 
 ```bash
 python run.py --transport streamable-http --port 5000 --path /mcp
 ```
 
-Then configure Claude Desktop:
+Then configure Claude Desktop to connect to the HTTP endpoint:
 
 ```json
 {
@@ -343,47 +323,37 @@ Then configure Claude Desktop:
 
 ### Transport Options Summary
 
-| Transport | Use Case | Configuration |
-|-----------|----------|---------------|
-| **STDIO** | Local development, direct integration | Command-based config |
-| **SSE** | Web-based, legacy SSE clients | URL-based config with `/sse` endpoint |
-| **Streamable HTTP** | Modern web deployments, production | URL-based config with custom path |
+| Transport | Best For | Configuration Type |
+|-----------|----------|-------------------|
+| **STDIO** | Local development, Claude Desktop | Command-based |
+| **HTTP** | Web deployments, production | URL-based config with `/mcp` endpoint |
 
-### Command Line Options
+## Server Configuration Options
 
-The `run.py` script supports the following options:
+The server supports comprehensive command-line configuration:
+
+- `--transport {stdio,streamable-http}`: Transport protocol (default: stdio)
+- `--host HOST`: Host to bind to for HTTP transport (default: 127.0.0.1)
+- `--port PORT`: Port to bind to for HTTP transport (default: 5000)
+- `--path PATH`: Path for HTTP transport (default: /mcp)
+- `--verbose, -v`: Enable verbose logging
+
+### Usage Examples
 
 ```bash
-python run.py --help
-```
-
-Options:
-- `--transport {stdio,sse,streamable-http}`: Transport protocol (default: stdio)
-- `--host HOST`: Host to bind to for web transports (default: 127.0.0.1)
-- `--port PORT`: Port to bind to for web transports (default: 5000)
-- `--path PATH`: Path for HTTP transport (default: /sse)
-- `--verbose`: Enable verbose logging
-
-Examples:
-```bash
-# STDIO (default)
+# Default STDIO for Claude Desktop
 python run.py
 
-# SSE on custom port
-python run.py --transport sse --port 8080
+# HTTP on custom port
+python run.py --transport streamable-http --port 8080
 
-# HTTP with custom path
-python run.py --transport streamable-http --port 3000 --path /api/mcp
+# Production HTTP server
+python run.py --transport streamable-http --host 0.0.0.0 --port 3000
 ```
-
-**Note**: Replace `D:\\repos\\TahubuSF` with the absolute path to your project directory.
 
 ### Current Status
 
-✅ **All Transport Protocols Working**: STDIO, SSE, and Streamable HTTP  
-✅ **FastMCP 2.0**: Latest features and capabilities  
-✅ **Production Ready**: Suitable for web deployments  
-✅ **All MCP Tools**: 27 Sitefinity tools working perfectly across all transports
+✅ **Both Transport Protocols Working**: STDIO and Streamable HTTP
 
 ## Entry Points Comparison
 

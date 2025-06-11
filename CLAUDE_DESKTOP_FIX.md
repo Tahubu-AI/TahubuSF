@@ -91,8 +91,7 @@ If you prefer direct Python execution:
 ## Key Benefits Restored
 
 - **STDIO Transport**: Perfect for Claude Desktop
-- **SSE Transport**: Available for web clients  
-- **HTTP Transport**: Ready for production deployments
+- **HTTP Transport**: Available for web clients and production deployments
 - **FastMCP 2.x Features**: LLM sampling, context injection, etc.
 
 ## Prevention

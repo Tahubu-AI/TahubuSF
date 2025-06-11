@@ -21,25 +21,25 @@ def parse_args():
     )
     parser.add_argument(
         "--transport", "-t", 
-        choices=["stdio", "sse", "streamable-http"], 
+        choices=["stdio", "streamable-http"], 
         default="stdio",
         help="Transport protocol to use (default: stdio)"
     )
     parser.add_argument(
         "--host", 
         default="127.0.0.1",
-        help="Host to bind to for SSE/HTTP transport (default: 127.0.0.1)"
+        help="Host to bind to for HTTP transport (default: 127.0.0.1)"
     )
     parser.add_argument(
         "--port", "-p", 
         type=int, 
         default=5000,
-        help="Port to bind to for SSE/HTTP transport (default: 5000)"
+        help="Port to bind to for HTTP transport (default: 5000)"
     )
     parser.add_argument(
         "--path",
-        default="/sse",
-        help="Path for SSE/HTTP transport (default: /sse)"
+        default="/mcp",
+        help="Path for HTTP transport (default: /mcp)"
     )
     return parser.parse_args()
 
@@ -61,10 +61,6 @@ def main():
         logger.info("Starting in production mode (stdio only)")
         # Run the MCP server with stdio transport
         mcp.run(transport="stdio")
-    elif args.transport == "sse":
-        logger.info(f"Starting SSE server on {args.host}:{args.port}{args.path}")
-        # Run the MCP server with SSE transport
-        mcp.run(transport="sse", host=args.host, port=args.port)
     elif args.transport == "streamable-http":
         logger.info(f"Starting HTTP server on {args.host}:{args.port}{args.path}")
         # Run the MCP server with streamable HTTP transport (recommended for web deployments)

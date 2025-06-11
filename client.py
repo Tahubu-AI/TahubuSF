@@ -1,8 +1,8 @@
 from mcp import ClientSession
-from mcp.client.sse import sse_client
+from mcp.client.streamable_http import streamable_http_client
 
 async def run():
-    async with sse_client(url="http://localhost:4000/sse") as streams:
+    async with streamable_http_client(url="http://localhost:5000/mcp") as streams:
         async with ClientSession(*streams) as session:
             # Call the function you want to run
             await session.initialize()

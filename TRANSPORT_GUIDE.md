@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your TahubuSF MCP server has been successfully upgraded to use **FastMCP 2.0**, which provides multiple transport protocols for different deployment scenarios. This guide explains how to use each transport option.
+Your TahubuSF MCP server has been successfully upgraded to use **FastMCP 2.0**, which provides multiple transport protocols for different deployment scenarios. This guide explains how to use the available transport options.
 
 ## What Changed
 
@@ -16,7 +16,6 @@ mcp.run()                               # STDIO only
 ```python
 from fastmcp import FastMCP             # Standalone FastMCP 2.0
 mcp.run(transport="stdio")              # STDIO transport (default)
-mcp.run(transport="sse")                # SSE transport for web clients
 mcp.run(transport="streamable-http")    # Modern HTTP transport
 ```
 
@@ -54,33 +53,7 @@ python run.py --transport stdio
 }
 ```
 
-### 2. 🌐 SSE Transport (Server-Sent Events)
-
-**Status**: ✅ **Working and Ready**
-
-**Best for**: Web-based MCP clients, legacy SSE support
-
-**Usage**:
-```bash
-# Start SSE server
-python run.py --transport sse --port 5000
-
-# Custom host and port
-python run.py --transport sse --host 0.0.0.0 --port 8080
-```
-
-**Claude Desktop Configuration**:
-```json
-{
-    "mcpServers":{
-        "TahubuSF-SSE": {
-            "url": "http://127.0.0.1:5000/sse"
-        }
-    }
-}
-```
-
-### 3. 🚀 Streamable HTTP Transport (Recommended for Web)
+### 2. 🚀 Streamable HTTP Transport (Recommended for Web)
 
 **Status**: ✅ **Working and Production-Ready**
 
@@ -115,10 +88,10 @@ python run.py --help
 ```
 
 **Available Options**:
-- `--transport {stdio,sse,streamable-http}`: Transport protocol (default: stdio)
-- `--host HOST`: Host to bind to for web transports (default: 127.0.0.1)
-- `--port PORT`: Port to bind to for web transports (default: 5000)  
-- `--path PATH`: Path for HTTP transport (default: /sse)
+- `--transport {stdio,streamable-http}`: Transport protocol (default: stdio)
+- `--host HOST`: Host to bind to for HTTP transport (default: 127.0.0.1)
+- `--port PORT`: Port to bind to for HTTP transport (default: 5000)  
+- `--path PATH`: Path for HTTP transport (default: /mcp)
 - `--verbose, -v`: Enable verbose logging
 
 ## Examples
@@ -128,9 +101,6 @@ python run.py --help
 ```bash
 # Local development with Claude Desktop
 python run.py
-
-# Test web interface with SSE
-python run.py --transport sse --port 5000
 
 # Production-ready HTTP server
 python run.py --transport streamable-http --port 8080 --host 0.0.0.0
@@ -151,7 +121,7 @@ python run.py --transport streamable-http --port 3000 --path /api/v1/mcp
 Use the provided test scripts to verify your setup:
 
 ```bash
-# Test all transports
+# Test available transports
 python test_transports.py
 
 # Interactive demo
@@ -164,7 +134,6 @@ python demo_transports.py
 |----------|----------------------|---------------|
 | **Local Development** | STDIO | Default `python run.py` |
 | **Claude Desktop** | STDIO | Command-based config |
-| **Web Testing** | SSE | `--transport sse` |
 | **Production Web** | Streamable HTTP | `--transport streamable-http` |
 | **Docker/Cloud** | Streamable HTTP | With `--host 0.0.0.0` |
 
@@ -177,13 +146,13 @@ python demo_transports.py
 
 ### Code Changes
 - Updated import in `tahubu_sf/app.py` to `from fastmcp import FastMCP`
-- Enhanced `run.py` with full transport options
+- Enhanced `run.py` with transport options
 - Added comprehensive documentation and examples
 
 ### No Breaking Changes
 - Existing STDIO functionality works exactly as before
 - All MCP tools function identically
-- Enhanced with new transport capabilities
+- Enhanced with HTTP transport capabilities
 
 ## Troubleshooting
 
@@ -199,13 +168,7 @@ python demo_transports.py
    python run.py --verbose
    ```
 
-3. **Test SSE Transport**:
-   ```bash
-   python run.py --transport sse --port 5000 --verbose
-   # Then test: curl -I http://127.0.0.1:5000/sse
-   ```
-
-4. **Test HTTP Transport**:
+3. **Test HTTP Transport**:
    ```bash
    python run.py --transport streamable-http --port 5001 --path /mcp
    # Then test: curl -I http://127.0.0.1:5001/mcp
@@ -216,7 +179,7 @@ python demo_transports.py
 1. **Port Already in Use**
    ```bash
    # Use a different port
-   python run.py --transport sse --port 5001
+   python run.py --transport streamable-http --port 5001
    ```
 
 2. **Host Binding Issues**
@@ -233,19 +196,18 @@ python demo_transports.py
 
 ### 🎯 Success Criteria
 
-All transport protocols are now working:
+Both transport protocols are now working:
 - ✅ **STDIO Transport**: Perfect for Claude Desktop integration  
-- ✅ **SSE Transport**: Working with HTTP/1.1 200 OK response
 - ✅ **HTTP Transport**: Working with proper redirects and endpoints
 - ✅ **All 27 MCP Tools**: Available across all transport protocols
 
 ## Current Benefits
 
-✅ **Multi-Transport Support**: All three transport protocols working  
+✅ **Dual-Transport Support**: STDIO and HTTP transport protocols working  
 ✅ **Modern Architecture**: FastMCP 2.0 with latest features  
 ✅ **Production Ready**: Suitable for web deployments  
 ✅ **Claude Desktop**: Seamless STDIO integration  
-✅ **Web Integration**: SSE and HTTP for browser-based clients  
+✅ **Web Integration**: HTTP for browser-based clients  
 ✅ **Scalability**: Host and port configuration for different environments
 
-Your TahubuSF MCP server now has the full FastMCP 2.0 capabilities with multiple transport support! 🎉 
+Your TahubuSF MCP server now has FastMCP 2.0 capabilities with STDIO and HTTP transport support! 🎉 
