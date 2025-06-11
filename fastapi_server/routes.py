@@ -209,12 +209,12 @@ class VideoDraftRequest(BaseModel):
     content: str
     parent_id: str
 
-class ContentResponse(BaseModel):
-    """Response model for created content"""
-    id: str
-    title: str
-    url_name: str
-    status: str
+# class ContentResponse(BaseModel):
+#     """Response model for created content"""
+#     id: str
+#     title: str
+#     url_name: str
+#     status: str
 
 async def _execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -480,13 +480,15 @@ async def run_tool(request: ToolRequest):
             detail=f"Error running tool: {str(e)}"
         )
 
-@router.post("/blog-posts/draft", response_model=ContentResponse)
+@router.post("/blog-posts/draft")
 async def create_blog_draft(request: BlogPostDraftRequest):
     """
     Create a new blog post draft (REST endpoint).
     
     This is a traditional REST API endpoint with Pydantic validation.
     For MCP clients, use POST /api/run-tool with tool name 'createBlogPostDraft' instead.
+    
+    Returns the raw Sitefinity API response with all available properties.
     """
     try:
         logger.info(f"Creating blog post draft: {request.title}")
@@ -502,13 +504,8 @@ async def create_blog_draft(request: BlogPostDraftRequest):
         
         result = await _execute_tool("createBlogPostDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating blog post draft: {str(e)}")
         raise HTTPException(
@@ -516,9 +513,12 @@ async def create_blog_draft(request: BlogPostDraftRequest):
             detail=f"Error creating blog post draft: {str(e)}"
         )
 
-@router.post("/list-items/draft", response_model=ContentResponse)
+@router.post("/list-items/draft")
 async def create_list_item_draft(request: ListItemDraftRequest):
-    """Create a new list item draft (REST endpoint)"""
+    """Create a new list item draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating list item draft: {request.title}")
         
@@ -531,13 +531,8 @@ async def create_list_item_draft(request: ListItemDraftRequest):
         
         result = await _execute_tool("createListItemDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating list item draft: {str(e)}")
         raise HTTPException(
@@ -545,9 +540,12 @@ async def create_list_item_draft(request: ListItemDraftRequest):
             detail=f"Error creating list item draft: {str(e)}"
         )
 
-@router.post("/events/draft", response_model=ContentResponse)
+@router.post("/events/draft")
 async def create_event_draft(request: EventDraftRequest):
-    """Create a new event draft (REST endpoint)"""
+    """Create a new event draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating event draft: {request.title}")
         
@@ -563,13 +561,8 @@ async def create_event_draft(request: EventDraftRequest):
         
         result = await _execute_tool("createEventDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating event draft: {str(e)}")
         raise HTTPException(
@@ -577,9 +570,12 @@ async def create_event_draft(request: EventDraftRequest):
             detail=f"Error creating event draft: {str(e)}"
         )
 
-@router.post("/images/draft", response_model=ContentResponse)
+@router.post("/images/draft")
 async def create_image_draft(request: ImageDraftRequest):
-    """Create a new image draft (REST endpoint)"""
+    """Create a new image draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating image draft: {request.title}")
         
@@ -592,13 +588,8 @@ async def create_image_draft(request: ImageDraftRequest):
         
         result = await _execute_tool("createImageDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating image draft: {str(e)}")
         raise HTTPException(
@@ -606,9 +597,12 @@ async def create_image_draft(request: ImageDraftRequest):
             detail=f"Error creating image draft: {str(e)}"
         )
 
-@router.post("/documents/draft", response_model=ContentResponse)
+@router.post("/documents/draft")
 async def create_document_draft(request: DocumentDraftRequest):
-    """Create a new document draft (REST endpoint)"""
+    """Create a new document draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating document draft: {request.title}")
         
@@ -622,13 +616,8 @@ async def create_document_draft(request: DocumentDraftRequest):
         
         result = await _execute_tool("createDocumentDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating document draft: {str(e)}")
         raise HTTPException(
@@ -636,9 +625,12 @@ async def create_document_draft(request: DocumentDraftRequest):
             detail=f"Error creating document draft: {str(e)}"
         )
 
-@router.post("/videos/draft", response_model=ContentResponse)
+@router.post("/videos/draft")
 async def create_video_draft(request: VideoDraftRequest):
-    """Create a new video draft (REST endpoint)"""
+    """Create a new video draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating video draft: {request.title}")
         
@@ -651,13 +643,8 @@ async def create_video_draft(request: VideoDraftRequest):
         
         result = await _execute_tool("createVideoDraft", params)
         
-        # Return in ContentResponse format
-        return ContentResponse(
-            id=result["id"],
-            title=result["title"],
-            url_name=result["url_name"],
-            status=result["status"]
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating video draft: {str(e)}")
         raise HTTPException(
