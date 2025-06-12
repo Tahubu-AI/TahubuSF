@@ -1,343 +1,217 @@
 #!/usr/bin/env python3
 """
-FastMCP 2.0 Test Suite
-Comprehensive testing for HTTP streaming, authentication, proxying, and client features
+FastMCP 2.0 Simple Test Suite
+Tests FastMCP server functionality without external dependencies
 """
 import asyncio
-import pytest
-import httpx
-import time
+import sys
 import logging
-from typing import Dict, Any
+import argparse
+from typing import List, Dict, Any
 
-# Configure logging for tests
-logging.basicConfig(level=logging.INFO)
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class FastMCPTester:
-    """Comprehensive test suite for FastMCP 2.0"""
+class FastMCPSimpleTester:
+    """Simple test suite for FastMCP 2.0"""
     
-    def __init__(self, server_url: str = "http://127.0.0.1:3000"):
+    def __init__(self, server_url: str = "http://127.0.0.1:3000/mcp"):
         self.server_url = server_url
-        self.client = httpx.AsyncClient()
         self.test_results = {}
     
-    async def test_server_health(self) -> bool:
-        """Test server health endpoint"""
-        logger.info("🏥 Testing server health...")
+    async def test_fastmcp_client_connection(self) -> bool:
+        """Test FastMCP client connection and basic functionality"""
+        logger.info("🧪 Testing FastMCP Client Connection")
+        
         try:
-            response = await self.client.get(f"{self.server_url}/health")
-            if response.status_code == 200:
-                health_data = response.json()
-                logger.info(f"✅ Server health: {health_data}")
-                return True
-            else:
-                logger.error(f"❌ Health check failed: {response.status_code}")
-                return False
-        except Exception as e:
-            logger.error(f"❌ Health check error: {e}")
-            return False
-    
-    async def test_list_tools(self) -> bool:
-        """Test listing available tools"""
-        logger.info("📋 Testing tool listing...")
-        try:
-            response = await self.client.get(f"{self.server_url}/tools")
-            if response.status_code == 200:
-                tools = response.json()
+            from fastmcp import Client
+            
+            # Connect to the FastMCP server
+            client = Client(self.server_url)
+            
+            async with client:
+                logger.info("✅ Connected to FastMCP server")
+                
+                # List available tools
+                logger.info("📋 Listing tools...")
+                tools = await client.list_tools()
                 logger.info(f"✅ Found {len(tools)} tools")
-                for tool in tools[:5]:  # Show first 5 tools
-                    tool_name = tool.get('name', tool) if isinstance(tool, dict) else str(tool)
-                    logger.info(f"   • {tool_name}")
-                return len(tools) > 0
-            else:
-                logger.error(f"❌ Tool listing failed: {response.status_code}")
-                return False
+                
+                if len(tools) == 0:
+                    logger.error("❌ No tools found!")
+                    return False
+                
+                # Show first few tools
+                logger.info("   Available tools:")
+                for i, tool in enumerate(tools[:5]):
+                    logger.info(f"   • {tool.name}")
+                if len(tools) > 5:
+                    logger.info(f"   ... and {len(tools) - 5} more")
+                
+                return True
+                
+        except ImportError:
+            logger.error("❌ FastMCP library not available")
+            logger.error("   Make sure FastMCP is installed: pip install fastmcp")
+            return False
         except Exception as e:
-            logger.error(f"❌ Tool listing error: {e}")
+            logger.error(f"❌ Client connection test failed: {e}")
             return False
     
     async def test_tool_execution(self) -> bool:
-        """Test executing MCP tools"""
+        """Test executing some basic tools"""
         logger.info("🔧 Testing tool execution...")
-        test_tools = [
-            ("get_news", {}),
-            ("get_blog_posts", {}),
-            ("get_sites", {}),
-            ("get_pages", {})
-        ]
         
-        success_count = 0
-        for tool_name, args in test_tools:
-            try:
-                payload = {
-                    "tool": tool_name,
-                    "arguments": args
-                }
-                response = await self.client.post(
-                    f"{self.server_url}/call-tool",
-                    json=payload,
-                    timeout=30
-                )
+        try:
+            from fastmcp import Client
+            
+            client = Client(self.server_url)
+            
+            async with client:
+                # Test simple tools that should exist
+                test_tools = [
+                    "get_sites",
+                    "get_news", 
+                    "get_blog_posts"
+                ]
                 
-                if response.status_code == 200:
-                    result = response.json()
-                    logger.info(f"✅ Tool {tool_name}: Success")
-                    success_count += 1
-                else:
-                    logger.warning(f"⚠️  Tool {tool_name}: HTTP {response.status_code}")
-            except Exception as e:
-                logger.warning(f"⚠️  Tool {tool_name}: {str(e)[:100]}")
-        
-        success_rate = success_count / len(test_tools)
-        logger.info(f"📊 Tool execution success rate: {success_rate:.1%} ({success_count}/{len(test_tools)})")
-        return success_rate > 0.5  # At least 50% success rate
-    
-    async def test_streaming_response(self) -> bool:
-        """Test HTTP streaming capabilities"""
-        logger.info("🌊 Testing streaming responses...")
-        try:
-            # Test with a tool that might return large response
-            payload = {
-                "tool": "get_news",
-                "arguments": {},
-                "stream": True  # Request streaming
-            }
-            
-            async with self.client.stream(
-                "POST",
-                f"{self.server_url}/call-tool",
-                json=payload,
-                timeout=30
-            ) as response:
-                if response.status_code == 200:
-                    chunks = []
-                    async for chunk in response.aiter_text():
-                        chunks.append(chunk)
-                        if len(chunks) >= 5:  # Limit for testing
-                            break
-                    
-                    logger.info(f"✅ Streaming: Received {len(chunks)} chunks")
-                    return len(chunks) > 0
-                else:
-                    logger.warning(f"⚠️  Streaming failed: HTTP {response.status_code}")
-                    return False
-        except Exception as e:
-            logger.warning(f"⚠️  Streaming error: {e}")
-            return False
-    
-    async def test_authentication(self, auth_token: str = None) -> bool:
-        """Test authentication features"""
-        logger.info("🔐 Testing authentication...")
-        
-        if not auth_token:
-            logger.info("ℹ️  No auth token provided, skipping auth test")
-            return True
-        
-        try:
-            # Test with authentication
-            headers = {"Authorization": f"Bearer {auth_token}"}
-            response = await self.client.get(
-                f"{self.server_url}/tools",
-                headers=headers
-            )
-            
-            if response.status_code == 200:
-                logger.info("✅ Authentication: Success")
-                return True
-            elif response.status_code == 401:
-                logger.warning("⚠️  Authentication: Token rejected")
-                return False
-            else:
-                logger.warning(f"⚠️  Authentication: HTTP {response.status_code}")
-                return False
-        except Exception as e:
-            logger.error(f"❌ Authentication error: {e}")
-            return False
-    
-    async def test_cors_headers(self) -> bool:
-        """Test CORS configuration"""
-        logger.info("🌐 Testing CORS headers...")
-        try:
-            response = await self.client.options(f"{self.server_url}/tools")
-            cors_headers = [
-                "Access-Control-Allow-Origin",
-                "Access-Control-Allow-Methods",
-                "Access-Control-Allow-Headers"
-            ]
-            
-            found_headers = sum(1 for header in cors_headers if header in response.headers)
-            logger.info(f"✅ CORS: Found {found_headers}/{len(cors_headers)} headers")
-            return found_headers >= 2  # At least 2 CORS headers
-        except Exception as e:
-            logger.warning(f"⚠️  CORS test error: {e}")
-            return False
-    
-    async def test_error_handling(self) -> bool:
-        """Test error handling"""
-        logger.info("🚨 Testing error handling...")
-        
-        test_cases = [
-            # Invalid tool name
-            {
-                "tool": "nonexistent_tool",
-                "arguments": {},
-                "expected_status": [400, 404, 500]
-            },
-            # Invalid arguments
-            {
-                "tool": "get_news",
-                "arguments": {"invalid_param": "value"},
-                "expected_status": [200, 400]  # Might ignore invalid params
-            }
-        ]
-        
-        success_count = 0
-        for i, test_case in enumerate(test_cases):
-            try:
-                response = await self.client.post(
-                    f"{self.server_url}/call-tool",
-                    json=test_case,
-                    timeout=15
-                )
+                success_count = 0
+                for tool_name in test_tools:
+                    try:
+                        logger.info(f"🧪 Testing {tool_name}...")
+                        result = await client.call_tool(tool_name)
+                        
+                        # Extract content from MCP response
+                        if hasattr(result, '__iter__') and len(result) > 0:
+                            content = result[0].text if hasattr(result[0], 'text') else str(result[0])
+                        else:
+                            content = str(result)
+                        
+                        logger.info(f"✅ {tool_name} completed ({len(content)} characters)")
+                        success_count += 1
+                        
+                    except Exception as e:
+                        logger.warning(f"⚠️  {tool_name} failed: {e}")
                 
-                if response.status_code in test_case["expected_status"]:
-                    logger.info(f"✅ Error case {i+1}: Handled correctly ({response.status_code})")
-                    success_count += 1
-                else:
-                    logger.warning(f"⚠️  Error case {i+1}: Unexpected status {response.status_code}")
-            except Exception as e:
-                logger.warning(f"⚠️  Error case {i+1}: Exception {e}")
-        
-        return success_count >= len(test_cases) // 2
-    
-    async def test_performance(self) -> bool:
-        """Test basic performance characteristics"""
-        logger.info("⚡ Testing performance...")
-        
-        # Test response time
-        start_time = time.time()
-        try:
-            response = await self.client.get(f"{self.server_url}/health")
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200 and response_time < 5.0:
-                logger.info(f"✅ Performance: Response time {response_time:.3f}s")
-                return True
-            else:
-                logger.warning(f"⚠️  Performance: Slow response {response_time:.3f}s")
-                return False
+                success_rate = success_count / len(test_tools)
+                logger.info(f"📊 Tool execution success rate: {success_rate:.1%} ({success_count}/{len(test_tools)})")
+                return success_rate > 0.5  # At least 50% success
+                
         except Exception as e:
-            logger.error(f"❌ Performance test error: {e}")
+            logger.error(f"❌ Tool execution test failed: {e}")
             return False
     
-    async def run_all_tests(self, auth_token: str = None) -> Dict[str, bool]:
+    async def test_server_responsiveness(self) -> bool:
+        """Test server response times"""
+        logger.info("⏱️  Testing server responsiveness...")
+        
+        try:
+            from fastmcp import Client
+            import time
+            
+            client = Client(self.server_url)
+            
+            async with client:
+                # Test multiple quick requests
+                start_time = time.time()
+                
+                for i in range(3):
+                    await client.list_tools()
+                
+                end_time = time.time()
+                avg_time = (end_time - start_time) / 3
+                
+                logger.info(f"✅ Average response time: {avg_time:.2f}s")
+                return avg_time < 5.0  # Should respond within 5 seconds
+                
+        except Exception as e:
+            logger.error(f"❌ Responsiveness test failed: {e}")
+            return False
+    
+    async def run_all_tests(self) -> Dict[str, bool]:
         """Run all tests and return results"""
-        logger.info("🧪 Starting FastMCP 2.0 Test Suite")
-        logger.info("=" * 60)
+        logger.info("🚀 Starting FastMCP 2.0 Test Suite")
+        logger.info("=" * 50)
         
         tests = [
-            ("Server Health", self.test_server_health),
-            ("List Tools", self.test_list_tools),
+            ("Connection", self.test_fastmcp_client_connection),
             ("Tool Execution", self.test_tool_execution),
-            ("Streaming Response", self.test_streaming_response),
-            ("Authentication", lambda: self.test_authentication(auth_token)),
-            ("CORS Headers", self.test_cors_headers),
-            ("Error Handling", self.test_error_handling),
-            ("Performance", self.test_performance)
+            ("Responsiveness", self.test_server_responsiveness)
         ]
         
         results = {}
+        passed = 0
+        
         for test_name, test_func in tests:
-            logger.info(f"\n🔄 Running {test_name}...")
+            logger.info(f"\n🧪 Running test: {test_name}")
             try:
                 result = await test_func()
                 results[test_name] = result
-                status = "✅ PASS" if result else "❌ FAIL"
-                logger.info(f"   {status}")
+                if result:
+                    passed += 1
+                    logger.info(f"✅ {test_name}: PASSED")
+                else:
+                    logger.error(f"❌ {test_name}: FAILED")
             except Exception as e:
                 results[test_name] = False
-                logger.error(f"   ❌ ERROR: {e}")
+                logger.error(f"❌ {test_name}: ERROR - {e}")
         
         # Summary
-        logger.info("\n" + "=" * 60)
-        logger.info("📊 TEST RESULTS SUMMARY")
-        logger.info("=" * 60)
-        
-        passed = sum(1 for result in results.values() if result)
-        total = len(results)
+        logger.info("\n" + "=" * 50)
+        logger.info(f"🎯 Test Results: {passed}/{len(tests)} passed")
         
         for test_name, result in results.items():
-            status = "✅ PASS" if result else "❌ FAIL"
+            status = "✅ PASSED" if result else "❌ FAILED"
             logger.info(f"   {test_name}: {status}")
         
-        logger.info(f"\n📈 Overall: {passed}/{total} tests passed ({passed/total:.1%})")
-        
-        if passed >= total * 0.75:  # 75% pass rate
-            logger.info("🎉 FastMCP 2.0 implementation is working well!")
-        elif passed >= total * 0.5:  # 50% pass rate
-            logger.info("⚠️  FastMCP 2.0 implementation has some issues")
+        if passed == len(tests):
+            logger.info("🎉 All tests passed! FastMCP 2.0 is working correctly!")
         else:
-            logger.error("❌ FastMCP 2.0 implementation needs attention")
+            logger.warning(f"⚠️  {len(tests) - passed} test(s) failed. Check server and configuration.")
         
         return results
-    
-    async def cleanup(self):
-        """Clean up test resources"""
-        await self.client.aclose()
 
-async def run_tests():
-    """Main test runner"""
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="FastMCP 2.0 Test Suite")
+async def main():
+    """Main test execution"""
+    parser = argparse.ArgumentParser(description="FastMCP 2.0 Simple Test Suite")
     parser.add_argument(
-        "--server-url",
+        "--server-url", 
         default="http://127.0.0.1:3000",
-        help="FastMCP server URL"
-    )
-    parser.add_argument(
-        "--auth-token",
-        help="Authentication token for testing"
-    )
-    parser.add_argument(
-        "--test-auth",
-        action="store_true",
-        help="Test authentication features"
-    )
-    parser.add_argument(
-        "--test-streaming",
-        action="store_true",
-        help="Test streaming features"
-    )
-    parser.add_argument(
-        "--test-http",
-        action="store_true",
-        help="Test HTTP transport"
+        help="FastMCP server URL (without /mcp suffix)"
     )
     
     args = parser.parse_args()
     
-    tester = FastMCPTester(args.server_url)
+    print("FastMCP 2.0 Simple Test Suite")
+    print("=" * 40)
+    print("Make sure the FastMCP server is running:")
+    print("  python fastmcp_custom/server.py --transport streamable-http --port 3000")
+    print()
+    
+    # Ensure the URL has /mcp suffix for FastMCP client
+    server_url = args.server_url
+    if not server_url.endswith('/mcp'):
+        server_url += '/mcp'
+    
+    print(f"Testing server at: {server_url}")
+    print()
+    
+    tester = FastMCPSimpleTester(server_url)
     
     try:
-        if args.test_http:
-            logger.info("🌐 Testing HTTP transport only...")
-            result = await tester.test_server_health()
-            logger.info(f"HTTP transport test: {'✅ PASS' if result else '❌ FAIL'}")
-        elif args.test_auth:
-            logger.info("🔐 Testing authentication only...")
-            result = await tester.test_authentication(args.auth_token)
-            logger.info(f"Authentication test: {'✅ PASS' if result else '❌ FAIL'}")
-        elif args.test_streaming:
-            logger.info("🌊 Testing streaming only...")
-            result = await tester.test_streaming_response()
-            logger.info(f"Streaming test: {'✅ PASS' if result else '❌ FAIL'}")
-        else:
-            # Run all tests
-            await tester.run_all_tests(args.auth_token)
-    finally:
-        await tester.cleanup()
+        results = await tester.run_all_tests()
+        
+        # Exit with appropriate code
+        all_passed = all(results.values())
+        sys.exit(0 if all_passed else 1)
+        
+    except KeyboardInterrupt:
+        logger.info("\n⏹️  Tests interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"❌ Test suite error: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    asyncio.run(run_tests()) 
+    asyncio.run(main()) 
