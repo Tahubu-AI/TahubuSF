@@ -28,38 +28,51 @@ logger = logging.getLogger(__name__)
 
 class TahubuSFClient:
     """
-    FastMCP 2.0 HTTP Streaming Client for TahubuSF
-    Provides high-level interface to the TahubuSF MCP server
+    TahubuSF FastMCP 2.0 client for interacting with the Sitefinity API
     """
     
     def __init__(
-        self, 
+        self,
         server_url: str = "http://127.0.0.1:3000/mcp",
-        auth_token: Optional[str] = None,
         use_streaming: bool = True
     ):
+        """
+        Initialize the client
+        
+        Args:
+            server_url: The URL of the FastMCP server
+            use_streaming: Whether to use streaming transport
+        """
         self.server_url = server_url
-        self.auth_token = auth_token
         self.use_streaming = use_streaming
         self.client = None
         
     async def connect(self):
-        """Connect to the FastMCP 2.0 server"""
+        """Connect to the FastMCP server"""
         logger.info(f"Connecting to FastMCP server at {self.server_url}")
         
-        if FASTMCP_AVAILABLE:
-            # Use FastMCP 2.0 native client
-            self.client = Client(self.server_url)
-            logger.info("Connected using FastMCP 2.0 native client")
+        from fastmcp import Client
+        
+        # Create client with appropriate transport
+        if self.use_streaming:
+            self.client = Client(
+                self.server_url,
+                transport="streamable-http"
+            )
         else:
-            logger.error("FastMCP library not available - cannot connect")
-            raise ImportError("FastMCP library required for client functionality")
+            self.client = Client(
+                self.server_url,
+                transport="stdio"
+            )
+            
+        logger.info("Connected to FastMCP server")
     
     async def disconnect(self):
-        """Disconnect from the server"""
+        """Disconnect from the FastMCP server"""
         if self.client:
-            # FastMCP client handles cleanup automatically
-            logger.info("Disconnected from server")
+            await self.client.close()
+            self.client = None
+            logger.info("Disconnected from FastMCP server")
     
     async def list_tools(self) -> list:
         """List available tools on the server"""
@@ -92,9 +105,29 @@ class TahubuSFClient:
         """Get news items from Sitefinity"""
         return await self.call_tool("get_news")
     
-    async def get_blog_posts(self) -> str:
-        """Get blog posts from Sitefinity"""
+    async def get_blog_posts(self) -> Dict[str, Any]:
+        """
+        Get blog posts from Sitefinity
+        
+        Returns:
+            Dict[str, Any]: A dictionary containing:
+                - total_count: Total number of blog posts
+                - posts: List of blog posts with limited properties
+                - has_more: Whether there are more posts available
+        """
         return await self.call_tool("get_blog_posts")
+    
+    async def get_blog_post_by_id(self, post_id: str) -> Dict[str, Any]:
+        """
+        Get a single blog post by its ID
+        
+        Args:
+            post_id: The ID of the blog post to retrieve
+            
+        Returns:
+            Dict[str, Any]: The complete blog post data
+        """
+        return await self.call_tool("get_blog_post_by_id", {"post_id": post_id})
     
     async def create_blog_post(
         self, 
