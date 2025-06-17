@@ -216,6 +216,7 @@ The web interface provides an easy way to test your MCP tools:
 
 - `getNews` - Get news articles
 - `getBlogPosts` - Get blog posts with content
+- `getBlogPostById` - Get a specific blog post by its ID
 - `getPages` - Get standard pages
 - `getSharedContent` - Get shared content blocks
 
@@ -307,14 +308,14 @@ curl http://localhost:8000/api/list-tools
 ```
 ├── tahubu_sf/           # Core library package
 │   ├── api/             # API endpoint modules
-│   │   ├── blogs.py     # Blog-related endpoints
-│   │   ├── news.py      # News-related endpoints
-│   │   ├── pages.py     # Pages and templates endpoints
-│   │   └── sites.py     # Site information endpoints
+│   │   ├── blog_posts.py    # Blog post management endpoints
+│   │   ├── news.py          # News-related endpoints
+│   │   ├── pages.py         # Pages and templates endpoints
+│   │   └── sites.py         # Site information endpoints
 │   ├── config/          # Configuration settings
-│   │   └── settings.py  # URL and app configuration
+│   │   └── settings.py    # URL and app configuration
 │   ├── utils/           # Utility functions
-│   │   ├── http.py      # HTTP request utilities
+│   │   ├── http.py        # HTTP request utilities
 │   │   └── string_utils.py # String manipulation utilities
 │   └── app.py           # Application factory
 │

@@ -149,7 +149,7 @@ python test_fastmcp_client.py
 ==================================================
 ✅ Connected to FastMCP server
 📋 Listing tools...
-✅ Found 28 tools
+✅ Found 29 tools
 🧪 Testing get_sites tool...
 ✅ get_sites completed successfully!
 📄 Full result: Name: Default, LiveUrl: localhost, IsOffline: False
@@ -228,13 +228,15 @@ async with client:
 ### Server Logs
 
 The server provides detailed logging showing:
+
 - Session creation and management
 - MCP request processing
 - Tool execution results
 - Connection lifecycle
 
 Example server output:
-```
+
+```bash
 INFO - Starting MCP server 'TahubuSFAPI FastMCP 2.0' with transport 'streamable-http' on http://127.0.0.1:3000/mcp
 INFO - Created new transport with session ID: abc123...
 INFO - Processing request of type ListToolsRequest
