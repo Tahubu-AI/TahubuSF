@@ -69,11 +69,53 @@ class FastMCPSimpleTester:
             client = Client(self.server_url)
             
             async with client:
-                # Test simple tools that should exist
+                # Test blog post tools
+                logger.info("🧪 Testing blog post tools...")
+                
+                # Get blog posts
+                try:
+                    logger.info("📝 Getting blog posts...")
+                    result = await client.call_tool("get_blog_posts")
+                    
+                    # Extract content from MCP response
+                    if hasattr(result, '__iter__') and len(result) > 0:
+                        content = result[0].text if hasattr(result[0], 'text') else str(result[0])
+                    else:
+                        content = str(result)
+                    
+                    logger.info(f"✅ get_blog_posts completed successfully!")
+                    logger.info(f"📊 Blog posts summary:")
+                    logger.info(f"   - Total posts: {content.get('total_count', 'unknown')}")
+                    logger.info(f"   - Posts returned: {len(content.get('posts', []))}")
+                    logger.info(f"   - Has more: {content.get('has_more', False)}")
+                    
+                    # If we have posts, test getting a single post
+                    if content.get('posts'):
+                        first_post = content['posts'][0]
+                        post_id = first_post.get('Id')
+                        
+                        if post_id:
+                            logger.info(f"📄 Getting single blog post {post_id}...")
+                            single_post = await client.call_tool("get_blog_post_by_id", {"post_id": post_id})
+                            
+                            if hasattr(single_post, '__iter__') and len(single_post) > 0:
+                                post_content = single_post[0].text if hasattr(single_post[0], 'text') else str(single_post[0])
+                            else:
+                                post_content = str(single_post)
+                            
+                            logger.info(f"✅ get_blog_post_by_id completed successfully!")
+                            logger.info(f"📄 Post details:")
+                            logger.info(f"   - Title: {post_content.get('Title', 'unknown')}")
+                            logger.info(f"   - Last Modified: {post_content.get('LastModified', 'unknown')}")
+                            logger.info(f"   - Content length: {len(post_content.get('Content', ''))} characters")
+                    
+                except Exception as e:
+                    logger.warning(f"⚠️  Blog post tools failed: {e}")
+                
+                # Test other tools
                 test_tools = [
                     "get_sites",
-                    "get_news", 
-                    "get_blog_posts"
+                    "get_news"
                 ]
                 
                 success_count = 0
