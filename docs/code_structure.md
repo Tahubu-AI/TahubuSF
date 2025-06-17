@@ -4,26 +4,94 @@ This document outlines the recommended structure for organizing code in the Tahu
 
 ## Package Structure
 
-The project follows a modular structure:
+```
+TahubuSF/
+├── tahubu_sf/
+│   ├── __init__.py
+│   ├── app.py                 # Main FastAPI application
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── blog_posts.py      # Blog post management endpoints
+│   │   ├── news.py           # News item management endpoints
+│   │   ├── lists.py          # List item management endpoints
+│   │   ├── events.py         # Event management endpoints
+│   │   ├── pages.py          # Page management endpoints
+│   │   ├── images.py         # Image management endpoints
+│   │   ├── documents.py      # Document management endpoints
+│   │   ├── videos.py         # Video management endpoints
+│   │   └── shared_content.py # Shared content management endpoints
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── settings.py       # Configuration settings
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── http.py          # HTTP utility functions
+│   └── fastapi/
+│       ├── __init__.py
+│       └── routes.py        # FastAPI route definitions
+├── fastapi_server/
+│   ├── __init__.py
+│   ├── main.py             # FastAPI server entry point
+│   └── routes.py           # FastAPI route handlers
+├── fastmcp_custom/
+│   ├── __init__.py
+│   ├── server.py           # FastMCP server implementation
+│   └── client.py           # FastMCP client implementation
+├── inspector/
+│   ├── index.html         # Inspector web interface
+│   ├── css/
+│   │   └── styles.css     # Inspector styles
+│   └── js/
+│       ├── tools.js       # Tool interaction functions
+│       ├── formatters.js  # Result formatting functions
+│       └── utils.js       # Utility functions
+├── tests/
+│   ├── __init__.py
+│   ├── test_blog_post.py  # Blog post tests
+│   └── test_news.py       # News item tests
+├── docs/
+│   └── code_structure.md  # This file
+├── requirements.txt       # Python dependencies
+└── README.md             # Project documentation
+```
 
-```
-tahubu_sf/
-├── api/                  # API endpoint modules
-│   ├── blogs.py          # Blog-related endpoints
-│   ├── news.py           # News-related endpoints
-│   ├── pages.py          # Pages and templates endpoints
-│   ├── sites.py          # Site information endpoints
-│   └── __init__.py
-├── config/               # Configuration settings
-│   ├── settings.py       # URL and app configuration
-│   └── __init__.py
-├── utils/                # Utility functions
-│   ├── http.py           # HTTP request utilities
-│   └── __init__.py
-└── __init__.py
-app.py                   # Application factory
-run.py                   # Entry point script
-```
+## Key Components
+
+### API Layer (`tahubu_sf/api/`)
+
+- `blog_posts.py`: Handles blog post operations (create, read, update, delete)
+- `news.py`: Manages news item operations
+- `lists.py`: Handles list item operations
+- `events.py`: Manages event operations
+- `pages.py`: Handles page operations
+- `images.py`: Manages image operations
+- `documents.py`: Handles document operations
+- `videos.py`: Manages video operations
+- `shared_content.py`: Handles shared content operations
+
+### Server Layer
+
+- `fastapi_server/`: FastAPI server implementation
+- `fastmcp_custom/`: FastMCP server and client implementation
+
+### Inspector Interface
+
+- `inspector/`: Web-based interface for testing and debugging
+  - `index.html`: Main interface
+  - `js/tools.js`: Tool interaction logic
+  - `js/formatters.js`: Result formatting
+  - `js/utils.js`: Utility functions
+
+### Configuration
+
+- `config/settings.py`: Central configuration management
+- `utils/http.py`: HTTP utility functions
+
+### Testing
+
+- `tests/`: Test suite for API endpoints
+  - `test_blog_post.py`: Blog post tests
+  - `test_news.py`: News item tests
 
 ## Guidelines for Adding New Functionality
 
@@ -101,4 +169,4 @@ def create_app() -> FastMCP:
 2. Implement the feature following the structure guidelines
 3. Add appropriate tests
 4. Update documentation if necessary
-5. Submit a pull request for review 
+5. Submit a pull request for review
