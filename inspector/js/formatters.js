@@ -799,72 +799,117 @@ function formatNewsResults(data) {
 
 // Format blog posts results
 function formatBlogPostsResults(data) {
+    try {
+        if (!data || !data.posts || data.posts.length === 0) {
+            document.getElementById('results-container').innerHTML = '<div class="formatted-results"><p>No blog posts found.</p></div>';
+            return;
+        }
+
+        const totalCount = data.total_count || data.posts.length;
+        const hasMore = data.has_more || false;
+        const posts = data.posts;
+
+        let html = `
+            <div class="formatted-results">
+                <h3>Blog Posts (${totalCount} total${hasMore ? ' - more available' : ''})</h3>
+                <div class="result-list">
+        `;
+
+        posts.forEach(post => {
+            // Format the publication date if it exists
+            const pubDate = post.PublicationDate ? new Date(post.PublicationDate).toLocaleString() : 'Not published';
+            
+            html += `
+                <div class="result-item">
+                    <h3>${post.Title || 'Untitled'}</h3>
+                    <div class="result-property">
+                        <span class="property-name">Publication Date:</span>
+                        <span class="property-value">${pubDate}</span>
+                    </div>
+                    <div class="result-property">
+                        <span class="property-name">URL:</span>
+                        <span class="property-value">${post.ItemDefaultUrl || 'N/A'}</span>
+                    </div>
+                    <div class="result-property">
+                        <span class="property-name">Summary:</span>
+                        <span class="property-value">${post.Summary || 'No summary available'}</span>
+                    </div>
+                    <div class="result-property">
+                        <span class="property-name">ID:</span>
+                        <span class="property-value">${post.Id || 'N/A'}</span>
+                    </div>
+                    <div class="result-property">
+                        <span class="property-name">Comments:</span>
+                        <span class="property-value">${post.AllowComments ? 'Enabled' : 'Disabled'}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+
+        document.getElementById('results-container').innerHTML = html;
+    } catch (error) {
+        console.error('Error formatting blog posts results:', error);
+        document.getElementById('results-container').innerHTML = `
+            <div class="formatted-results">
+                <p>Error formatting results. Raw data:</p>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            </div>
+        `;
+    }
+}
+
+function formatBlogPostById(post) {
     const resultsContainer = document.getElementById('results-container');
     
     try {
-        // Parse the data if it's a string
-        let posts = data;
-        if (typeof data === 'string') {
-            const parsedData = parseStructuredString(data);
-            if (Array.isArray(parsedData)) {
-                // Convert array to expected format with 'value' property
-                posts = { value: parsedData };
-            }
-        }
-        
-        if (!posts || !posts.value || posts.value.length === 0) {
-            resultsContainer.innerHTML = '<pre id="results">No blog posts found.</pre>';
+        if (!post) {
+            resultsContainer.innerHTML = '<pre id="results">Blog post not found.</pre>';
             return;
         }
         
         let formattedOutput = '<div class="formatted-results">';
-        formattedOutput += `<h3>Blog Posts (${posts.value.length} found)</h3>`;
+        formattedOutput += `<h3>${post.Title || 'Untitled Post'}</h3>`;
         
-        posts.value.forEach(post => {
-            formattedOutput += `<div class="result-item">
-                <h3>${post.Title || 'Untitled Post'}</h3>`;
-                
-            if (post.PublicationDate) {
-                const date = new Date(post.PublicationDate).toLocaleString();
+        // Add all post properties
+        for (const [key, value] of Object.entries(post)) {
+            if (key === 'Content') {
+                // For content, show a truncated version with a "Show More" button
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">Published:</span>
+                    <span class="property-name">${key}:</span>
+                    <div class="content-preview">
+                        <div class="content-preview-text">${value.substring(0, 200)}${value.length > 200 ? '...' : ''}</div>
+                        ${value.length > 200 ? '<button class="show-more-btn" onclick="toggleContent(this)">Show More</button>' : ''}
+                        <div class="content-full" style="display: none;">${value}</div>
+                    </div>
+                </div>`;
+            } else if (key === 'PublicationDate') {
+                const date = new Date(value).toLocaleString();
+                formattedOutput += `<div class="result-property">
+                    <span class="property-name">${key}:</span>
                     <span class="property-value">${date}</span>
                 </div>`;
-            }
-            
-            if (post.UrlName) {
+            } else {
                 formattedOutput += `<div class="result-property">
-                    <span class="property-name">URL Name:</span>
-                    <span class="property-value">${post.UrlName}</span>
+                    <span class="property-name">${key}:</span>
+                    <span class="property-value">${value}</span>
                 </div>`;
             }
-            
-            if (post.Summary) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">Summary:</span>
-                    <span class="property-value">${post.Summary}</span>
-                </div>`;
-            }
-
-            if (post.Id) {
-                formattedOutput += `<div class="result-property">
-                    <span class="property-name">ID:</span>
-                    <span class="property-value">${post.Id}</span>
-                </div>`;
-            }
-                
-            formattedOutput += '</div>';
-        });
+        }
         
         formattedOutput += '</div>';
         
         // Update the results container
         resultsContainer.innerHTML = formattedOutput;
     } catch (error) {
-        console.error('Error formatting blog post results:', error);
+        console.error('Error formatting blog post by ID:', error);
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
-        document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        document.getElementById('results').textContent = typeof post === 'string' ? post : JSON.stringify(post, null, 2);
     }
 }
 
@@ -1690,5 +1735,21 @@ function formatPageTemplatesResults(data) {
         // Fallback to showing the raw data
         resultsContainer.innerHTML = '<pre id="results"></pre>';
         document.getElementById('results').textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    }
+}
+
+// Toggle content visibility for blog posts
+function toggleContent(button) {
+    const contentPreview = button.previousElementSibling;
+    const contentFull = button.nextElementSibling;
+    
+    if (contentFull.style.display === 'none') {
+        contentFull.style.display = 'block';
+        contentPreview.style.display = 'none';
+        button.textContent = 'Show Less';
+    } else {
+        contentFull.style.display = 'none';
+        contentPreview.style.display = 'block';
+        button.textContent = 'Show More';
     }
 }
