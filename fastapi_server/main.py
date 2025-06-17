@@ -18,8 +18,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import from our modular architecture
-from tahubu_sf.api.news import get_news
-from tahubu_sf.api.blogs import get_blog_posts
+from tahubu_sf.api.news import get_news, create_news_item
+from tahubu_sf.api.blog_posts import get_blog_posts, get_blog_post_by_id
 from tahubu_sf.api.pages import get_pages, get_page_templates
 from tahubu_sf.api.sites import get_sites
 from tahubu_sf.config.settings import APP_NAME, AUTH_TYPE, API_KEY, USERNAME, AUTH_KEY

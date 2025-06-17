@@ -12,8 +12,7 @@ from pydantic import BaseModel, Field
 
 # Import tool functions
 from tahubu_sf.api.news import get_news, create_news_item  # Assuming create_news_item is defined
-from tahubu_sf.api.blogs import get_blog_posts
-from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
+from tahubu_sf.api.blog_posts import create_blog_post, get_blog_posts, get_blog_post_by_id, get_parent_blogs
 from tahubu_sf.api.lists import get_list_items
 from tahubu_sf.api.list_items import create_list_item, get_parent_lists
 from tahubu_sf.api.calendars import get_events
@@ -70,6 +69,8 @@ TOOL_MAP = {
     "createVideoDraft": create_video,
     "createListItemDraft": create_list_item,
     "createEventDraft": create_event,
+    "getBlogPostById": get_blog_post_by_id,
+    "createBlogPost": create_blog_post,
 }
 
 # Data models
