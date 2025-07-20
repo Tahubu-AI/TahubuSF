@@ -55,6 +55,7 @@ logger = logging.getLogger(__name__)
 
  # Create FastMCP server with basic configuration
 server = FastMCP(name="TahubuSF FastMCP 2.0")
+# server.mount("/mcp", server.http_app(),)
 
 def create_fastmcp_server(
     name: str = f"{APP_NAME} FastMCP 2.0",
@@ -206,9 +207,6 @@ def main():
     else:
         logger.info("Starting STDIO transport...")
         server.run(transport="stdio")
-
-app = FastAPI(title="TahubuSF")
-app.mount("/mcp", server.http_app(), )
 
 if __name__ == "__main__":
     main()
