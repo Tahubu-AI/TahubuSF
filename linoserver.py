@@ -53,6 +53,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+ # Create FastMCP server with basic configuration
+server = FastMCP(name="TahubuSF FastMCP 2.0")
+
 def create_fastmcp_server(
     name: str = f"{APP_NAME} FastMCP 2.0",
     port: int = 3000,
@@ -75,10 +78,6 @@ def create_fastmcp_server(
     """
     logger.info(f"Creating {name} with FastMCP 2.0")
     
-    # Create FastMCP server with basic configuration
-    server = FastMCP(name=name)
-    http_app = server.http_app(transport="streamable-http")
-
     # Configure authentication if requested
     if enable_auth and auth_token:
         logger.info("Authentication enabled")
@@ -208,5 +207,8 @@ def main():
         logger.info("Starting STDIO transport...")
         server.run(transport="stdio")
 
+app = FastAPI(title="TahubuSF")
+app.mount("/mcp", server.http_app(), )
+
 if __name__ == "__main__":
-    main() 
+    main()
