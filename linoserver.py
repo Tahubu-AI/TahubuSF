@@ -19,6 +19,7 @@ if project_root not in sys.path:
 # Now import from the actual fastmcp package (not our local one)
 try:
     from fastmcp import FastMCP
+    from fastapi import FastAPI
 except ImportError:
     print("❌ FastMCP library not found. Please install with: pip install fastmcp")
     sys.exit(1)
@@ -76,7 +77,8 @@ def create_fastmcp_server(
     
     # Create FastMCP server with basic configuration
     server = FastMCP(name=name)
-    
+    http_app = server.http_app(transport="streamable-http")
+
     # Configure authentication if requested
     if enable_auth and auth_token:
         logger.info("Authentication enabled")
@@ -185,9 +187,6 @@ def main():
         auth_token=args.auth_token
     )
 
-     # Expose ASGI app for FastAPI
-     #fastmcp_asgi_app = server.asgi()
-    
     # Log configuration
     logger.info(f"Starting FastMCP 2.0 server:")
     logger.info(f"  Transport: {args.transport}")
