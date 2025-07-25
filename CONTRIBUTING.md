@@ -6,7 +6,7 @@ We are happy to accept contributions to the TahubuSF project in the form of [fee
 
 Are you interested in contributing to the code? We would love your help! However, we do have some guidelines that we need contributors to follow so that we can keep things running smoothly.
 
-Please review the [development approach](./docs/development/development-approach.md) document.
+Please review the [contribuing guidelines and style guide](./docs/contributing/index.md) documents.
 
 ## Submitting issues
 
@@ -20,7 +20,7 @@ Do you have an idea for a feature or a general question about something not cove
 
 ### Reproducing issues
 
-Point us to a [minimalistic project that reproduces this issue (repro)](./docs/development/contributing/repro.md) hosted in a public GitHub repo.
+Point us to a [minimalistic project that reproduces this issue (repro)](./docs/contributing/repro.md) hosted in a public GitHub repo.
 
 We will close this issue if:
 
