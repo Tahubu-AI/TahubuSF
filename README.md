@@ -54,7 +54,7 @@ pip install -r requirements.txt
 
 The TahubuSF application uses environment variables for configuration, the most important being:
 
-- `SITEFINITY_SITE_PREFIX`: Base URL for your Sitefinity site (default: https://thetrainingboss.com)
+- `SITEFINITY_SITE_PREFIX`: Base URL for your Sitefinity site
 
 Set this by creating a `.env` file in the project root:
 
