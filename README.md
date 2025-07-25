@@ -443,3 +443,17 @@ When running the FastAPI server, comprehensive API documentation is available at
 ---
 
 **Ready to integrate Sitefinity with Claude Desktop and web applications!** 🎉
+
+## Professional Services
+
+**Tahubu** offers comprehensive consulting and training services in the following specialized areas:
+
+- **Sitefinity Development & Implementation** - Expert guidance on Progress Sitefinity CMS solutions, architecture, and best practices
+- **Artificial Intelligence Integration** - Strategic AI implementation, workflow optimization, and custom AI solution development  
+- **Model Context Protocol (MCP)** - Advanced consulting on MCP frameworks, integration strategies, and technical implementation
+
+Our experienced team provides tailored solutions to help organizations leverage these cutting-edge technologies effectively. Whether you need strategic guidance, hands-on implementation support, or comprehensive training programs, we deliver results that drive your business forward.
+
+**Ready to get started?** Contact us today to discuss your project requirements and explore how our expertise can benefit your organization.
+
+**Get in Touch:** [https://tahubu.com/contact](https://tahubu.com/contact)
