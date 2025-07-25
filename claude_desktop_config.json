@@ -1,0 +1,13 @@
+{
+    "mcpServers": {
+        "TahubuSF": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "D:\\repos\\TahubuSF",
+                "run",
+                "run.py"
+            ]
+        }
+    }
+} 

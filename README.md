@@ -1,50 +1,8 @@
 ![TahubuSF](media/tahubusf-light.svg)
 
-# TahubuSF - Sitefinity MCP API Server
+# TahubuSF MCP Server
 
-An enterprise-grade MCP server for interacting with Sitefinity APIs.
-
-## Project Structure
-
-```
-├── tahubu_sf/           # Core library package
-│   ├── api/             # API endpoint modules
-│   │   ├── blogs.py     # Blog-related endpoints
-│   │   ├── news.py      # News-related endpoints
-│   │   ├── pages.py     # Pages and templates endpoints
-│   │   └── sites.py     # Site information endpoints
-│   ├── config/          # Configuration settings
-│   │   └── settings.py  # URL and app configuration
-│   ├── utils/           # Utility functions
-│   │   ├── http.py      # HTTP request utilities
-│   │   └── string_utils.py # String manipulation utilities
-│   └── app.py           # Application factory
-│
-├── fastapi_server/      # FastAPI implementation
-│   ├── main.py          # FastAPI application definition
-│   ├── routes.py        # API route definitions
-│   ├── config.py        # Configuration settings
-│   ├── wsgi.py          # WSGI entry point
-│   ├── azure_deploy.py  # Azure deployment utility
-│   └── tests/           # API tests
-│
-├── inspector/           # Web interface for testing
-│   ├── css/             # CSS stylesheets
-│   │   └── styles.css   # Main stylesheet
-│   ├── js/              # JavaScript files
-│   │   ├── utils.js     # Utility functions
-│   │   ├── formatters.js # Result formatters
-│   │   └── tools.js     # Tool interaction functions
-│   └── index.html       # Main HTML page
-│
-├── media/               # Static media files
-├── docs/                # Documentation files
-├── simple_server.py     # Simple HTTP server for testing
-├── run_fastapi.py       # FastAPI server entry point
-├── direct_test.py       # FastAPI testing utility
-├── test_fastapi.py      # API validation tests
-└── run.py               # Entry point for Claude Desktop
-```
+A Model Context Protocol (MCP) server that provides seamless access to **Sitefinity CMS** data and operations. Built with FastMCP 2.x, it offers both MCP integration for Claude Desktop and REST API access for web applications.
 
 ## Environment setup
 
@@ -121,16 +79,18 @@ For a complete list of environment variables, see [Environment Variables Documen
 Sitefinity web services require authentication for most operations. TahubuSF supports three authentication methods:
 
 #### Anonymous Access
+
 For public content or services that don't require authentication:
 
-```
+```bash
 SITEFINITY_AUTH_TYPE=anonymous
 ```
 
 #### API Key Authentication
+
 For web services configured with API key access:
 
-```
+```bash
 SITEFINITY_AUTH_TYPE=apikey
 SITEFINITY_API_KEY=your-api-key-from-sitefinity
 ```
@@ -138,14 +98,16 @@ SITEFINITY_API_KEY=your-api-key-from-sitefinity
 In Sitefinity, generate an API key at: Administration → Settings → Advanced → WebServices → WebServiceAccessKey
 
 #### Access Key
+
 For user-specific authentication:
 
-```
+```bash
 SITEFINITY_AUTH_TYPE=accesskey
 SITEFINITY_AUTH_KEY=your-access-key
 ```
 
 In Sitefinity, you can generate an Access Key by following these steps:
+
 1. Create a user with appropriate permissions for the web service
 2. Navigate to Administration → Users
 3. Click Actions → Generate access key for the specific user
@@ -154,6 +116,7 @@ In Sitefinity, you can generate an Access Key by following these steps:
 For more details, see [Sitefinity's official documentation on generating access keys](https://www.progress.com/documentation/sitefinity-cms/generate-access-key).
 
 Choose the appropriate authentication method based on your Sitefinity's web services configuration:
+
 - For "Anonymous users", use `anonymous`
 - For "API key authentication", use `apikey` 
 - For "Authenticated users", use `accesskey`
@@ -195,120 +158,108 @@ If you encounter dependency conflicts with packages like LangChain, try these so
 
 3. Ensure the correct Python interpreter is being used in VS Code by selecting it from the Python interpreter list.
 
-## Testing & Running Options
+## 🚀 Quick Start
 
-This project offers multiple ways to test and run your MCP server, each optimized for different use cases:
-
-### 1. MCP Inspector (Web Interface for Testing)
-
-To quickly test your MCP tools via the MCP-provided web interface, use the MCP Inspector:
+### For Claude Desktop (MCP Integration)
 
 ```bash
-mcp dev run.py
-```
+# 1. Install dependencies
+pip install -r requirements.txt
 
-### 2. Simple Server (Custom HTTP Server for testing and development)
-
-The simplest and most reliable way to test your MCP tools via a custom HTTP server:
-
-```bash
-python simple_server.py
-```
-
-This starts a custom HTTP server built with Python's standard library that:
-
-- Requires minimal dependencies (avoids MCP tooling conflicts)
-- Serves a web interface for testing all Sitefinity MCP tools
-- Directly executes MCP tools with your modular code structure
-- Opens your browser automatically to the testing interface
-- Is extremely reliable across different Python environments
-
-**Best for**: Daily development and testing when you need a stable experience
-
-#### Inspector Interface Structure
-
-The web interface has been refactored for better maintainability:
-
-- `inspector/`: Root folder for the web interface
-  - `index.html`: Main HTML page
-  - `css/styles.css`: All CSS styles
-  - `js/utils.js`: General utility functions
-  - `js/formatters.js`: Functions for formatting API responses
-  - `js/tools.js`: Functions for interacting with the API
-
-This structure makes it easier to maintain and extend the web interface.
-
-### 3. FastAPI Server Options
-
-#### Option A: Direct Test Script (Easiest)
-
-For quickly testing the FastAPI server without import path issues:
-
-```bash
-python direct_test.py
-```
-
-This script:
-
-- Automatically installs required dependencies if needed
-- Handles Python path issues automatically
-- Opens your browser to the FastAPI server UI
-- Shows real-time logs in the console
-
-#### Option B: Standard Entry Point
-
-The standard way to run the FastAPI server:
-
-```bash
-python run_fastapi.py [--port PORT] [--host HOST]
-```
-
-Example with custom port:
-
-```bash
-python run_fastapi.py --port 9000
-```
-
-#### Option C: Testing with UI and API Tests
-
-```bash
-python test_fastapi.py
-```
-
-This runs the FastAPI server, opens a browser, and executes API tests to verify functionality.
-
-### 3. Claude Desktop Integration
-
-For direct integration with Claude Desktop:
-
-```bash
+# 2. Start MCP server
 python run.py
+
+# 3. Add to Claude Desktop config
 ```
 
-This runs the server with stdio transport using the modular code structure from the `tahubu_sf` package.
+### For Web/API Access
 
-## Entry Points Comparison
+Start the FastAPI server to access tools via HTTP API:
 
-| Entry Point | Command | Best For | Pros | Cons |
-|-------------|---------|----------|------|------|
-| **mcp dev run.py** | `mcp dev run.py` | MCP Inspector | • Quick testing<br>• MCP web interface | • Requires MCP CLI<br>• Limited to MCP tools |
-| **simple_server.py** | `python simple_server.py` | Local development | • Most reliable<br>• No dependency issues<br>• Simple to use | • Basic UI<br>• Not suitable for production |
-| **direct_test.py** | `python direct_test.py` | Testing FastAPI | • Handles import issues<br>• Auto-installs requirements | • Temporary files<br>• More complex |
-| **run_fastapi.py** | `python run_fastapi.py` | Azure deployment prep | • Production-quality API<br>• Swagger docs | • More dependencies<br>• Possible import issues |
-| **test_fastapi.py** | `python test_fastapi.py` | API validation | • Runs tests automatically<br>• Validates responses | • Focuses on testing |
-| **run.py** | `python run.py` | Claude Desktop | • Direct tool execution<br>• MCP integration | • No web interface |
+```bash
+# Production/Standard Use
+cd fastapi_server
+python run.py
 
-### When to Use Each Option
+# Development/Testing (auto-opens browser to Inspector)
+python run_fastapi_dev.py
+```
 
-- **simple_server.py**: When you want reliable, hassle-free testing during development
-- **direct_test.py**: When you want to test the FastAPI implementation without dealing with Python path issues
-- **run_fastapi.py**: When preparing for Azure deployment or need a production-quality API
-- **test_fastapi.py**: When testing API correctness and responses
-- **run.py**: When integrating with Claude Desktop
+The `run_fastapi_dev.py` script provides the easiest way to get started - it automatically:
+- Installs dependencies if needed
+- Starts the FastAPI server  
+- Opens your browser to the Inspector interface
+- Handles cleanup when you stop the server
 
-## Claude Desktop Integration
+#### API Endpoints
 
-To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` file and include the following:
+Once the FastAPI server is running, you can access:
+
+- **API Documentation**: http://localhost:8000/docs
+- **Tool Inspector**: http://localhost:8000/inspector/
+- **Health Check**: http://localhost:8000/health
+- **Run Tools**: http://localhost:8000/api/run-tool
+
+#### Inspector Interface
+
+The web interface provides an easy way to test your MCP tools:
+
+- `inspector/index.html`: Main testing interface
+- `inspector/css/styles.css`: Styling
+- `inspector/js/`: JavaScript modules for tool interaction
+
+## 📋 Available Tools
+
+**28 Sitefinity MCP Tools** including:
+
+### 📰 Content Management
+
+- `getNews` - Get news articles
+- `getBlogPosts` - Get blog posts with content
+- `getBlogPostById` - Get a specific blog post by its ID
+- `getPages` - Get standard pages
+- `getSharedContent` - Get shared content blocks
+
+### 📅 Events & Media
+
+- `getEvents` - Get calendar events
+- `getCalendars` - Get available calendars
+- `getImages` - Get image galleries
+- `getDocuments` - Get document libraries
+
+### 🔧 System Operations
+
+- `getSites` - Get site information
+- `getForms` - Get available forms
+- `getUsers` - Get user accounts
+- `searchContent` - Search across content types
+
+### 🛠️ Administrative
+
+- `createContent` - Create new content
+- `updateContent` - Update existing content
+- `deleteContent` - Delete content
+- `publishContent` - Publish/unpublish content
+
+[View complete tool list with descriptions →](TOOLS.md)
+
+## 🏗️ Architecture
+
+### STDIO Transport (MCP)
+
+```bash
+Claude Desktop → MCP Protocol → STDIO → TahubuSF Server → Sitefinity API
+```
+
+### FastAPI Server (HTTP)
+
+```bash
+Web Browser → HTTP/REST → FastAPI → TahubuSF Tools → Sitefinity API
+```
+
+## ⚙️ Configuration
+
+### Claude Desktop Setup
 
 ```json
 {
@@ -326,32 +277,169 @@ To use the MCP server in Claude desktop, edit the `claude_desktop_config.json` f
 }
 ```
 
-Replace `D:\\repos\\TahubuSF` with the absolute path to your project directory.
+## 🧪 Testing
 
-## Development
-
-### Adding New Endpoints
-
-To add a new API endpoint:
-
-1. Create a new module in the `tahubu_sf/api/` directory
-2. Add the endpoint URL to `tahubu_sf/config/settings.py`
-3. Create your API function using the provided HTTP utilities
-4. Register the function in `tahubu_sf/app.py`
-5. Add it to both `simple_server.py` and `fastapi_server/routes.py` to make it available in both interfaces
-
-For more details, see [Code Structure Guidelines](docs/code_structure.md).
-
-## FastAPI Server Details
-
-For more details on the FastAPI implementation that can be deployed to Azure App Service, see [FastAPI Server Documentation](fastapi_server/README.md).
-
-### Quick Testing
-
-To quickly test the FastAPI server without any import path issues, use the direct test script:
+### Test MCP Server
 
 ```bash
-python direct_test.py
+# Test server functionality
+python -c "from tahubu_sf.app import create_app; app = create_app(); print('✅ MCP Server Working!')"
+
+# Test STDIO transport
+python run.py --verbose
 ```
 
-This is the most reliable way to test the FastAPI server on different Python environments.
+### Test FastAPI Server
+
+```bash
+# Automated testing
+python fastapi_http_test.py
+
+# Manual API testing
+curl http://localhost:8000/health
+curl http://localhost:8000/api/list-tools
+```
+
+## 📂 Project Structure
+
+## Project Structure
+
+```
+├── tahubu_sf/           # Core library package
+│   ├── api/             # API endpoint modules
+│   │   ├── blog_posts.py    # Blog post management endpoints
+│   │   ├── news.py          # News-related endpoints
+│   │   ├── pages.py         # Pages and templates endpoints
+│   │   └── sites.py         # Site information endpoints
+│   ├── config/          # Configuration settings
+│   │   └── settings.py    # URL and app configuration
+│   ├── utils/           # Utility functions
+│   │   ├── http.py        # HTTP request utilities
+│   │   └── string_utils.py # String manipulation utilities
+│   └── app.py           # Application factory
+│
+├── fastapi_server/      # FastAPI implementation
+│   ├── main.py          # FastAPI application definition
+│   ├── routes.py        # API route definitions
+│   ├── config.py        # Configuration settings
+│   ├── wsgi.py          # WSGI entry point
+│   ├── azure_deploy.py  # Azure deployment utility
+│   └── tests/           # API tests
+│
+├── inspector/           # Web interface for testing
+│   ├── css/             # CSS stylesheets
+│   │   └── styles.css   # Main stylesheet
+│   ├── js/              # JavaScript files
+│   │   ├── utils.js     # Utility functions
+│   │   ├── formatters.js # Result formatters
+│   │   └── tools.js     # Tool interaction functions
+│   └── index.html       # Main HTML page
+│
+├── media/               # Static media files
+├── docs/                # Documentation files
+├── run_fastapi_dev.py   # FastAPI development utility to start server and open inspector
+├── fastapi_http_test.py # FastAPI HTTP transport and tool testing utility
+└── run.py               # Entry point for Claude Desktop
+```
+
+## 🚢 Deployment
+
+### Local Development
+
+```bash
+# MCP/Claude Desktop
+python run.py
+
+# Web/API server and Inspector for development
+python run_fastapi_dev.py
+
+# Web/API production server
+cd fastapi_server && python run.py
+```
+
+### Production (HTTP)
+
+```bash
+# FastAPI production server
+cd fastapi_server
+python run.py --host 0.0.0.0 --port 8000
+
+# Or with uvicorn directly
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### Docker Deployment
+
+To deploy the FastAPI server using Docker, create a `Dockerfile` in the `fastapi_server` directory:
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+WORKDIR /app/fastapi_server
+CMD ["python", "run.py", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+## 🔍 API Documentation
+
+When running the FastAPI server, comprehensive API documentation is available at:
+
+- **Interactive Docs**: http://localhost:8000/docs
+- **OpenAPI Schema**: http://localhost:8000/openapi.json
+- **Tool Inspector**: http://localhost:8000/inspector/
+
+## 🛠️ Development
+
+### Adding New Tools
+
+1. Create tool function in `tahubu_sf/api/`
+2. Add MCP tool wrapper in `tahubu_sf/tools/`
+3. Register tool in `tahubu_sf/app.py`
+4. Test with both STDIO and FastAPI
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Submit a pull request
+
+## 📚 Documentation
+
+- [Transport Guide](TRANSPORT_GUIDE.md) - STDIO vs HTTP transport
+- [Tool Reference](TOOLS.md) - Complete tool documentation  
+- [API Guide](API_GUIDE.md) - Sitefinity API integration
+- [Claude Desktop Setup](CLAUDE_DESKTOP_FIX.md) - Configuration guide
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Claude Desktop Connection**
+
+- Verify JSON configuration syntax
+- Check file paths (use double backslashes on Windows)
+- Ensure `uv` is installed and accessible
+
+**FastAPI Server**
+
+- Check port availability with `netstat -an | findstr :8000`
+- Verify Sitefinity API connectivity
+- Review server logs for detailed errors
+
+**Dependencies**
+
+- Run `pip install -r requirements.txt`
+- For `uv`: Run `uv sync` to ensure consistency
+
+### Support
+
+- Check [Issues](https://github.com/your-repo/issues) for known problems
+- Create new issue with detailed error information
+- Include system details and configuration
+
+---
+
+**Ready to integrate Sitefinity with Claude Desktop and web applications!** 🎉

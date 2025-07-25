@@ -89,4 +89,4 @@ async def create_news_item(
         return response
     except Exception as e:
         logger.error(f"Error creating news item draft: {str(e)}")
-        raise Exception(f"Failed to create nes item draft: {str(e)}") from e
+        raise Exception(f"Failed to create news item draft: {str(e)}") from e

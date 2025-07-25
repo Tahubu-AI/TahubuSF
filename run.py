@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-Entry point for running the TahubuSF MCP server
+Entry point for running the TahubuSF MCP server with STDIO transport
+For HTTP/web access, use the FastAPI server in fastapi_server/
 """
 import argparse
 import logging
@@ -33,10 +34,10 @@ def main():
     )
     
     logger.info("Creating TahubuSF MCP server")
-    logger.info("To run in development mode with web interface, use: python simple_server.py")
-    logger.info("Starting in production mode (stdio only)")
+    logger.info("Using STDIO transport for Claude Desktop integration")
+    logger.info("For HTTP/web access, use: cd fastapi_server && python run.py")
     
-    # Run the MCP server with stdio transport
+    # Run the MCP server with STDIO transport (optimal for Claude Desktop)
     mcp.run(transport="stdio")
 
 if __name__ == "__main__":

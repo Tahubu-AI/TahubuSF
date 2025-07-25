@@ -8,7 +8,7 @@
             "name": "MCP Server Debugger (Windows)",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/simple_server.py",
+            "program": "${workspaceFolder}/run_fastapi_dev.py",
             "jinja": true,
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"

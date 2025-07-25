@@ -38,6 +38,16 @@
                         </div>
 
                         <div class="tool-card">
+                            <h2 class="tool-title">Get Blog Post by ID</h2>
+                            <p class="tool-description">Fetch a specific blog post by its ID</p>
+                            <div class="input-group">
+                                <input type="text" id="blogPostId" placeholder="Enter blog post ID">
+                                <button onclick="getBlogPostById(document.getElementById('blogPostId').value)">Get Post</button>
+                            </div>
+                            <span id="blogpostbyid-loading" class="loading hidden"></span>
+                        </div>
+
+                        <div class="tool-card">
                             <h2 class="tool-title">List Items</h2>
                             <p class="tool-description">Fetch list items from Sitefinity</p>
                             <button onclick="runTool('getListItems')">Run Tool</button>

@@ -4,7 +4,7 @@ API endpoints for creating and managing blog posts
 import logging
 import re
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from tahubu_sf.config.settings import ENDPOINTS, CONTENT_TYPES
 from tahubu_sf.utils.http import make_request, make_post_request
@@ -91,4 +91,75 @@ async def get_parent_blogs() -> Dict[str, str]:
         return blogs
     except Exception as e:
         logger.error(f"Error retrieving parent blogs: {str(e)}")
-        return {} 
+        return {}
+
+async def get_blog_post_by_id(post_id: str) -> Dict[str, Any]:
+    """
+    Get a single blog post by its ID.
+    
+    Args:
+        post_id: The ID of the blog post to retrieve
+        
+    Returns:
+        Dict[str, Any]: The complete blog post data
+    """
+    try:
+        endpoint = f"{POSTS_CONTENT_ENDPOINT}({post_id})"
+        data = await make_request(endpoint)
+        return data
+    except Exception as e:
+        logger.error(f"Error retrieving blog post {post_id}: {str(e)}")
+        raise Exception(f"Failed to retrieve blog post: {str(e)}") from e
+
+async def get_blog_posts() -> Dict[str, Any]:
+    """
+    Get blog posts from the Sitefinity site with pagination support.
+    
+    Returns:
+        Dict[str, Any]: A dictionary containing:
+            - total_count: Total number of blog posts
+            - posts: List of blog posts with limited properties
+            - has_more: Boolean indicating if there are more posts
+    """
+    try:
+        # Get posts with count included in the response
+        data = await make_request(
+            POSTS_CONTENT_ENDPOINT,
+            params={
+                "$count": "true",
+                "$select": "Id,PublicationDate,Title,ItemDefaultUrl,AllowComments,Summary,ParentId,Content"
+            }
+        )
+        
+        # Process posts to handle summary/content
+        posts = []
+        for post in data.get("value", []):
+            # Get summary or first 100 chars of content
+            summary = post.get("Summary", "")
+            if not summary and "Content" in post:
+                content = post.get("Content", "")
+                # Remove HTML tags for summary
+                content = re.sub(r'<[^>]+>', '', content)
+                summary = content[:100] + "..." if len(content) > 100 else content
+            
+            # Create post with limited properties
+            processed_post = {
+                "Id": post.get("Id"),
+                "PublicationDate": post.get("PublicationDate"),
+                "Title": post.get("Title"),
+                "ItemDefaultUrl": post.get("ItemDefaultUrl"),
+                "AllowComments": post.get("AllowComments"),
+                "Summary": summary,
+                "ParentId": post.get("ParentId")
+            }
+            posts.append(processed_post)
+        
+        return {
+            "total_count": data.get("@odata.count", 0),
+            "posts": posts,
+            "has_more": "@odata.nextLink" in data
+        }
+        
+    except Exception as e:
+        logger.error(f"Error retrieving blog posts: {str(e)}")
+        raise Exception(f"Failed to retrieve blog posts: {str(e)}") from e 

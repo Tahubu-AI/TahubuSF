@@ -3,7 +3,7 @@
  */
 
 // Run a tool with the given name
-async function runTool(toolName) {
+async function runTool(toolName, params = {}) {
     // Show loading indicator
     const loaderId = toolName.toLowerCase().replace('get', '').replace('create', '') + "-loading";
     const loaderElement = document.getElementById(loaderId);
@@ -26,7 +26,7 @@ async function runTool(toolName) {
             },
             body: JSON.stringify({
                 name: toolName,
-                params: {}
+                params: params
             }),
         });
         
@@ -69,6 +69,9 @@ async function runTool(toolName) {
             } else if (toolName === 'getBlogPosts' && result) {
                 // Format blog posts in a more readable way
                 formatBlogPostsResults(result);
+            } else if (toolName === 'getBlogPostById' && result) {
+                // Format single blog post in a more readable way
+                formatBlogPostById(result);
             } else if (toolName === 'getListItems' && result) {
                 // Format list Items in a more readable way
                 formatListItemsResults(result);
@@ -544,3 +547,18 @@ function closeListsEditor() {
 function closeEventEditor() {
     document.getElementById('eventEditorModal').style.display = 'none';
 } 
+
+// Add function to get blog post by ID
+async function getBlogPostById(postId) {
+    if (!postId) {
+        alert('Please enter a blog post ID');
+        return;
+    }
+    
+    try {
+        await runTool('getBlogPostById', { post_id: postId });
+    } catch (error) {
+        console.error('Error getting blog post:', error);
+        alert('Error getting blog post: ' + error.message);
+    }
+}

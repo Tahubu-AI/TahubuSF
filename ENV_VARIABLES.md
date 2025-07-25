@@ -86,10 +86,10 @@ $env:SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com"
 $env:SITEFINITY_AUTH_TYPE="apikey"
 $env:SITEFINITY_API_KEY="your-api-key"
 $env:RETRY_MAX_ATTEMPTS="3"
-python simple_server.py
+python run_fastapi_dev.py
 
 # Linux/macOS
-SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com" SITEFINITY_AUTH_TYPE="apikey" SITEFINITY_API_KEY="your-api-key" RETRY_MAX_ATTEMPTS="3" python simple_server.py
+SITEFINITY_SITE_PREFIX="https://your-sitefinity-site.com" SITEFINITY_AUTH_TYPE="apikey" SITEFINITY_API_KEY="your-api-key" RETRY_MAX_ATTEMPTS="3" python run_fastapi_dev.py
 ```
 
 ## Environment Variables in Azure

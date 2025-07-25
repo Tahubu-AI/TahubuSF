@@ -3,7 +3,7 @@ API routes for the FastAPI server
 """
 import logging
 import json
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Optional
 from datetime import datetime
 
 from fastapi import APIRouter, Request, HTTPException
@@ -12,8 +12,7 @@ from pydantic import BaseModel, Field
 
 # Import tool functions
 from tahubu_sf.api.news import get_news, create_news_item  # Assuming create_news_item is defined
-from tahubu_sf.api.blogs import get_blog_posts
-from tahubu_sf.api.blog_posts import create_blog_post, get_parent_blogs
+from tahubu_sf.api.blog_posts import create_blog_post, get_blog_posts, get_blog_post_by_id, get_parent_blogs
 from tahubu_sf.api.lists import get_list_items
 from tahubu_sf.api.list_items import create_list_item, get_parent_lists
 from tahubu_sf.api.calendars import get_events
@@ -70,6 +69,8 @@ TOOL_MAP = {
     "createVideoDraft": create_video,
     "createListItemDraft": create_list_item,
     "createEventDraft": create_event,
+    "getBlogPostById": get_blog_post_by_id,
+    "createBlogPost": create_blog_post,
 }
 
 # Data models
@@ -86,17 +87,92 @@ class ToolInfo(BaseModel):
     """Information about a tool"""
     name: str
     description: str
+    schema: Dict[str, Any] = {}  # Parameter schema information
 
 class ToolListResponse(BaseModel):
     """Response model for tool listing"""
     tools: List[ToolInfo]
+
+# Define tool schemas for better discoverability
+TOOL_SCHEMAS = {
+    "createBlogPostDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the blog post"},
+            "content": {"type": "string", "description": "The main content of the blog post (HTML supported)"},
+            "summary": {"type": "string", "description": "A short summary of the blog post"},
+            "parent_id": {"type": "string", "description": "The ID of the parent blog (use getParentBlogs to find)"},
+            "allow_comments": {"type": "boolean", "description": "Whether to allow comments", "default": True}
+        },
+        "required": ["title", "content", "parent_id"]
+    },
+    "createListItemDraft": {
+        "type": "object", 
+        "properties": {
+            "title": {"type": "string", "description": "The title of the list item"},
+            "content": {"type": "string", "description": "The main content of the list item"},
+            "parent_id": {"type": "string", "description": "The ID of the parent list (use getParentLists to find)"}
+        },
+        "required": ["title", "content", "parent_id"]
+    },
+    "createEventDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the event"},
+            "content": {"type": "string", "description": "The description of the event"},
+            "summary": {"type": "string", "description": "A short summary of the event"},
+            "eventstart": {"type": "string", "format": "date-time", "description": "Event start date/time (ISO format)"},
+            "eventend": {"type": "string", "format": "date-time", "description": "Event end date/time (ISO format)"},
+            "parent_id": {"type": "string", "description": "The ID of the parent calendar (use getCalendars to find)"}
+        },
+        "required": ["title", "content", "parent_id"]
+    },
+    "createNewsItemDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the news item"},
+            "content": {"type": "string", "description": "The main content of the news item (HTML supported)"},
+            "summary": {"type": "string", "description": "A short summary of the news item"},
+            "allow_comments": {"type": "boolean", "description": "Whether to allow comments", "default": True}
+        },
+        "required": ["title", "content"]
+    },
+    "createImageDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the image"},
+            "dalle_prompt": {"type": "string", "description": "DALL-E prompt for generating the image"},
+            "parent_id": {"type": "string", "description": "The ID of the parent album (use getAlbums to find)"}
+        },
+        "required": ["title", "dalle_prompt", "parent_id"]
+    },
+    "createDocumentDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the document"},
+            "content": {"type": "string", "description": "The content of the document"},
+            "summary": {"type": "string", "description": "A short summary of the document"},
+            "parent_id": {"type": "string", "description": "The ID of the parent document library (use getDocumentLibraries to find)"}
+        },
+        "required": ["title", "content", "parent_id"]
+    },
+    "createVideoDraft": {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string", "description": "The title of the video"},
+            "content": {"type": "string", "description": "The description of the video"},
+            "parent_id": {"type": "string", "description": "The ID of the parent video library (use getVideoLibraries to find)"}
+        },
+        "required": ["title", "content", "parent_id"]
+    }
+}
 
 # Blog post specific models
 class BlogPostDraftRequest(BaseModel):
     """Request model for creating a blog post draft"""
     title: str
     content: str
-    summary: str = None
+    summary: Optional[str] = None
     parent_id: str
     allow_comments: bool = True
 
@@ -111,8 +187,8 @@ class EventDraftRequest(BaseModel):
     title: str
     content: str
     summary: str
-    eventstart: datetime
-    eventend: datetime
+    eventstart: Optional[datetime] = None
+    eventend: Optional[datetime] = None
     parent_id: str
 
 class ImageDraftRequest(BaseModel):
@@ -126,7 +202,7 @@ class DocumentDraftRequest(BaseModel):
     title: str
     content: str
     parent_id: str
-    summary: str = None
+    summary: Optional[str] = None
 
 class VideoDraftRequest(BaseModel):
     """Request model for creating a video draft"""
@@ -134,33 +210,270 @@ class VideoDraftRequest(BaseModel):
     content: str
     parent_id: str
 
-class ContentResponse(BaseModel):
-    """Response model for created content"""
-    id: str
-    title: str
-    url_name: str
-    status: str
+# class ContentResponse(BaseModel):
+#     """Response model for created content"""
+#     id: str
+#     title: str
+#     url_name: str
+#     status: str
+
+async def _execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Internal function that executes any tool with given parameters.
+    This is the single source of truth for tool execution logic.
+    """
+    logger.info(f"Executing tool: {tool_name} with params: {params}")
+    
+    if tool_name not in TOOL_MAP:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown tool: {tool_name}"
+        )
+        
+    # For creation tools, call the underlying API functions directly
+    if tool_name == "createBlogPostDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        summary = params.get("summary")
+        parent_id = params.get("parent_id")
+        allow_comments = params.get("allow_comments", True)
+        
+        # Validate required parameters
+        if not title or not content or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_blog_post(
+            title=title,
+            content=content,
+            summary=summary,
+            parent_id=parent_id,
+            allow_comments=allow_comments
+        )
+        
+        return result
+    
+    elif tool_name == "createListItemDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        parent_id = params.get("parent_id")
+        
+        # Validate required parameters
+        if not title or not content or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_list_item(
+            title=title,
+            content=content,
+            parent_id=parent_id,
+        )
+        
+        return result
+    
+    elif tool_name == "createEventDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        summary = params.get("summary")
+        parent_id = params.get("parent_id")
+        event_start = params.get("eventstart")
+        event_end = params.get("eventend")
+        
+        # Validate required parameters
+        if not title or not content or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_event(
+            title=title,
+            content=content,
+            summary=summary,
+            parent_id=parent_id,
+            eventstart=event_start,
+            eventend=event_end
+        )
+        
+        return result
+    
+    elif tool_name == "createNewsItemDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        summary = params.get("summary")
+        allow_comments = params.get("allow_comments", True)
+        
+        # Validate required parameters
+        if not title or not content:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_news_item(
+            title=title,
+            content=content,
+            summary=summary,
+            allow_comments=allow_comments
+        )
+        
+        return result
+    
+    elif tool_name == "createImageDraft":
+        # Extract required parameters
+        title = params.get("title")
+        dalle_prompt = params.get("dalle_prompt")
+        parent_id = params.get("parent_id")
+        
+        # Validate required parameters
+        if not title or not dalle_prompt or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not dalle_prompt:
+                missing.append("dalle_prompt")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_image(
+            title=title,
+            dalle_prompt=dalle_prompt,
+            parent_id=parent_id
+        )
+        
+        return result
+    
+    elif tool_name == "createDocumentDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        parent_id = params.get("parent_id")
+        summary = params.get("summary")
+        
+        # Validate required parameters
+        if not title or not content or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_document(
+            title=title,
+            content=content,
+            summary=summary,
+            parent_id=parent_id
+        )
+        
+        return result
+    
+    elif tool_name == "createVideoDraft":
+        # Extract required parameters
+        title = params.get("title")
+        content = params.get("content")
+        parent_id = params.get("parent_id")
+        
+        # Validate required parameters
+        if not title or not content or not parent_id:
+            missing = []
+            if not title:
+                missing.append("title")
+            if not content:
+                missing.append("content")
+            if not parent_id:
+                missing.append("parent_id")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required parameters: {', '.join(missing)}"
+            )
+        
+        # Call the underlying API function directly
+        result = await create_video(
+            title=title,
+            content=content,
+            parent_id=parent_id
+        )
+        
+        return result
+    
+    else:
+        # For read-only tools, run the function directly (these work fine)
+        result = await TOOL_MAP[tool_name](**params)
+        return result
 
 @router.post("/run-tool")
 async def run_tool(request: ToolRequest):
-    """Execute a tool directly with provided parameters"""
+    """
+    Execute any MCP tool directly with provided parameters.
+    
+    This is the MCP-compatible unified endpoint that handles all 28 tools.
+    Use this endpoint for:
+    - MCP client integration
+    - Multi-tool automation
+    - Consistent tool execution pattern
+    
+    For traditional REST API usage, use the specific endpoints instead:
+    - POST /api/blog-posts/draft for blog posts
+    - POST /api/events/draft for events  
+    - etc.
+    """
     try:
-        tool_name = request.name
-        params = request.params
-        
-        logger.info(f"Running tool: {tool_name} with params: {params}")
-        
-        if tool_name not in TOOL_MAP:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Unknown tool: {tool_name}"
-            )
-            
-        # Run the tool function
-        result = await TOOL_MAP[tool_name](**params)
-        
-        # Return a JSON response directly to handle any result type
+        result = await _execute_tool(request.name, request.params)
         return {"result": result}
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions (they have proper status codes)
+        raise
     except Exception as e:
         logger.exception(f"Error running tool: {str(e)}")
         raise HTTPException(
@@ -168,34 +481,32 @@ async def run_tool(request: ToolRequest):
             detail=f"Error running tool: {str(e)}"
         )
 
-@router.post("/blog-posts/draft", response_model=ContentResponse)
+@router.post("/blog-posts/draft")
 async def create_blog_draft(request: BlogPostDraftRequest):
-    """Create a new blog post draft"""
+    """
+    Create a new blog post draft (REST endpoint).
+    
+    This is a traditional REST API endpoint with Pydantic validation.
+    For MCP clients, use POST /api/run-tool with tool name 'createBlogPostDraft' instead.
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating blog post draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent blog ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "content": request.content,
+            "summary": request.summary,
+            "parent_id": request.parent_id,
+            "allow_comments": request.allow_comments
+        }
         
-        result = await create_blog_post(
-            title=request.title,
-            content=request.content,
-            summary=request.summary,
-            parent_id=request.parent_id,
-            allow_comments=request.allow_comments
-        )
+        result = await _execute_tool("createBlogPostDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating blog post draft: {str(e)}")
         raise HTTPException(
@@ -203,32 +514,26 @@ async def create_blog_draft(request: BlogPostDraftRequest):
             detail=f"Error creating blog post draft: {str(e)}"
         )
 
-@router.post("/list-items/draft", response_model=ContentResponse)
+@router.post("/list-items/draft")
 async def create_list_item_draft(request: ListItemDraftRequest):
-    """Create a new list item draft"""
+    """Create a new list item draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating list item draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent list ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "content": request.content,
+            "parent_id": request.parent_id
+        }
         
-        result = await create_list_item(
-            title=request.title,
-            content=request.content,
-            parent_id=request.parent_id
-        )
+        result = await _execute_tool("createListItemDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating list item draft: {str(e)}")
         raise HTTPException(
@@ -236,35 +541,29 @@ async def create_list_item_draft(request: ListItemDraftRequest):
             detail=f"Error creating list item draft: {str(e)}"
         )
 
-@router.post("/events/draft", response_model=ContentResponse)
+@router.post("/events/draft")
 async def create_event_draft(request: EventDraftRequest):
-    """Create a new event draft"""
+    """Create a new event draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating event draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent calendar ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "content": request.content,
+            "summary": request.summary,
+            "parent_id": request.parent_id,
+            "eventstart": request.eventstart,
+            "eventend": request.eventend
+        }
         
-        result = await create_event(
-            title=request.title,
-            content=request.content,
-            summary=request.summary,
-            eventstart=request.eventstart,
-            eventend=request.eventend,
-            parent_id=request.parent_id
-        )
+        result = await _execute_tool("createEventDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating event draft: {str(e)}")
         raise HTTPException(
@@ -272,32 +571,26 @@ async def create_event_draft(request: EventDraftRequest):
             detail=f"Error creating event draft: {str(e)}"
         )
 
-@router.post("/images/draft", response_model=ContentResponse)
+@router.post("/images/draft")
 async def create_image_draft(request: ImageDraftRequest):
-    """Create a new image draft"""
+    """Create a new image draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating image draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent album ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "dalle_prompt": request.dalle_prompt,
+            "parent_id": request.parent_id
+        }
         
-        result = await create_image(
-            title=request.title,
-            dalle_prompt=request.dalle_prompt,
-            parent_id=request.parent_id
-        )
+        result = await _execute_tool("createImageDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating image draft: {str(e)}")
         raise HTTPException(
@@ -305,33 +598,27 @@ async def create_image_draft(request: ImageDraftRequest):
             detail=f"Error creating image draft: {str(e)}"
         )
 
-@router.post("/documents/draft", response_model=ContentResponse)
+@router.post("/documents/draft")
 async def create_document_draft(request: DocumentDraftRequest):
-    """Create a new document draft"""
+    """Create a new document draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating document draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent document library ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "content": request.content,
+            "parent_id": request.parent_id,
+            "summary": request.summary
+        }
         
-        result = await create_document(
-            title=request.title,
-            content=request.content,
-            summary=request.summary,
-            parent_id=request.parent_id
-        )
+        result = await _execute_tool("createDocumentDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating document draft: {str(e)}")
         raise HTTPException(
@@ -339,32 +626,26 @@ async def create_document_draft(request: DocumentDraftRequest):
             detail=f"Error creating document draft: {str(e)}"
         )
 
-@router.post("/videos/draft", response_model=ContentResponse)
+@router.post("/videos/draft")
 async def create_video_draft(request: VideoDraftRequest):
-    """Create a new video draft"""
+    """Create a new video draft (REST endpoint)
+    
+    Returns the raw Sitefinity API response with all available properties.
+    """
     try:
         logger.info(f"Creating video draft: {request.title}")
         
-        # Validate required fields
-        if not request.parent_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Parent video library ID (parent_id) is required"
-            )
+        # Convert Pydantic model to params dict and delegate to shared execution logic
+        params = {
+            "title": request.title,
+            "content": request.content,
+            "parent_id": request.parent_id
+        }
         
-        result = await create_video(
-            title=request.title,
-            content=request.content,
-            parent_id=request.parent_id
-        )
+        result = await _execute_tool("createVideoDraft", params)
         
-        # Extract ID and other info from result
-        return ContentResponse(
-            id=result.get("Id", "unknown"),
-            title=request.title,
-            url_name=result.get("UrlName", ""),
-            status="draft"
-        )
+        # Return raw Sitefinity API response with all properties
+        return result
     except Exception as e:
         logger.exception(f"Error creating video draft: {str(e)}")
         raise HTTPException(
@@ -446,13 +727,20 @@ async def get_video_library_list():
 
 @router.get("/list-tools", response_model=ToolListResponse)
 async def list_tools():
-    """List all available tools"""
+    """List all available tools with descriptions and parameter schemas"""
     tools = []
     
     for name, func in TOOL_MAP.items():
+        # Get tool description from docstring
+        description = func.__doc__.strip() if func.__doc__ else "No description available"
+        
+        # Get parameter schema if available
+        schema = TOOL_SCHEMAS.get(name, {})
+        
         tools.append(ToolInfo(
             name=name,
-            description=func.__doc__.strip() if func.__doc__ else "No description available"
+            description=description,
+            schema=schema
         ))
         
     return ToolListResponse(tools=tools) 

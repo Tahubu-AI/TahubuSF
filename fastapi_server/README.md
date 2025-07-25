@@ -34,17 +34,16 @@ fastapi_server/
 
 ### Running Locally
 
-To run the server locally:
+To directly run the FastAPI server directly, execute the following command from the project root:
 
 ```bash
-python run_fastapi.py --port 8000
+cd fastapi_server && python run.py --port 8000
 ```
 
-Or directly:
+Or run the server locally for development and launch the Inspector, execute the following command from the project root:
 
 ```bash
-cd fastapi_server
-uvicorn main:app --reload
+python run_fastapi_dev.py
 ```
 
 ### API Documentation
@@ -114,8 +113,8 @@ For more details on environment variables, see [Environment Variables Documentat
 
 ## Testing
 
-Run tests using pytest:
+Run tests against a running FastAPI server instance:
 
 ```bash
-python test_fastapi.py
+python fastapi_http_test.py
 ```
