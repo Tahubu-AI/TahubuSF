@@ -302,7 +302,6 @@ curl http://localhost:8000/api/list-tools
 
 ## 📂 Project Structure
 
-```
 ## Project Structure
 
 ```

@@ -1,0 +1,21 @@
+SITEFINITY_SITE_PREFIX=http://localhost:44350
+
+# Authentication options:
+# Option 1: Anonymous access
+#SITEFINITY_AUTH_TYPE=anonymous
+
+# Option 2: API key authentication (for web services)
+#SITEFINITY_AUTH_TYPE=apikey
+#SITEFINITY_API_KEY=SitefinityApiKey
+
+# Option 3: Access Key (for user-specific auth)
+SITEFINITY_AUTH_TYPE=accesskey
+SITEFINITY_AUTH_KEY=
+
+# Retry strategy settings
+RETRY_MAX_ATTEMPTS=3
+RETRY_MIN_SECONDS=1
+RETRY_MAX_SECONDS=5
+
+# Server settings
+PORT=7777
